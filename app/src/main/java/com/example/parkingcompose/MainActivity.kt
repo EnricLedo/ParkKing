@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,10 +24,23 @@ import com.example.parkingcompose.ui.theme.DaleComposeTheme
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat.startActivity
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 
 
 class MainActivity : ComponentActivity() {
@@ -36,19 +48,75 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             DaleComposeTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    GreetingImage()
+                val navController = rememberNavController()
+                val navigateAction = remember(navController) {
+                    NavigationActions(navController)
                 }
+                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                val selectedDestination = navBackStackEntry?.destination?.route ?: MyAppRoute.HOME
+
+                MyAppContent(
+                    navController = navController,
+                    selectedDestination = selectedDestination,
+                    navigateTopLevelDestination = navigateAction::navigateTo
+                )
             }
         }
     }
 }
 
+@Composable
+fun MyAppContent(
+    modifier: Modifier = Modifier,
+    navController: NavHostController,
+    selectedDestination: String,
+    navigateTopLevelDestination: (MyAppTopLevelDestination) -> Unit
+) {
+    Row(modifier = modifier.fillMaxSize()) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            NavHost(
+                modifier = Modifier.weight(1f),
+                navController = navController,
+                startDestination = MyAppRoute.HOME
+            ) {
+                composable(MyAppRoute.HOME) {
+                    GreetingImage()
+                }
+                composable(MyAppRoute.ACCOUNT) {
+                    AccountScreen()
+                }
+                composable(MyAppRoute.SETTINGS) {
+                    SettingsScreen()
+                }
+            }
+            MyAppBottomNavigation(
+                selectedDestination = selectedDestination,
+                navigateTopLevelDestination = navigateTopLevelDestination
+            )
+        }
+    }
+}
 
+@Composable
+fun MyAppBottomNavigation(
+    selectedDestination: String,
+    navigateTopLevelDestination: (MyAppTopLevelDestination) -> Unit
+) {
+    NavigationBar(modifier = Modifier.fillMaxWidth()) {
+        TOP_LEVEL_DESTINATIONS.forEach { destinations ->
+            NavigationBarItem(
+                selected = selectedDestination == destinations.route,
+                onClick = { navigateTopLevelDestination(destinations) },
+                icon = {
+                    Icon(
+                        imageVector = destinations.selectedIcon,
+                        contentDescription = stringResource(id = destinations.iconTextId)
+                    )
+                }
+            )
+        }
+    }
+}
 
 @Composable
 fun GreetingImage(modifier: Modifier = Modifier){
