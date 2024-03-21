@@ -19,6 +19,10 @@ dependencyResolutionManagement {
     }
 }
 
+<<<<<<< HEAD
 rootProject.name = "crud2"
+=======
+rootProject.name = "ParkingCompose"
+>>>>>>> cb479210994fd1fb70a91de3ddef2e61e12b316f
 include(":app")
  

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "84528945230",
+    "project_id": "parkking-dffdc",
+    "storage_bucket": "parkking-dffdc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:84528945230:android:c7feae14d71ddea6da8b1f",
+        "android_client_info": {
+          "package_name": "com.example.parkingcompose"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB4PjESkZeDjRa5jKOKqx4_VvSlAb016vo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

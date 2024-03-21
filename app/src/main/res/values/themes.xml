@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+<<<<<<< HEAD
     <style name="Theme.Crud2" parent="android:Theme.Material.Light.NoActionBar" />
+=======
+    <style name="Theme.DaleCompose" parent="android:Theme.Material.Light.NoActionBar" />
+>>>>>>> cb479210994fd1fb70a91de3ddef2e61e12b316f
 </resources>

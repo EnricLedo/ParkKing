@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+<<<<<<< HEAD
     id ("kotlin-android")
     id ("kotlin-kapt")
 }
@@ -12,6 +13,17 @@ android {
 
     defaultConfig {
         applicationId = "com.copernic.crud2"
+=======
+    id("com.google.gms.google-services")
+}
+
+android {
+    namespace = "com.example.parkingcompose"
+    compileSdk = 34
+
+    defaultConfig {
+        applicationId = "com.example.parkingcompose"
+>>>>>>> cb479210994fd1fb70a91de3ddef2e61e12b316f
         minSdk = 24
         targetSdk = 34
         versionCode = 1
@@ -53,6 +65,7 @@ android {
 }
 
 dependencies {
+<<<<<<< HEAD
     implementation("io.coil-kt:coil-compose:2.6.0")
     implementation("com.google.accompanist:accompanist-coil:0.15.0")
     implementation("io.coil-kt:coil-compose:1.4.0")
@@ -67,6 +80,10 @@ dependencies {
     implementation("androidx.room:room-runtime:2.6.1") // Reemplaza con la última versión estable de Room cuando la encuentres
     kapt("androidx.room:room-compiler:2.6.1") // Utiliza la misma versión que room-runtime para compatibilidad
     implementation("androidx.room:room-ktx:2.6.1") // Kotlin Extensions para Room
+=======
+
+
+>>>>>>> cb479210994fd1fb70a91de3ddef2e61e12b316f
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -75,6 +92,17 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+<<<<<<< HEAD
+=======
+    implementation(libs.play.services.maps)
+    implementation(libs.play.services.location)
+    implementation("com.google.maps.android:maps-compose:4.3.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.0")
+    implementation(libs.firebase.auth.ktx)
+    implementation(platform("com.google.firebase:firebase-bom:32.7.4"))
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.navigation.runtime.ktx)
+>>>>>>> cb479210994fd1fb70a91de3ddef2e61e12b316f
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
