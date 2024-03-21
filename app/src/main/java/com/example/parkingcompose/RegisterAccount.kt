@@ -1,7 +1,10 @@
 package com.example.parkingcompose
 
+import android.content.ContentValues.TAG
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
@@ -16,7 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-
+import com.example.parkingcompose.data.User
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,9 +36,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import com.example.parkingcompose.data.Rol
 import com.example.parkingcompose.ui.theme.DaleComposeTheme
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.*
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 
 class RegisterAccount : ComponentActivity() {
@@ -84,6 +89,7 @@ fun RegisterActivityCompose() {
             value = email,
             onValueChange = { email = it },
             label = { Text("Email") },
+
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -114,7 +120,8 @@ fun RegisterActivityCompose() {
         Button(
             onClick = {
                 if (password.text == repeatPassword.text && email.text.isNotEmpty() && password.text.isNotEmpty()) {
-                    register(auth, email.text, password.text)
+                    register(auth, email.text, password.text, localContext)
+
                 }
             },
             modifier = Modifier.fillMaxWidth()
@@ -136,13 +143,40 @@ fun RegisterActivityCompose() {
     }
 }
 
-private fun register(auth: FirebaseAuth, email: String, password: String) {
+private fun register(auth: FirebaseAuth, email: String, password: String, localContext: Context) {
     auth.createUserWithEmailAndPassword(email, password)
         .addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                // Aquí debes manejar la navegación a la pantalla de inicio de sesión
+                val displayName = task.result.user?.email?.split("@")?.get(0)
+                createUser(displayName.toString())
+                val intent = Intent(localContext, Login::class.java)
+                ContextCompat.startActivity(localContext, intent, null)
             } else {
                 // Aquí debes mostrar el mensaje de error
             }
+        }
+}
+
+private fun createUser(displayName: String){
+    val auth = Firebase.auth
+    val userId = auth.currentUser?.uid
+
+    val user = User(
+        username = "",
+        email = auth.currentUser?.email.toString(),
+        rol = Rol.User,
+        id = userId.toString()
+
+    ).toMap()
+    val db = FirebaseFirestore.getInstance()
+
+    // Añade un nuevo documento a la colección "users"
+    db.collection("users")
+        .add(user)
+        .addOnSuccessListener { documentReference ->
+            Log.d(TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
+        }
+        .addOnFailureListener { e ->
+            Log.w(TAG, "Error adding document", e)
         }
 }

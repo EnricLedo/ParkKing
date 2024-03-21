@@ -46,6 +46,10 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+    override fun onBackPressed() {
+        super.onBackPressed()
+        this.moveTaskToBack(true)
+    }
 }
 
 
@@ -108,7 +112,7 @@ fun GreetingImage(modifier: Modifier = Modifier){
                     .border(2.dp, Color.Black, RoundedCornerShape(4.dp))
                     .padding(4.dp)  // Margen entre la imagen y el borde
                     .clickable {  // Add this modifier
-                        val intent = Intent(localContext, RegisterAccount::class.java)
+                        val intent = Intent(localContext, UserProfile::class.java)
                         startActivity(localContext, intent, null)
                     }
             )

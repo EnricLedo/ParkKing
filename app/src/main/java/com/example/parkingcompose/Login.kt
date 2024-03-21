@@ -47,10 +47,15 @@ class Login : ComponentActivity() {
             DaleComposeTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
-
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    LoginActivity()
+                    if(FirebaseAuth.getInstance().currentUser?.email.isNullOrEmpty()){
+                        LoginActivity()
+                    } else {
+                        // Si el usuario ya está logeado, inicia MainActivity
+                        val intent = Intent(this, MainActivity::class.java)
+                        startActivity(intent)
+                    }
                 }
             }
         }
