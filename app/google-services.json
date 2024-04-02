@@ -7,12 +7,25 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:84528945230:android:c7feae14d71ddea6da8b1f",
+        "mobilesdk_app_id": "1:84528945230:android:bac57f3ce1122dafda8b1f",
         "android_client_info": {
           "package_name": "com.example.parkingcompose"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "84528945230-m22vtu9ur6h7nds725slhi8di00vo9db.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.parkingcompose",
+            "certificate_hash": "28e10175fde2db03debde3f42ed88e56fa7678d4"
+          }
+        },
+        {
+          "client_id": "84528945230-qvi9srll4ispag2f1dck5otn0t32865h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyB4PjESkZeDjRa5jKOKqx4_VvSlAb016vo"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "84528945230-qvi9srll4ispag2f1dck5otn0t32865h.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

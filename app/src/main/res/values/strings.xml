@@ -3,4 +3,6 @@
     <string name="home">Home</string>
     <string name="account">account</string>
     <string name="settings">Settings</string>
+    <string name="default_web_client_id">1:84528945230:android:c7feae14d71ddea6da8b1f</string>
+    <string name="web_client_id">84528945230-qvi9srll4ispag2f1dck5otn0t32865h.apps.googleusercontent.com</string>
 </resources>

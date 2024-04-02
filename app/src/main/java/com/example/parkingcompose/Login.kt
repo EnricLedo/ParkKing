@@ -1,10 +1,13 @@
 package com.example.parkingcompose
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -35,101 +38,116 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
 import com.example.parkingcompose.ui.theme.DaleComposeTheme
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.google.firebase.auth.GoogleAuthProvider
+import kotlinx.coroutines.tasks.await
 
+    class Login : ComponentActivity() {
+        private lateinit var auth: FirebaseAuth
+        private lateinit var googleSignInClient: GoogleSignInClient
 
-class Login : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            DaleComposeTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    if(FirebaseAuth.getInstance().currentUser?.email.isNullOrEmpty()){
-                        LoginActivity()
-                    } else {
-                        // Si el usuario ya está logeado, inicia MainActivity
-                        val intent = Intent(this, MainActivity::class.java)
-                        startActivity(intent)
+        override fun onCreate(savedInstanceState: Bundle?) {
+            super.onCreate(savedInstanceState)
+            setContent {
+                DaleComposeTheme {
+                    Surface(color = MaterialTheme.colorScheme.background) {
+                        if (FirebaseAuth.getInstance().currentUser?.email.isNullOrEmpty()) {
+                            LoginActivity()
+                        } else {
+                            val intent = Intent(this, MainActivity::class.java)
+                            startActivity(intent)
+                        }
                     }
                 }
             }
+
+            // Initialize FirebaseAuth and GoogleSignInClient here
+            auth = Firebase.auth
+            val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build()
+            googleSignInClient = GoogleSignIn.getClient(this, gso)
+
         }
-    }
-}
 
-@Composable
-fun LoginActivity() {
-    val auth = Firebase.auth
-    var email by remember { mutableStateOf(TextFieldValue("")) }
-    var password by remember { mutableStateOf(TextFieldValue("")) }
-    val localContext = LocalContext.current // Capturamos el contexto local
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "Iniciar sesión",
-            fontSize = 28.sp,
-            color = Color.Black,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
-        )
+        @Composable
+        fun LoginActivity() {
+            var email by remember { mutableStateOf(TextFieldValue("")) }
+            var password by remember { mutableStateOf(TextFieldValue("")) }
+            val localContext = LocalContext.current
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Iniciar sesión",
+                    fontSize = 28.sp,
+                    color = Color.Black,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-        OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("Email") },
-            modifier = Modifier.fillMaxWidth()
-        )
+                Spacer(modifier = Modifier.height(16.dp))
 
-        Spacer(modifier = Modifier.height(16.dp))
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    label = { Text("Email") },
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-        OutlinedTextField(
-            value = password,
-            onValueChange = { password = it },
-            label = { Text("Password") },
-            visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            modifier = Modifier.fillMaxWidth()
-        )
+                Spacer(modifier = Modifier.height(16.dp))
 
-        Spacer(modifier = Modifier.height(16.dp))
+                OutlinedTextField(
+                    value = password,
+                    onValueChange = { password = it },
+                    label = { Text("Password") },
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-        Button(
-            onClick = {
-                if (email.text.isNotEmpty() && password.text.isNotEmpty()) {
-                    login(auth, email.text, password.text, localContext)
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Button(
+                    onClick = {
+                        if (email.text.isNotEmpty() && password.text.isNotEmpty()) {
+                            login(auth, email.text, password.text, localContext)
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("INICIAR SESIÓN")
                 }
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("INICIAR SESIÓN")
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Button(
+                    onClick = {
+
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("INICIAR SESIÓN CON GOOGLE")
+                }
+            }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
 
-        Button(
-            onClick = {
-                val intent = Intent(localContext, RegisterAccount::class.java)
-                ContextCompat.startActivity(localContext, intent, null)
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("CREAR UNA CUENTA")
-        }
     }
-}
 
-private fun login(auth: FirebaseAuth, email: String, password: String, context: Context) {
+    private fun login(auth: FirebaseAuth, email: String, password: String, context: Context) {
     auth.signInWithEmailAndPassword(email, password)
         .addOnCompleteListener { task ->
             if (task.isSuccessful) {

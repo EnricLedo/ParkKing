@@ -24,8 +24,16 @@
             android:value="AIzaSyBJaQHN_hNjr2mzdY9TvDZbknDF1qqTk7g" />
 
         <activity
-            android:name=".MainActivity"
-        />
+            android:name=".MainActiviti"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.DaleCompose">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity android:name=".MotosActivity" />
         <activity android:name=".LobbyMapActivity" />
         <activity android:name=".ParkingListActivity" />
@@ -33,7 +41,8 @@
         <activity android:name=".RegisterAccount"/>
         <activity android:name=".UserProfile"/>
         <activity android:name=".CreateParkking"/>
-        <activity android:name=".Login"
+        <activity android:name=".Login"/>
+        <activity android:name=".MainActivity"
 
             android:exported="true"
             android:label="@string/app_name"
