@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -38,69 +39,73 @@ fun SearchScreen(
         SearchScreen(navController = navController)
 }
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun SearchScreen(modifier: Modifier = Modifier, navController: NavHostController){
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier.fillMaxSize()  // Llena todo el espacio disponible
+    Scaffold(
+        bottomBar = { BottomNavigationBar(navController) }
     ) {
-
-        Text(
-            text = "Seleccione el tipo de vehiculo",
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.align(Alignment.TopCenter)
-                .padding(12.dp)
-        )
-
-        val localContext = LocalContext.current // Capturamos el contexto local
-
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceEvenly,
-            modifier = Modifier.fillMaxHeight()  // Llena toda la altura disponible
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.fillMaxSize()  // Llena todo el espacio disponible
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.moto),
-                contentDescription = "Imagen de bicicleta",
-                modifier = modifier
-                    .width(60.dp)  // Ancho de la imagen
-                    .height(60.dp)  // Altura de la imagen
-                    .border(2.dp, Color.Black, RoundedCornerShape(4.dp))
-                    .padding(4.dp)  // Margen entre la imagen y el borde
-                    .clickable {  // Add this modifier
-                        val intent = Intent(localContext, LobbyMapActivity::class.java)
-                        ContextCompat.startActivity(localContext, intent, null)
-                    }
+
+            Text(
+                text = "Seleccione el tipo de vehiculo",
+                style = MaterialTheme.typography.headlineMedium,
+                modifier = Modifier.align(Alignment.TopCenter)
+                    .padding(12.dp)
             )
 
-            Image(
-                painter = painterResource(id = R.drawable.coche),
-                contentDescription = "Imagen de coche",
-                modifier = modifier
-                    .width(60.dp)  // Ancho de la imagen
-                    .height(60.dp)  // Altura de la imagen
-                    .border(2.dp, Color.Black, RoundedCornerShape(4.dp))
-                    .padding(4.dp)  // Margen entre la imagen y el borde
-                    .clickable {  // Add this modifier
-                        val intent = Intent(localContext, ParkingListActivity::class.java)
-                        ContextCompat.startActivity(localContext, intent, null)
-                    }
-            )
+            val localContext = LocalContext.current // Capturamos el contexto local
 
-            Image(
-                painter = painterResource(id = R.drawable.patinete),
-                contentDescription = "Imagen de patinete",
-                modifier = modifier
-                    .width(60.dp)  // Ancho de la imagen
-                    .height(60.dp)  // Altura de la imagen
-                    .border(2.dp, Color.Black, RoundedCornerShape(4.dp))
-                    .padding(4.dp)  // Margen entre la imagen y el borde
-                    .clickable {  // Add this modifier
-                        val intent = Intent(localContext, UserProfile::class.java)
-                        ContextCompat.startActivity(localContext, intent, null)
-                    }
-            )
-            BottomNavigationBar(navController)
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceEvenly,
+                modifier = Modifier.fillMaxHeight()  // Llena toda la altura disponible
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.moto),
+                    contentDescription = "Imagen de bicicleta",
+                    modifier = modifier
+                        .width(60.dp)  // Ancho de la imagen
+                        .height(60.dp)  // Altura de la imagen
+                        .border(2.dp, Color.Black, RoundedCornerShape(4.dp))
+                        .padding(4.dp)  // Margen entre la imagen y el borde
+                        .clickable {  // Add this modifier
+                            val intent = Intent(localContext, LobbyMapActivity::class.java)
+                            ContextCompat.startActivity(localContext, intent, null)
+                        }
+                )
+
+                Image(
+                    painter = painterResource(id = R.drawable.coche),
+                    contentDescription = "Imagen de coche",
+                    modifier = modifier
+                        .width(60.dp)  // Ancho de la imagen
+                        .height(60.dp)  // Altura de la imagen
+                        .border(2.dp, Color.Black, RoundedCornerShape(4.dp))
+                        .padding(4.dp)  // Margen entre la imagen y el borde
+                        .clickable {  // Add this modifier
+                            val intent = Intent(localContext, ParkingListActivity::class.java)
+                            ContextCompat.startActivity(localContext, intent, null)
+                        }
+                )
+
+                Image(
+                    painter = painterResource(id = R.drawable.patinete),
+                    contentDescription = "Imagen de patinete",
+                    modifier = modifier
+                        .width(60.dp)  // Ancho de la imagen
+                        .height(60.dp)  // Altura de la imagen
+                        .border(2.dp, Color.Black, RoundedCornerShape(4.dp))
+                        .padding(4.dp)  // Margen entre la imagen y el borde
+                        .clickable {  // Add this modifier
+                            val intent = Intent(localContext, UserProfile::class.java)
+                            ContextCompat.startActivity(localContext, intent, null)
+                        }
+                )
+            }
         }
     }
 }
@@ -110,12 +115,21 @@ fun BottomNavigationBar(navController: NavHostController) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            ,
         horizontalArrangement = Arrangement.Center
     ) {
         Button(onClick = { navController.navigate("profile") },
-        modifier = Modifier.fillMaxWidth()) {
+            modifier = Modifier.weight(1f)) {
             Text(text = "Go to Profile")
+        }
+
+        Button(onClick = { navController.navigate("mapa") },
+            modifier = Modifier.weight(1f)) {
+            Text(text = "Go Map")
+        }
+        Button(onClick = { navController.navigate("parkingList") },
+            modifier = Modifier.weight(1f)) {
+            Text(text = "Go Parkings")
         }
     }
 }

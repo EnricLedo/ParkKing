@@ -13,19 +13,26 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.parkingcompose.data.LocationRepository
+import com.example.parkingcompose.data.MapViewModelFactory
 import com.example.parkingcompose.domain.GoogleAuthUiClient
 import com.example.parkingcompose.screens.LoginScreen
+import com.example.parkingcompose.screens.MapScreen
+import com.example.parkingcompose.screens.ParkingListScreen
 import com.example.parkingcompose.viewmodels.SignInGoogleViewModel
 import com.google.android.gms.auth.api.identity.Identity
 import com.example.parkingcompose.screens.ProfileScreen
 import com.example.parkingcompose.screens.SearchScreen
 import com.example.parkingcompose.ui.theme.DaleComposeTheme
 import com.example.parkingcompose.viewmodels.LoginMailViewModel
+import com.example.parkingcompose.viewmodels.MapViewModel
+import com.example.parkingcompose.viewmodels.ParkingViewModel
 import com.example.parkingcompose.viewmodels.SearchScreenViewModel
 
 import kotlinx.coroutines.launch
@@ -43,7 +50,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         val signInViewModel: SignInGoogleViewModel by viewModels()
         val loginViewModel: LoginMailViewModel by viewModels()
-
+        val parkingViewModel: ParkingViewModel by viewModels()
+               val locationRepository = LocationRepository(this)
+        val mapViewModel: MapViewModel by viewModels { MapViewModelFactory(locationRepository) }
         setContent {
             DaleComposeTheme{
                 Surface(
@@ -130,8 +139,9 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        composable("mapa"){
+                        composable("mapa") {
 
+                            MapScreen(mapViewModel,navController)
                         }
 
                         composable("search") {
@@ -145,6 +155,11 @@ class MainActivity : ComponentActivity() {
                                 navController = navController
                             )
                         }
+                        composable("parkingList") {
+                            ParkingListScreen(parkingViewModel,navController)
+                        }
+
+
 
                         composable("profile") {
                             ProfileScreen(
