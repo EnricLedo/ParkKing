@@ -133,8 +133,7 @@ fun RegisterActivityCompose() {
 
         Button(
             onClick = {
-                val intent = Intent(localContext, Login::class.java)
-                ContextCompat.startActivity(localContext, intent, null)
+
             },
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -149,8 +148,8 @@ private fun register(auth: FirebaseAuth, email: String, password: String, localC
             if (task.isSuccessful) {
                 val displayName = task.result.user?.email?.split("@")?.get(0)
                 createUser(displayName.toString())
-                val intent = Intent(localContext, Login::class.java)
-                ContextCompat.startActivity(localContext, intent, null)
+                //val intent = Intent(localContext, Login::class.java)
+                //ContextCompat.startActivity(localContext, intent, null)
             } else {
                 // Aquí debes mostrar el mensaje de error
             }

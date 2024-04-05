@@ -1,195 +1,171 @@
 package com.example.parkingcompose
 
-
-import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
-import com.example.parkingcompose.ui.theme.DaleComposeTheme
-import androidx.compose.ui.graphics.Color
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Text
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import androidx.core.content.ContextCompat.startActivity
-import androidx.navigation.NavHostController
+import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.parkingcompose.screens.AccountScreen
-import com.example.parkingcompose.screens.SettingsScreen
+import com.example.parkingcompose.domain.GoogleAuthUiClient
+import com.example.parkingcompose.screens.LoginScreen
+import com.example.parkingcompose.viewmodels.SignInGoogleViewModel
+import com.google.android.gms.auth.api.identity.Identity
+import com.example.parkingcompose.screens.ProfileScreen
+import com.example.parkingcompose.screens.SearchScreen
+import com.example.parkingcompose.ui.theme.DaleComposeTheme
+import com.example.parkingcompose.viewmodels.LoginMailViewModel
+import com.example.parkingcompose.viewmodels.SearchScreenViewModel
 
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
+
+    private val googleAuthUiClient by lazy {
+        GoogleAuthUiClient(
+            context = applicationContext,
+            oneTapClient = Identity.getSignInClient(applicationContext)
+        )
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val signInViewModel: SignInGoogleViewModel by viewModels()
+        val loginViewModel: LoginMailViewModel by viewModels()
+
         setContent {
-            DaleComposeTheme {
-                val navController = rememberNavController()
-                val navigateAction = remember(navController) {
-                    NavigationActions(navController)
-                }
-                val navBackStackEntry by navController.currentBackStackEntryAsState()
-                val selectedDestination = navBackStackEntry?.destination?.route ?: MyAppRoute.HOME
+            DaleComposeTheme{
+                Surface(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    val navController = rememberNavController()
+                    NavHost(navController = navController, startDestination = "sign_in") {
+                        composable("sign_in") {
+                            val state by signInViewModel.state.collectAsStateWithLifecycle()
 
-                MyAppContent(
-                    navController = navController,
-                    selectedDestination = selectedDestination,
-                    navigateTopLevelDestination = navigateAction::navigateTo
-                )
+                            LaunchedEffect(key1 = Unit) {
+                                if(googleAuthUiClient.getSignedInUser() != null) {
+                                    navController.navigate("profile")
+                                }
+                            }
+
+                            val launcher = rememberLauncherForActivityResult(
+                                contract = ActivityResultContracts.StartIntentSenderForResult(),
+                                onResult = { result ->
+                                    if(result.resultCode == RESULT_OK) {
+                                        lifecycleScope.launch {
+                                            val signInResult = googleAuthUiClient.signInWithIntent(
+                                                intent = result.data ?: return@launch
+                                            )
+                                            signInViewModel.onSignInResult(signInResult)
+                                        }
+                                    }
+                                }
+                            )
+
+                            LaunchedEffect(key1 = state.isSignInSuccessful) {
+                                if(state.isSignInSuccessful) {
+                                    Toast.makeText(
+                                        applicationContext,
+                                        "Sign in successful",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+
+                                    navController.navigate("search")
+                                    signInViewModel.resetState()
+                                }
+                            }
+
+                            LoginScreen(
+                                state = state,
+                                loginViewModel = loginViewModel,
+                                onLogin = { email, password ->
+                                    lifecycleScope.launch {
+                                        loginViewModel.login(this@MainActivity, email, password)
+                                    }
+                                }
+
+                            ,
+                                onRegister = { },
+                                onSignInClick = {
+                                    lifecycleScope.launch {
+                                        val signInIntentSender = googleAuthUiClient.signIn()
+                                        launcher.launch(
+                                            IntentSenderRequest.Builder(
+                                                signInIntentSender ?: return@launch
+                                            ).build()
+                                        )
+                                    }
+                                }
+                            )
+
+
+                        }
+                        composable("profile") {
+                            ProfileScreen(
+                                userData = googleAuthUiClient.getSignedInUser(),
+                                onSignOut = {
+                                    lifecycleScope.launch {
+                                        googleAuthUiClient.signOut()
+                                        Toast.makeText(
+                                            applicationContext,
+                                            "Signed out",
+                                            Toast.LENGTH_LONG
+                                        ).show()
+
+                                        navController.popBackStack()
+                                    }
+                                }
+                            )
+                        }
+
+                        composable("mapa"){
+
+                        }
+
+                        composable("search") {
+                            SearchScreen(
+                                viewModel = SearchScreenViewModel(
+                                    signedInUser = googleAuthUiClient.getSignedInUser(),
+                                    signOut = {
+                                        googleAuthUiClient.signOut()
+                                    }
+                                ),
+                                navController = navController
+                            )
+                        }
+
+                        composable("profile") {
+                            ProfileScreen(
+                                userData = googleAuthUiClient.getSignedInUser(),
+                                onSignOut = {
+                                    lifecycleScope.launch {
+                                        googleAuthUiClient.signOut()
+                                        Toast.makeText(
+                                            applicationContext,
+                                            "Signed out",
+                                            Toast.LENGTH_LONG
+                                        ).show()
+
+                                        navController.popBackStack()
+                                    }
+                                }
+                            )
+                        }
+                    }
+                }
             }
         }
     }
-    override fun onBackPressed() {
-        super.onBackPressed()
-        this.moveTaskToBack(true)
-    }
 }
-
-@Composable
-fun MyAppContent(
-    modifier: Modifier = Modifier,
-    navController: NavHostController,
-    selectedDestination: String,
-    navigateTopLevelDestination: (MyAppTopLevelDestination) -> Unit
-) {
-    Row(modifier = modifier.fillMaxSize()) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            NavHost(
-                modifier = Modifier.weight(1f),
-                navController = navController,
-                startDestination = MyAppRoute.HOME
-            ) {
-                composable(MyAppRoute.HOME) {
-                    GreetingImage()
-                }
-                composable(MyAppRoute.ACCOUNT) {
-                    AccountScreen()
-                }
-                composable(MyAppRoute.SETTINGS) {
-                    SettingsScreen()
-                }
-            }
-            MyAppBottomNavigation(
-                selectedDestination = selectedDestination,
-                navigateTopLevelDestination = navigateTopLevelDestination
-            )
-        }
-    }
-}
-
-@Composable
-fun MyAppBottomNavigation(
-    selectedDestination: String,
-    navigateTopLevelDestination: (MyAppTopLevelDestination) -> Unit
-) {
-    NavigationBar(modifier = Modifier.fillMaxWidth()) {
-        TOP_LEVEL_DESTINATIONS.forEach { destinations ->
-            NavigationBarItem(
-                selected = selectedDestination == destinations.route,
-                onClick = { navigateTopLevelDestination(destinations) },
-                icon = {
-                    Icon(
-                        imageVector = destinations.selectedIcon,
-                        contentDescription = stringResource(id = destinations.iconTextId)
-                    )
-                }
-            )
-        }
-    }
-}
-
-@Composable
-fun GreetingImage(modifier: Modifier = Modifier){
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier.fillMaxSize()  // Llena todo el espacio disponible
-    ) {
-
-        Text(
-            text = "Seleccione el tipo de vehiculo",
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.align(Alignment.TopCenter)
-                .padding(12.dp)
-        )
-
-        val localContext = LocalContext.current // Capturamos el contexto local
-
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceEvenly,
-            modifier = Modifier.fillMaxHeight()  // Llena toda la altura disponible
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.moto),
-                contentDescription = "Imagen de bicicleta",
-                modifier = modifier
-                    .width(60.dp)  // Ancho de la imagen
-                    .height(60.dp)  // Altura de la imagen
-                    .border(2.dp, Color.Black, RoundedCornerShape(4.dp))
-                    .padding(4.dp)  // Margen entre la imagen y el borde
-                    .clickable {  // Add this modifier
-                        val intent = Intent(localContext, LobbyMapActivity::class.java)
-                        startActivity(localContext, intent, null)
-                    }
-            )
-
-            Image(
-                painter = painterResource(id = R.drawable.coche),
-                contentDescription = "Imagen de coche",
-                modifier = modifier
-                    .width(60.dp)  // Ancho de la imagen
-                    .height(60.dp)  // Altura de la imagen
-                    .border(2.dp, Color.Black, RoundedCornerShape(4.dp))
-                    .padding(4.dp)  // Margen entre la imagen y el borde
-                    .clickable {  // Add this modifier
-                        val intent = Intent(localContext, ParkingListActivity::class.java)
-                        startActivity(localContext, intent, null)
-                    }
-            )
-
-            Image(
-                painter = painterResource(id = R.drawable.patinete),
-                contentDescription = "Imagen de patinete",
-                modifier = modifier
-                    .width(60.dp)  // Ancho de la imagen
-                    .height(60.dp)  // Altura de la imagen
-                    .border(2.dp, Color.Black, RoundedCornerShape(4.dp))
-                    .padding(4.dp)  // Margen entre la imagen y el borde
-                    .clickable {  // Add this modifier
-                        val intent = Intent(localContext, UserProfile::class.java)
-                        startActivity(localContext, intent, null)
-                    }
-            )
-        }
-    }
-}
-
-
-
-
