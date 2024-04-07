@@ -1,5 +1,6 @@
 package com.example.parkingcompose
 
+import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -8,12 +9,12 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
@@ -22,18 +23,21 @@ import androidx.navigation.compose.rememberNavController
 import com.example.parkingcompose.data.LocationRepository
 import com.example.parkingcompose.data.MapViewModelFactory
 import com.example.parkingcompose.domain.GoogleAuthUiClient
+import com.example.parkingcompose.screens.CrearParkingScreen
+import com.example.parkingcompose.screens.ForgotPasswordScreen
 import com.example.parkingcompose.screens.LoginScreen
 import com.example.parkingcompose.screens.MapScreen
 import com.example.parkingcompose.screens.ParkingListScreen
 import com.example.parkingcompose.viewmodels.SignInGoogleViewModel
 import com.google.android.gms.auth.api.identity.Identity
 import com.example.parkingcompose.screens.ProfileScreen
-import com.example.parkingcompose.screens.SearchScreen
+import com.example.parkingcompose.screens.RegisterScreen
 import com.example.parkingcompose.ui.theme.DaleComposeTheme
+import com.example.parkingcompose.viewmodels.CrearParkingViewModel
 import com.example.parkingcompose.viewmodels.LoginMailViewModel
 import com.example.parkingcompose.viewmodels.MapViewModel
 import com.example.parkingcompose.viewmodels.ParkingViewModel
-import com.example.parkingcompose.viewmodels.SearchScreenViewModel
+import com.example.parkingcompose.viewmodels.RegisterViewModel
 
 import kotlinx.coroutines.launch
 
@@ -46,12 +50,17 @@ class MainActivity : ComponentActivity() {
         )
     }
 
+    @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val signInViewModel: SignInGoogleViewModel by viewModels()
         val loginViewModel: LoginMailViewModel by viewModels()
         val parkingViewModel: ParkingViewModel by viewModels()
-               val locationRepository = LocationRepository(this)
+        val registerViewModel: RegisterViewModel by viewModels()
+        val crearParkingViewModel: CrearParkingViewModel by viewModels()
+        val forgotPasswordViewModel: ForgotPasswordViewModel by viewModels()
+        val locationRepository = LocationRepository(this)
+
         val mapViewModel: MapViewModel by viewModels { MapViewModelFactory(locationRepository) }
         setContent {
             DaleComposeTheme{
@@ -65,7 +74,7 @@ class MainActivity : ComponentActivity() {
 
                             LaunchedEffect(key1 = Unit) {
                                 if(googleAuthUiClient.getSignedInUser() != null) {
-                                    navController.navigate("profile")
+                                    navController.navigate("mapa")
                                 }
                             }
 
@@ -91,12 +100,13 @@ class MainActivity : ComponentActivity() {
                                         Toast.LENGTH_LONG
                                     ).show()
 
-                                    navController.navigate("search")
+                                    navController.navigate("mapa")
                                     signInViewModel.resetState()
                                 }
                             }
 
                             LoginScreen(
+                                navHostController = navController,
                                 state = state,
                                 loginViewModel = loginViewModel,
                                 onLogin = { email, password ->
@@ -106,7 +116,7 @@ class MainActivity : ComponentActivity() {
                                 }
 
                             ,
-                                onRegister = { },
+                                onRegister = {navController.navigate("register")},
                                 onSignInClick = {
                                     lifecycleScope.launch {
                                         val signInIntentSender = googleAuthUiClient.signIn()
@@ -133,9 +143,10 @@ class MainActivity : ComponentActivity() {
                                             Toast.LENGTH_LONG
                                         ).show()
 
-                                        navController.popBackStack()
+                                        navController.navigate("sign_in")
                                     }
-                                }
+                                },
+                                navController = navController
                             )
                         }
 
@@ -144,39 +155,17 @@ class MainActivity : ComponentActivity() {
                             MapScreen(mapViewModel,navController)
                         }
 
-                        composable("search") {
-                            SearchScreen(
-                                viewModel = SearchScreenViewModel(
-                                    signedInUser = googleAuthUiClient.getSignedInUser(),
-                                    signOut = {
-                                        googleAuthUiClient.signOut()
-                                    }
-                                ),
-                                navController = navController
-                            )
-                        }
                         composable("parkingList") {
                             ParkingListScreen(parkingViewModel,navController)
                         }
-
-
-
-                        composable("profile") {
-                            ProfileScreen(
-                                userData = googleAuthUiClient.getSignedInUser(),
-                                onSignOut = {
-                                    lifecycleScope.launch {
-                                        googleAuthUiClient.signOut()
-                                        Toast.makeText(
-                                            applicationContext,
-                                            "Signed out",
-                                            Toast.LENGTH_LONG
-                                        ).show()
-
-                                        navController.popBackStack()
-                                    }
-                                }
-                            )
+                        composable("register"){
+                            RegisterScreen(registerViewModel,navController)
+                        }
+                        composable("crearparking"){
+                            CrearParkingScreen(crearParkingViewModel)
+                        }
+                        composable("forgotpassword"){
+                            ForgotPasswordScreen(forgotPasswordViewModel)
                         }
                     }
                 }

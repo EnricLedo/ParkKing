@@ -4,7 +4,13 @@
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="29" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="29"
+        tools:ignore="ScopedStorage" />
+
 
 
     <application
@@ -35,12 +41,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".MotosActivity" />
-        <activity android:name=".LobbyMapActivity" />
         <activity android:name=".ParkingListActivity" />
-        <activity android:name=".ForgotPasswordActivity"/>
         <activity android:name=".RegisterAccount"/>
         <activity android:name=".UserProfile"/>
-        <activity android:name=".CreateParkking"/>
+
 
 
     </application>

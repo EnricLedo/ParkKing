@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -32,31 +33,44 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import com.example.parkingcompose.R
 import com.example.parkingcompose.data.Parking
+import com.example.parkingcompose.navegacion.BottomNavigationBar
+
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun ParkingListScreen(parkingViewModel: ParkingViewModel = viewModel(),navController: NavHostController) {
+fun ParkingListScreen(parkingViewModel: ParkingViewModel = viewModel(), navController: NavHostController) {
     val parkingList = remember { parkingViewModel.getParkingList() }
 
     Scaffold(
-    bottomBar = { BottomNavigationBar(navController) }
-) {
-    LazyColumn {
-        items(parkingList) { parking ->
-            ParkingItem(
-                parking = parking,
-                modifier = Modifier.padding(8.dp)
-            )
+        bottomBar = { BottomNavigationBar(navController) }
+    ) {
+        Column {
+            Button(
+                onClick = { navController.navigate("crearparking") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+            ) {
+                Text("Añadir un parking")
+            }
+
+            LazyColumn {
+                items(parkingList) { parking ->
+                    ParkingItem(
+                        parking = parking,
+                        modifier = Modifier.padding(8.dp)
+                    )
+                }
+            }
         }
     }
-}
 }
 
 
@@ -122,19 +136,22 @@ private fun ParkingItemButton(
         )
     }
 }
+
+
 @Composable
 fun ParkingIcon(
-    parkingIcon: ImageBitmap,
+    parkingIcon: String,
     modifier: Modifier = Modifier
 ) {
+    val image = painterResource(R.drawable.parking_ninot)
     Image(
+        painter = image,
+        contentDescription = null,
         modifier = modifier
             .size(8.dp)
             .padding(8.dp)
             .clip(MaterialTheme.shapes.small),
-        contentScale = ContentScale.Crop,
-        bitmap = parkingIcon,
-        contentDescription = null
+        contentScale = ContentScale.Crop
     )
 }
 @Composable

@@ -16,7 +16,7 @@ class ParkingViewModel : ViewModel() {
             location = Pair(37.7749, -122.4194), // Ejemplo de coordenadas para San Francisco
             name = "Parking 1",
             description = "Este es un parking de ejemplo",
-            image = ImageBitmap(100, 100), // Supongamos que tienes una imagen de tamaño 100x100
+            image = "imagen1", // Supongamos que tienes una imagen de tamaño 100x100
             parkingRating = 4.5f,
             reviewList = listOf(), // Lista de revisiones vacía
             tagList = listOf(), // Lista de etiquetas vacía
@@ -30,7 +30,7 @@ class ParkingViewModel : ViewModel() {
             location = Pair(40.7128, -74.0060), // Ejemplo de coordenadas para Nueva York
             name = "Parking 2",
             description = "Otro parking de ejemplo",
-            image = ImageBitmap(100, 100), // Supongamos que tienes una imagen de tamaño 100x100
+            image = "imagen2", // Supongamos que tienes una imagen de tamaño 100x100
             parkingRating = 4.0f,
             reviewList = listOf(), // Lista de revisiones vacía
             tagList = listOf(), // Lista de etiquetas vacía

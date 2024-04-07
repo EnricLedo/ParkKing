@@ -1,50 +1,41 @@
 package com.example.parkingcompose.screens
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import com.example.parkingcompose.data.LoginState
-import com.example.parkingcompose.viewmodels.LoginMailViewModel
-
+import com.example.parkingcompose.viewmodels.RegisterViewModel
 
 @Composable
-fun LoginScreen(
-    navHostController: NavHostController,
-    state: LoginState,
-    loginViewModel: LoginMailViewModel,
-    onLogin: (String, String) -> Unit,
-    onRegister: () -> Unit,
-    onSignInClick: () -> Unit
-) {
-    val loginState by loginViewModel.loginState.collectAsState()
+fun RegisterScreen(viewModel: RegisterViewModel, navController: NavHostController) {
+    val localContext = LocalContext.current // Capturamos el contexto local
 
     Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Iniciar sesión",
+            text = "Registrarse",
             fontSize = 28.sp,
             color = Color.Black,
             textAlign = TextAlign.Center,
@@ -54,8 +45,8 @@ fun LoginScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
-            value = loginState.email,
-            onValueChange = { loginViewModel.onEmailChange(it) },
+            value = viewModel.email.value,
+            onValueChange = { viewModel.onEmailChange(it) },
             label = { Text("Email") },
             modifier = Modifier.fillMaxWidth()
         )
@@ -63,8 +54,8 @@ fun LoginScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
-            value = loginState.password,
-            onValueChange = { loginViewModel.onPasswordChange(it) },
+            value = viewModel.password.value,
+            onValueChange = { viewModel.onPasswordChange(it) },
             label = { Text("Password") },
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -73,38 +64,31 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-
-            Button(
-                onClick = { onLogin(loginState.email, loginState.password) },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("INICIAR SESIÓN")
-            }
-
-            Button(
-                onClick = { onSignInClick() },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("GOOGLE SIGN-IN")
-            }
-
+        OutlinedTextField(
+            value = viewModel.repeatPassword.value,
+            onValueChange = { viewModel.onRepeatPasswordChange(it) },
+            label = { Text("Repeat Password") },
+            visualTransformation = PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            modifier = Modifier.fillMaxWidth()
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = { onRegister() },
-            modifier = Modifier.fillMaxWidth(0.5F)
+            onClick = { viewModel.register(navController) },
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Text("REGISTRARSE")
+            Text("Register")
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         Button(
-            onClick = { navHostController.navigate("forgotpassword") },
-            modifier = Modifier.fillMaxWidth(0.5F)
+            onClick = { navController.navigate("sign_in")},
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Contraseña olvidada")
+            Text("Ya tengo cuenta")
         }
-
-
-
     }
 }
