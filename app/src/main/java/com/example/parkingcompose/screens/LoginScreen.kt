@@ -2,11 +2,11 @@ package com.example.parkingcompose.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
@@ -24,7 +24,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.parkingcompose.data.LoginState
-import com.example.parkingcompose.domain.GoogleAuthUiClient
+import com.example.parkingcompose.ui.theme.ButtonTextStyle
+import com.example.parkingcompose.util.GoogleAuthUiClient
 import com.example.parkingcompose.viewmodels.LoginMailViewModel
 import com.example.parkingcompose.viewmodels.RegisterViewModel
 
@@ -43,14 +44,14 @@ fun LoginScreen(
     val loginState by loginViewModel.loginState.collectAsState()
 
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().padding(14.dp),
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+
     ) {
         Text(
             text = "Iniciar sesión",
             fontSize = 28.sp,
-            color = Color.Black,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth()
         )
@@ -80,9 +81,12 @@ fun LoginScreen(
 
             Button(
                 onClick = { onLogin(loginState.email, loginState.password) },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth().padding(0.dp, 0.dp, 0.dp, 8.dp)
             ) {
-                Text("INICIAR SESIÓN")
+                Text(
+                    "INICIAR SESIÓN",
+                    style = ButtonTextStyle
+                )
             }
 
         Button(
@@ -92,23 +96,33 @@ fun LoginScreen(
             },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("GOOGLE SIGN-IN")
+            Text(
+                "GOOGLE SIGN-IN",
+                style = ButtonTextStyle
+            )
         }
 
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(65.dp))
 
         Button(
             onClick = { onRegister() },
-            modifier = Modifier.fillMaxWidth(0.5F)
+            modifier = Modifier.fillMaxWidth(0.7F).padding(0.dp, 0.dp, 0.dp, 8.dp)
         ) {
-            Text("REGISTRARSE")
+            Text(
+                text = "REGISTRARSE",
+                style = ButtonTextStyle
+            )
+
         }
         Button(
             onClick = { navHostController.navigate("forgotpassword") },
-            modifier = Modifier.fillMaxWidth(0.5F)
+            modifier = Modifier.fillMaxWidth(0.7F)
         ) {
-            Text("Contraseña olvidada")
+            Text(
+                "CONTRASEÑA OLVIDADA",
+                style = ButtonTextStyle
+            )
         }
 
 

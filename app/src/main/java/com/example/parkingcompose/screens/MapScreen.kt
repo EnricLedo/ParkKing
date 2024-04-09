@@ -41,7 +41,7 @@ fun MapScreen(mapViewModel: MapViewModel, navController: NavHostController) {
                 modifier = Modifier.fillMaxSize().background(Color.White)
             ) {
                 GoogleMap(
-                    modifier = Modifier.fillMaxSize().padding(bottom = 80.dp),
+                    modifier = Modifier.fillMaxSize().padding(bottom = 70.dp),
                     cameraPositionState = cameraPositionState,
                     // Resto de las propiedades del mapa
                 )
