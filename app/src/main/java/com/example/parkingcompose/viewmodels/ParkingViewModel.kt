@@ -2,7 +2,6 @@ package com.example.parkingcompose.viewmodels
 
 
 
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.lifecycle.ViewModel
 import com.example.parkingcompose.data.Parking
 

@@ -1,6 +1,7 @@
 package com.example.parkingcompose.screens
 
 import android.annotation.SuppressLint
+import android.view.InputQueue
 import com.example.parkingcompose.viewmodels.ParkingViewModel
 
 
@@ -21,6 +22,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -33,6 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -81,7 +84,9 @@ fun ParkingItem(
 ) {
     var expanded by remember { mutableStateOf(false) }
     Card(
-        modifier = modifier
+        modifier = modifier,
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Column(
             modifier = Modifier
@@ -130,7 +135,7 @@ private fun ParkingItemButton(
         modifier = modifier
     ) {
         Icon(
-            imageVector = if (expanded) Icons.Filled.KeyboardArrowDown else Icons.Filled.KeyboardArrowUp,
+            imageVector = if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
             contentDescription = "See more or less information about a parking",
             tint = MaterialTheme.colorScheme.secondary
         )
@@ -143,7 +148,7 @@ fun ParkingIcon(
     parkingIcon: String,
     modifier: Modifier = Modifier
 ) {
-    val image = painterResource(R.drawable.parking_ninot)
+    val image = painterResource(R.drawable.coche)
     Image(
         painter = image,
         contentDescription = null,

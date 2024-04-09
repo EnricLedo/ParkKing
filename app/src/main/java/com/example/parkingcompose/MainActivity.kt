@@ -23,7 +23,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.parkingcompose.data.LocationRepository
 import com.example.parkingcompose.data.MapViewModelFactory
 import com.example.parkingcompose.domain.GoogleAuthUiClient
-import com.example.parkingcompose.screens.CrearParkingScreen
+import com.example.parkingcompose.screens.CreateParkingScreen
 import com.example.parkingcompose.screens.ForgotPasswordScreen
 import com.example.parkingcompose.screens.LoginScreen
 import com.example.parkingcompose.screens.MapScreen
@@ -33,7 +33,7 @@ import com.google.android.gms.auth.api.identity.Identity
 import com.example.parkingcompose.screens.ProfileScreen
 import com.example.parkingcompose.screens.RegisterScreen
 import com.example.parkingcompose.ui.theme.DaleComposeTheme
-import com.example.parkingcompose.viewmodels.CrearParkingViewModel
+import com.example.parkingcompose.viewmodels.CreateParkingViewModel
 import com.example.parkingcompose.viewmodels.LoginMailViewModel
 import com.example.parkingcompose.viewmodels.MapViewModel
 import com.example.parkingcompose.viewmodels.ParkingViewModel
@@ -57,7 +57,7 @@ class MainActivity : ComponentActivity() {
         val loginViewModel: LoginMailViewModel by viewModels()
         val parkingViewModel: ParkingViewModel by viewModels()
         val registerViewModel: RegisterViewModel by viewModels()
-        val crearParkingViewModel: CrearParkingViewModel by viewModels()
+        val crearParkingViewModel: CreateParkingViewModel by viewModels()
         val forgotPasswordViewModel: ForgotPasswordViewModel by viewModels()
         val locationRepository = LocationRepository(this)
 
@@ -162,7 +162,7 @@ class MainActivity : ComponentActivity() {
                             RegisterScreen(registerViewModel,navController)
                         }
                         composable("crearparking"){
-                            CrearParkingScreen(crearParkingViewModel)
+                            CreateParkingScreen(crearParkingViewModel)
                         }
                         composable("forgotpassword"){
                             ForgotPasswordScreen(forgotPasswordViewModel)
