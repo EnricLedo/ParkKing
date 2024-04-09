@@ -6,7 +6,7 @@ data class Parking(
     val location: Pair<Double, Double>,
     val name: String,
     val description: String,
-    val image: String,
+    val image: String, // URL del Storage
     val parkingRating: Float,
     val reviewList: List<Review>,
     val tagList: List<Tag>,

@@ -1,4 +1,4 @@
-package com.example.parkingcompose.domain
+package com.example.parkingcompose.util
 
 import android.content.Context
 import android.content.Intent

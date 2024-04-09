@@ -1,10 +1,9 @@
 package com.example.parkingcompose.dao
 
 import android.util.Log
-import androidx.navigation.NavHostController
 import com.example.parkingcompose.data.Rol
 import com.example.parkingcompose.data.User
-import com.example.parkingcompose.domain.GoogleAuthUiClient
+import com.example.parkingcompose.util.GoogleAuthUiClient
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
