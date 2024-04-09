@@ -1,4 +1,4 @@
-package com.example.parkingcompose.domain
+package com.example.parkingcompose.util
 
 import android.content.Context
 import android.content.Intent
@@ -45,7 +45,8 @@ class GoogleAuthUiClient(
                     UserData(
                         userId = uid,
                         username = displayName,
-                        profilePictureUrl = photoUrl?.toString()
+                        profilePictureUrl = photoUrl?.toString(),
+                        email = email ?: ""
                     )
                 },
                 errorMessage = null
@@ -74,7 +75,8 @@ class GoogleAuthUiClient(
         UserData(
             userId = uid,
             username = displayName,
-            profilePictureUrl = photoUrl?.toString()
+            profilePictureUrl = photoUrl?.toString(),
+            email = email ?: ""
         )
     }
 

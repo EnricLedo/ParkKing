@@ -20,12 +20,12 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import com.example.parkingcompose.util.GoogleAuthUiClient
 import com.example.parkingcompose.viewmodels.RegisterViewModel
 
 @Composable
-fun RegisterScreen(viewModel: RegisterViewModel, navController: NavHostController) {
+fun RegisterScreen(viewModel: RegisterViewModel, navController: NavHostController, googleAuthUiClient: GoogleAuthUiClient) {
     val localContext = LocalContext.current // Capturamos el contexto local
 
     Column(
@@ -76,7 +76,8 @@ fun RegisterScreen(viewModel: RegisterViewModel, navController: NavHostControlle
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = { viewModel.register(navController) },
+            onClick = { viewModel.registerUser(googleAuthUiClient)
+                navController.navigate("mapa")},
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Register")
