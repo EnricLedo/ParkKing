@@ -69,6 +69,12 @@ fun ParkingListScreen(parkingViewModel: ParkingViewModel = viewModel(), navContr
                     )
                 }
             }
+            Button(
+                onClick = { navController.navigate("review")},
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Crear Reseña")
+            }
         }
     }
 }
@@ -190,5 +196,6 @@ fun ParkingDescription(
             style = MaterialTheme.typography.bodyLarge
         )
     }
+
 }
 

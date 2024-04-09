@@ -32,12 +32,14 @@ import com.example.parkingcompose.viewmodels.SignInGoogleViewModel
 import com.google.android.gms.auth.api.identity.Identity
 import com.example.parkingcompose.screens.ProfileScreen
 import com.example.parkingcompose.screens.RegisterScreen
+import com.example.parkingcompose.screens.ReviewScreen
 import com.example.parkingcompose.ui.theme.DaleComposeTheme
 import com.example.parkingcompose.viewmodels.CrearParkingViewModel
 import com.example.parkingcompose.viewmodels.LoginMailViewModel
 import com.example.parkingcompose.viewmodels.MapViewModel
 import com.example.parkingcompose.viewmodels.ParkingViewModel
 import com.example.parkingcompose.viewmodels.RegisterViewModel
+import com.example.parkingcompose.viewmodels.ReviewViewModel
 
 import kotlinx.coroutines.launch
 
@@ -60,7 +62,7 @@ class MainActivity : ComponentActivity() {
         val crearParkingViewModel: CrearParkingViewModel by viewModels()
         val forgotPasswordViewModel: ForgotPasswordViewModel by viewModels()
         val locationRepository = LocationRepository(this)
-
+        val reviewViewModel: ReviewViewModel by viewModels()
         val mapViewModel: MapViewModel by viewModels { MapViewModelFactory(locationRepository) }
         setContent {
             DaleComposeTheme{
@@ -166,6 +168,9 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("forgotpassword"){
                             ForgotPasswordScreen(forgotPasswordViewModel)
+                        }
+                        composable("review"){
+                            ReviewScreen(reviewViewModel)
                         }
                     }
                 }
