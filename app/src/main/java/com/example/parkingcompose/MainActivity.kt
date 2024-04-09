@@ -32,12 +32,15 @@ import com.example.parkingcompose.viewmodels.SignInGoogleViewModel
 import com.google.android.gms.auth.api.identity.Identity
 import com.example.parkingcompose.screens.ProfileScreen
 import com.example.parkingcompose.screens.RegisterScreen
+import com.example.parkingcompose.screens.UpdateUsernameScreen
 import com.example.parkingcompose.ui.theme.DaleComposeTheme
 import com.example.parkingcompose.viewmodels.CrearParkingViewModel
 import com.example.parkingcompose.viewmodels.LoginMailViewModel
 import com.example.parkingcompose.viewmodels.MapViewModel
 import com.example.parkingcompose.viewmodels.ParkingViewModel
 import com.example.parkingcompose.viewmodels.RegisterViewModel
+import com.example.parkingcompose.viewmodels.UpdateUsernameViewModel
+
 
 import kotlinx.coroutines.launch
 
@@ -59,6 +62,7 @@ class MainActivity : ComponentActivity() {
         val registerViewModel: RegisterViewModel by viewModels()
         val crearParkingViewModel: CrearParkingViewModel by viewModels()
         val forgotPasswordViewModel: ForgotPasswordViewModel by viewModels()
+        val updateUsernameViewModel: UpdateUsernameViewModel by viewModels()
         val locationRepository = LocationRepository(this)
 
         val mapViewModel: MapViewModel by viewModels { MapViewModelFactory(locationRepository) }
@@ -94,40 +98,41 @@ class MainActivity : ComponentActivity() {
 
                             LaunchedEffect(key1 = state.isSignInSuccessful) {
                                 if(state.isSignInSuccessful) {
+
                                     Toast.makeText(
                                         applicationContext,
                                         "Sign in successful",
                                         Toast.LENGTH_LONG
                                     ).show()
-
+                                    RegisterViewModel().registerUser(googleAuthUiClient)
                                     navController.navigate("mapa")
                                     signInViewModel.resetState()
                                 }
                             }
 
                             LoginScreen(
-                                navHostController = navController,
-                                state = state,
-                                loginViewModel = loginViewModel,
-                                onLogin = { email, password ->
-                                    lifecycleScope.launch {
-                                        loginViewModel.login(this@MainActivity, email, password)
-                                    }
-                                }
-
-                            ,
-                                onRegister = {navController.navigate("register")},
-                                onSignInClick = {
-                                    lifecycleScope.launch {
-                                        val signInIntentSender = googleAuthUiClient.signIn()
-                                        launcher.launch(
-                                            IntentSenderRequest.Builder(
-                                                signInIntentSender ?: return@launch
-                                            ).build()
-                                        )
-                                    }
-                                }
-                            )
+                                        navHostController = navController,
+                                        state = state,
+                                        loginViewModel = loginViewModel,
+                                        registerViewModel = registerViewModel,
+                                        googleAuthUiClient = googleAuthUiClient,
+                                        onLogin = { email, password ->
+                                            lifecycleScope.launch {
+                                                loginViewModel.login(this@MainActivity, email, password)
+                                            }
+                                        },
+                                        onRegister = { navController.navigate("register") },
+                                        onSignInClick = {
+                                            lifecycleScope.launch {
+                                                val signInIntentSender = googleAuthUiClient.signIn()
+                                                launcher.launch(
+                                                    IntentSenderRequest.Builder(
+                                                        signInIntentSender ?: return@launch
+                                                    ).build()
+                                                )
+                                            }
+                                        }
+                                    )
 
 
                         }
@@ -159,13 +164,16 @@ class MainActivity : ComponentActivity() {
                             ParkingListScreen(parkingViewModel,navController)
                         }
                         composable("register"){
-                            RegisterScreen(registerViewModel,navController)
+                            RegisterScreen(registerViewModel,navController, googleAuthUiClient)
                         }
                         composable("crearparking"){
                             CrearParkingScreen(crearParkingViewModel)
                         }
                         composable("forgotpassword"){
                             ForgotPasswordScreen(forgotPasswordViewModel)
+                        }
+                        composable("updateusername"){
+                            UpdateUsernameScreen(updateUsernameViewModel,navController)
                         }
                     }
                 }

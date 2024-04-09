@@ -57,6 +57,9 @@ fun ProfileScreen(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                 }
+                Button(onClick = { navController.navigate("updateusername") }){
+                    Text(text = "Change username")
+                }
                 Button(onClick = onSignOut) {
                     Text(text = "Sign out")
                 }

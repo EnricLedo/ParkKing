@@ -24,7 +24,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.parkingcompose.data.LoginState
+import com.example.parkingcompose.domain.GoogleAuthUiClient
 import com.example.parkingcompose.viewmodels.LoginMailViewModel
+import com.example.parkingcompose.viewmodels.RegisterViewModel
 
 
 @Composable
@@ -32,10 +34,12 @@ fun LoginScreen(
     navHostController: NavHostController,
     state: LoginState,
     loginViewModel: LoginMailViewModel,
+    registerViewModel: RegisterViewModel,
+    googleAuthUiClient: GoogleAuthUiClient,
     onLogin: (String, String) -> Unit,
     onRegister: () -> Unit,
     onSignInClick: () -> Unit
-) {
+)  {
     val loginState by loginViewModel.loginState.collectAsState()
 
     Column(
@@ -81,12 +85,15 @@ fun LoginScreen(
                 Text("INICIAR SESIÓN")
             }
 
-            Button(
-                onClick = { onSignInClick() },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("GOOGLE SIGN-IN")
-            }
+        Button(
+            onClick = {
+                onSignInClick()
+
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("GOOGLE SIGN-IN")
+        }
 
 
         Spacer(modifier = Modifier.height(16.dp))

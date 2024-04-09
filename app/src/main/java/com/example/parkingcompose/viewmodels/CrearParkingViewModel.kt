@@ -13,7 +13,6 @@ import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
-import com.example.parkingcompose.ParkingListActivity
 import com.example.parkingcompose.data.Parking
 import com.google.firebase.firestore.FirebaseFirestore
 import java.io.ByteArrayOutputStream
@@ -74,8 +73,7 @@ class CrearParkingViewModel : ViewModel() {
             .add(parking)
             .addOnSuccessListener { documentReference ->
                 Log.d(TAG, "Parking added with ID: ${documentReference.id}")
-                val intent = Intent(localContext, ParkingListActivity::class.java)
-                ContextCompat.startActivity(localContext, intent, null)
+
             }
             .addOnFailureListener { e ->
                 Log.w(TAG, "Error adding parking", e)
