@@ -27,6 +27,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,7 +48,13 @@ import com.example.parkingcompose.navegacion.BottomNavigationBar
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ParkingListScreen(parkingViewModel: ParkingViewModel = viewModel(), navController: NavHostController) {
-    val parkingList = remember { parkingViewModel.getParkingList() }
+    val parkingListState = parkingViewModel.parkingList.collectAsState()
+
+    LaunchedEffect(key1 = Unit) {
+        parkingViewModel.getParkingList()
+    }
+
+    val parkingList = parkingListState.value
 
     Scaffold(
         bottomBar = { BottomNavigationBar(navController) }
@@ -72,6 +80,7 @@ fun ParkingListScreen(parkingViewModel: ParkingViewModel = viewModel(), navContr
         }
     }
 }
+
 
 
 @Composable

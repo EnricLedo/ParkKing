@@ -1,45 +1,38 @@
 package com.example.parkingcompose.viewmodels
 
-
-
-import androidx.compose.ui.graphics.ImageBitmap
+import android.widget.Toast
+import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
 import com.example.parkingcompose.data.Parking
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.tasks.await
 
+// Define a StateFlow for parkingList in ParkingViewModel
 class ParkingViewModel : ViewModel() {
-    private val parkingList = mutableListOf<Parking>()
+    private val db = FirebaseFirestore.getInstance()
+    private val _parkingList = MutableStateFlow<List<Parking>>(emptyList())
+    val parkingList: StateFlow<List<Parking>> = _parkingList
 
-    init {
-        // Ejemplo de parking 1
-        val parking1 = Parking(
-            parkingId = 1,
-            location = Pair(37.7749, -122.4194), // Ejemplo de coordenadas para San Francisco
-            name = "Parking 1",
-            description = "Este es un parking de ejemplo",
-            image = "imagen1", // Supongamos que tienes una imagen de tamaño 100x100
-            parkingRating = 4.5f,
-            reviewList = listOf(), // Lista de revisiones vacía
-            tagList = listOf(), // Lista de etiquetas vacía
-            priceMinute = 0.5f
-        )
-        parkingList.add(parking1)
-
-        // Ejemplo de parking 2
-        val parking2 = Parking(
-            parkingId = 2,
-            location = Pair(40.7128, -74.0060), // Ejemplo de coordenadas para Nueva York
-            name = "Parking 2",
-            description = "Otro parking de ejemplo",
-            image = "imagen2", // Supongamos que tienes una imagen de tamaño 100x100
-            parkingRating = 4.0f,
-            reviewList = listOf(), // Lista de revisiones vacía
-            tagList = listOf(), // Lista de etiquetas vacía
-            priceMinute = 0.75f
-        )
-        parkingList.add(parking2)
-    }
-
-    fun getParkingList(): MutableList<Parking> {
-        return parkingList
+    // Load parking list from Firestore
+    suspend fun getParkingList() {
+        try {
+            val querySnapshot = db.collection("parkings").get().await()
+            val list = mutableListOf<Parking>()
+            for (document in querySnapshot.documents) {
+                val parking = document.toObject(Parking::class.java)
+                parking?.let {
+                    list.add(it)
+                }
+            }
+            _parkingList.value = list
+        } catch (e: Exception) {
+            Toast.makeText(
+                null,
+                "Error al cargar la lista de parkings: ${e.message}",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 }
