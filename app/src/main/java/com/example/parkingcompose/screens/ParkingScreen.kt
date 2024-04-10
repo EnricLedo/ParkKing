@@ -44,15 +44,20 @@ import com.example.parkingcompose.R
 import com.example.parkingcompose.data.Parking
 import com.example.parkingcompose.navegacion.BottomNavigationBar
 import com.example.parkingcompose.ui.theme.ButtonTextStyle
+import com.example.parkingcompose.viewmodels.CreateParkingViewModel
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun ParkingListScreen(parkingViewModel: ParkingViewModel = viewModel(), navController: NavHostController) {
+fun ParkingListScreen(parkingViewModel: ParkingViewModel = viewModel(), createParkingViewModel: CreateParkingViewModel = viewModel(), navController: NavHostController) {
     val parkingListState = parkingViewModel.parkingList.collectAsState()
+    val errorState = parkingViewModel.error.collectAsState()
 
-    LaunchedEffect(key1 = Unit) {
-        parkingViewModel.getParkingList()
+    // Observe the update event
+    LaunchedEffect(createParkingViewModel.updateEvent) {
+        createParkingViewModel.updateEvent.collect {
+            parkingViewModel.getParkingList()
+        }
     }
 
     val parkingList = parkingListState.value
@@ -70,6 +75,10 @@ fun ParkingListScreen(parkingViewModel: ParkingViewModel = viewModel(), navContr
                 Text("ADD NEW PARKING", style = ButtonTextStyle)
             }
 
+            if (errorState.value != null) {
+                Text("Error: ${errorState.value}")
+            }
+
             LazyColumn {
                 items(parkingList) { parking ->
                     ParkingItem(
@@ -81,6 +90,8 @@ fun ParkingListScreen(parkingViewModel: ParkingViewModel = viewModel(), navContr
         }
     }
 }
+
+// ... Resto de los composables ...
 
 
 

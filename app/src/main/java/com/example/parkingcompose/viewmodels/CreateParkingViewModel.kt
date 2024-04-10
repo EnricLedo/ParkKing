@@ -7,15 +7,22 @@ import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.parkingcompose.data.Location
 import com.example.parkingcompose.data.Parking
 import com.example.parkingcompose.util.StorageUtil
 import com.google.firebase.firestore.FirebaseFirestore
-
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.launch
 
 class CreateParkingViewModel : ViewModel() {
     var name = mutableStateOf("")
     var description = mutableStateOf("")
     var priceMinute = mutableStateOf("")
+
+    private val _updateEvent = MutableSharedFlow<Unit>()
+    val updateEvent: SharedFlow<Unit> = _updateEvent
 
     fun onNameChange(newValue: String) {
         name.value = newValue
@@ -36,7 +43,7 @@ class CreateParkingViewModel : ViewModel() {
         if (imageUrl != null) {
             val parking = Parking(
                 parkingId = 0,
-                location = Pair(0.0, 0.0),
+                location = Location(0.0, 0.0),
                 name = name.value,
                 description = description.value,
                 image = imageUrl, // Usa la URL obtenida
@@ -51,7 +58,6 @@ class CreateParkingViewModel : ViewModel() {
         }
     }
 
-
     private fun addParking(parking: Parking, localContext: Context) {
         val db = FirebaseFirestore.getInstance()
 
@@ -60,7 +66,9 @@ class CreateParkingViewModel : ViewModel() {
             .add(parking)
             .addOnSuccessListener { documentReference ->
                 Log.d(TAG, "Parking added with ID: ${documentReference.id}")
-
+                viewModelScope.launch {
+                    _updateEvent.emit(Unit) // Emit an update event
+                }
             }
             .addOnFailureListener { e ->
                 Log.w(TAG, "Error adding parking", e)

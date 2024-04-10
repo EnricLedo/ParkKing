@@ -1,9 +1,14 @@
 package com.example.parkingcompose.data
 
 
+data class Location(
+    val latitude: Double = 0.0,
+    val longitude: Double = 0.0
+)
+
 data class Parking(
     val parkingId: Int = 0,
-    val location: Pair<Double, Double> = Pair(0.0, 0.0),
+    val location: Location = Location(),
     val name: String = "",
     val description: String = "",
     val image: String = "", // URL del Storage
@@ -11,16 +16,4 @@ data class Parking(
     val reviewList: List<Review> = emptyList(),
     val tagList: List<Tag> = emptyList(),
     val priceMinute: Float = 0.0f
-) {
-    constructor() : this(
-        0,
-        Pair(0.0, 0.0),
-        "",
-        "",
-        "",
-        0.0f,
-        emptyList(),
-        emptyList(),
-        0.0f
-    )
-}
+)
