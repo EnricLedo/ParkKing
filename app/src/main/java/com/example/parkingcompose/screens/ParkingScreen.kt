@@ -43,6 +43,7 @@ import androidx.navigation.NavHostController
 import com.example.parkingcompose.R
 import com.example.parkingcompose.data.Parking
 import com.example.parkingcompose.navegacion.BottomNavigationBar
+import com.example.parkingcompose.ui.theme.ButtonTextStyle
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -66,7 +67,7 @@ fun ParkingListScreen(parkingViewModel: ParkingViewModel = viewModel(), navContr
                     .fillMaxWidth()
                     .padding(8.dp)
             ) {
-                Text("Añadir un parking")
+                Text("ADD NEW PARKING", style = ButtonTextStyle)
             }
 
             LazyColumn {

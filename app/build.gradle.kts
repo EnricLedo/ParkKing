@@ -70,6 +70,7 @@ dependencies {
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.firebase.firestore.ktx)
     implementation(libs.play.services.auth)
+    implementation("androidx.core:core-splashscreen:1.0.1")
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0")
     implementation(libs.androidx.material3.android)
     implementation(libs.androidx.lifecycle.runtime.compose)
