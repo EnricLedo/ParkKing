@@ -1,44 +1,40 @@
-= ParkingCompose
+:copyleft:
 
-Este repositorio contiene una aplicación de estacionamiento implementada en Jetpack Compose.
+:author: Enric Ledo, Adrián Ramírez, Raúl Fernández y Yassine Allahuagbar
+:revdate: 11/04/2024
+:revnumber: 1.0
+:doctype: book
+:encoding: utf-8
+:lang: ca
+:toc: left
+:toclevels: 3
+:icons: font
+:imagesdir: ./images
 
-== Descripción
+:sectnums:
+= Parking Compose
 
-La aplicación permite a los usuarios gestionar un estacionamiento, incluyendo la reserva de espacios, la visualización de disponibilidad y la gestión de pagos.
+== Introduction
 
-== Instalación
+The application enables users to access information regarding parking spots, including the reservation of spaces, their features, and other pertinent details such as user reviews.
 
-Para probar la aplicación, sigue estos pasos:
+== Release Notes
 
-1. Clona este repositorio en tu máquina local.
-2. Abre el proyecto en Android Studio.
-3. Compila y ejecuta la aplicación en un emulador o dispositivo Android.
+=== First Sprint
+=== Second Sprint
+=== Third Sprint
+=== Forth Sprint
 
-== Uso
+· Modify the parking list to show information more clearly.
 
-Una vez que la aplicación esté en funcionamiento, puedes realizar las siguientes acciones:
+· Clean architecture: Divide files into MVVM.
 
-- Reservar un espacio de estacionamiento.
-- Visualizar la disponibilidad de espacios.
-- Gestionar pagos por el uso del estacionamiento.
+· Modify items visually using the palette colors.
 
-== Contribuir
+· Sign in with google and creating a user from it.
 
-¡Contribuciones son bienvenidas! Si deseas contribuir a este proyecto, sigue estos pasos:
+· App theme: setting a global app theme.
 
-1. Haz un fork del repositorio.
-2. Crea una nueva rama (`git checkout -b feature/feature-name`).
-3. Realiza tus cambios y realiza commits (`git commit -am 'Add new feature'`).
-4. Haz push de tus cambios a la rama (`git push origin feature/feature-name`).
-5. Abre una solicitud de extracción en GitLab.
+· Add tags to data database. With this parking will have certain attributes.
 
-== Licencia
-
-Este proyecto está licenciado bajo la Licencia MIT. Consulta el archivo `LICENSE` para obtener más detalles.
-
-== Contacto
-
-Si tienes alguna pregunta o sugerencia sobre el proyecto, no dudes en ponerte en contacto con el propietario del repositorio:
-
-Nombre: Adrián Ramírez López
-Correo electrónico: [tu@email.com](mailto:tu@email.com)
+· Show items rating, showing the overall stars rating from that parking.
