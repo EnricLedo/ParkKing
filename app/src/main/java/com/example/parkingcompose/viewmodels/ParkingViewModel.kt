@@ -1,45 +1,48 @@
 package com.example.parkingcompose.viewmodels
 
-
-
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.parkingcompose.data.Parking
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class ParkingViewModel : ViewModel() {
-    private val parkingList = mutableListOf<Parking>()
+    private val db = FirebaseFirestore.getInstance()
+    private val _parkingList = MutableStateFlow<List<Parking>>(emptyList())
+    val parkingList: StateFlow<List<Parking>> = _parkingList
+
+    private val _error = MutableStateFlow<String?>(null)
+    val error: StateFlow<String?> = _error
 
     init {
-        // Ejemplo de parking 1
-        val parking1 = Parking(
-            parkingId = 1,
-            location = Pair(37.7749, -122.4194), // Ejemplo de coordenadas para San Francisco
-            name = "Parking 1",
-            description = "Este es un parking de ejemplo",
-            image = "imagen1", // Supongamos que tienes una imagen de tamaño 100x100
-            parkingRating = 4.5f,
-            reviewList = listOf(), // Lista de revisiones vacía
-            tagList = listOf(), // Lista de etiquetas vacía
-            priceMinute = 0.5f
-        )
-        parkingList.add(parking1)
-
-        // Ejemplo de parking 2
-        val parking2 = Parking(
-            parkingId = 2,
-            location = Pair(40.7128, -74.0060), // Ejemplo de coordenadas para Nueva York
-            name = "Parking 2",
-            description = "Otro parking de ejemplo",
-            image = "imagen2", // Supongamos que tienes una imagen de tamaño 100x100
-            parkingRating = 4.0f,
-            reviewList = listOf(), // Lista de revisiones vacía
-            tagList = listOf(), // Lista de etiquetas vacía
-            priceMinute = 0.75f
-        )
-        parkingList.add(parking2)
+        getParkingList()
     }
 
-    fun getParkingList(): MutableList<Parking> {
-        return parkingList
+    fun getParkingList() {
+        viewModelScope.launch {
+            try {
+                val querySnapshot = db.collection("parkings").get().await()
+                val list = querySnapshot.documents.mapNotNull { document ->
+                    document.toObject(Parking::class.java)
+                }
+                _parkingList.value = list
+            } catch (e: Exception) {
+                _error.value = "Error al cargar la lista de parkings: ${e.message}"
+            }
+        }
+    }
+
+    fun deleteParking(parking: Parking) {
+        viewModelScope.launch {
+            try {
+                //db.collection("parkings").document(parking.).delete().await()
+                getParkingList()
+            } catch (e: Exception) {
+                _error.value = "Error al borrar el parking: ${e.message}"
+            }
+        }
     }
 }

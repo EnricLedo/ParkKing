@@ -12,6 +12,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.parkingcompose.ui.theme.ButtonTextStyle
+import com.example.parkingcompose.ui.theme.Orange
+import com.example.parkingcompose.ui.theme.OrangeDark
+import com.example.parkingcompose.ui.theme.OrangeLight
 import com.example.parkingcompose.viewmodels.UpdateUsernameViewModel
 
 @Composable
@@ -20,26 +24,27 @@ fun UpdateUsernameScreen(viewModel: UpdateUsernameViewModel, navHostController: 
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Tu actual username es:",
+            text = "Your current username is",
             fontSize = 28.sp,
-            color = Color.Black,
+            color = Color.White,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth()
         )
         Text(
             text = "${viewModel.currentUsername.value}",
             fontSize = 28.sp,
-            color = Color.Green,
+            color = Orange,
             textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth().padding(0.dp, 0.dp, 0.dp, 16.dp)
         )
         Text(
-            text = "Escribe el nombre con el que quieres que te vean los demás",
+            text = "Enter your new username:",
             fontSize = 28.sp,
-            color = Color.Black,
+            color = Color.White,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth()
         )
@@ -49,8 +54,9 @@ fun UpdateUsernameScreen(viewModel: UpdateUsernameViewModel, navHostController: 
         OutlinedTextField(
             value = viewModel.username.value,
             onValueChange = { viewModel.username.value = it },
-            label = { Text("Nombre de usuario") }, // Cambia la etiqueta a "Nombre de usuario"
-            modifier = Modifier.fillMaxWidth()
+            label = { Text("Username", color = OrangeDark) }, // Cambia la etiqueta a "Nombre de usuario"
+            modifier = Modifier.fillMaxWidth().padding(0.dp, 6.dp, 0.dp, 36.dp)
+
         )
 
         Button(
@@ -58,7 +64,7 @@ fun UpdateUsernameScreen(viewModel: UpdateUsernameViewModel, navHostController: 
                         navHostController.navigate("profile") },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("SAVE")
+            Text("SAVE", style = ButtonTextStyle)
         }
     }
 }

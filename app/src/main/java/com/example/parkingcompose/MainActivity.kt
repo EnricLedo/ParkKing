@@ -156,7 +156,7 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable("parkingList") {
-                            ParkingListScreen(parkingViewModel,navController)
+                            ParkingListScreen(parkingViewModel,createParkingViewModel,navController)
                         }
                         composable("register"){
                             RegisterScreen(registerViewModel,navController)

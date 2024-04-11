@@ -19,6 +19,7 @@ import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.parkingcompose.data.UserData
 import com.example.parkingcompose.navegacion.BottomNavigationBar
+import com.example.parkingcompose.ui.theme.ButtonTextStyle
 import com.example.parkingcompose.ui.theme.DaleComposeTheme
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -58,10 +59,12 @@ fun ProfileScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                 }
                 Button(onClick = { navController.navigate("updateusername") }){
-                    Text(text = "Change username")
+                    Text(text = "CHANGE USERNAME", style = ButtonTextStyle)
                 }
+                Spacer(modifier = Modifier.height(46.dp))
+
                 Button(onClick = onSignOut) {
-                    Text(text = "Sign out")
+                    Text(text = "SIGN OUT", style = ButtonTextStyle)
                 }
             }
         }

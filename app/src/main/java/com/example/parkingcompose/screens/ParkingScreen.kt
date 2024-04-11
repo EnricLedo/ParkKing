@@ -14,39 +14,67 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
+import coil.request.ImageRequest
+import coil.transform.CircleCropTransformation
 import com.example.parkingcompose.R
 import com.example.parkingcompose.data.Parking
 import com.example.parkingcompose.navegacion.BottomNavigationBar
+import com.example.parkingcompose.ui.theme.ButtonTextStyle
+import com.example.parkingcompose.ui.theme.OrangeLight
+import com.example.parkingcompose.ui.theme.OrangeSuperLight
+import com.example.parkingcompose.viewmodels.CreateParkingViewModel
+import com.google.common.math.Quantiles
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun ParkingListScreen(parkingViewModel: ParkingViewModel = viewModel(), navController: NavHostController) {
-    val parkingList = remember { parkingViewModel.getParkingList() }
+fun ParkingListScreen(parkingViewModel: ParkingViewModel = viewModel(), createParkingViewModel: CreateParkingViewModel = viewModel(), navController: NavHostController) {
+    val parkingListState = parkingViewModel.parkingList.collectAsState()
+    val errorState = parkingViewModel.error.collectAsState()
+
+    // Observe the update event
+    LaunchedEffect(createParkingViewModel.updateEvent) {
+        createParkingViewModel.updateEvent.collect {
+            parkingViewModel.getParkingList()
+        }
+    }
+
+    val parkingList = parkingListState.value
 
     Scaffold(
         bottomBar = { BottomNavigationBar(navController) }
@@ -58,13 +86,18 @@ fun ParkingListScreen(parkingViewModel: ParkingViewModel = viewModel(), navContr
                     .fillMaxWidth()
                     .padding(8.dp)
             ) {
-                Text("Añadir un parking")
+                Text("ADD NEW PARKING", style = ButtonTextStyle)
+            }
+
+            if (errorState.value != null) {
+                Text("Error: ${errorState.value}")
             }
 
             LazyColumn {
                 items(parkingList) { parking ->
                     ParkingItem(
                         parking = parking,
+                        parkingViewModel = parkingViewModel,
                         modifier = Modifier.padding(8.dp)
                     )
                 }
@@ -79,15 +112,27 @@ fun ParkingListScreen(parkingViewModel: ParkingViewModel = viewModel(), navContr
     }
 }
 
+// ... Resto de los composables ...
+
+
 
 @Composable
 fun ParkingItem(
     parking: Parking,
+    parkingViewModel: ParkingViewModel,
     modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
+
     Card(
-        modifier = modifier
+        modifier = modifier,
+        colors = CardColors(
+            containerColor = OrangeLight,
+            contentColor = Color.White,
+            disabledContainerColor = Color.Unspecified,
+            disabledContentColor = Color.Unspecified),
+
+        elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Column(
             modifier = Modifier
@@ -120,10 +165,12 @@ fun ParkingItem(
                         end = 16.dp
                     )
                 )
+                AdminButtons(parkingViewModel)
             }
         }
     }
 }
+
 
 @Composable
 private fun ParkingItemButton(
@@ -149,15 +196,19 @@ fun ParkingIcon(
     parkingIcon: String,
     modifier: Modifier = Modifier
 ) {
-    val image = painterResource(R.drawable.parking_ninot)
+    val painter = rememberAsyncImagePainter(
+        ImageRequest.Builder(LocalContext.current).data(data = parkingIcon).apply(block = fun ImageRequest.Builder.() {
+            transformations(CircleCropTransformation())
+        }).build()
+    )
+
     Image(
-        painter = image,
+        painter = painter,
         contentDescription = null,
         modifier = modifier
-            .size(8.dp)
+            .size(64.dp)
             .padding(8.dp)
-            .clip(MaterialTheme.shapes.small),
-        contentScale = ContentScale.Crop
+            .clip(MaterialTheme.shapes.small)
     )
 }
 @Composable
@@ -169,12 +220,12 @@ fun ParkingInformation(
     Column(modifier = modifier) {
         Text(
             text = parkingName,
-            style = MaterialTheme.typography.displayMedium,
+            style = MaterialTheme.typography.displaySmall.copy(color = Color.Black),
             modifier = Modifier.padding(top = 8.dp)
         )
         Text(
             text = parkingRating.toString(),
-            style = MaterialTheme.typography.bodyLarge
+            style = MaterialTheme.typography.bodyMedium
         )
     }
 }
@@ -199,3 +250,28 @@ fun ParkingDescription(
 
 }
 
+@Composable
+fun AdminButtons(
+    parkingViewModel: ParkingViewModel
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+    ) {
+
+        Button(
+            onClick = { /*parkingViewModel.deleteParking(parking = )*/ },
+            modifier = Modifier
+                .weight(1f)
+                .padding(8.dp),
+            colors = ButtonColors(
+                containerColor = Color.Red,
+                contentColor = Color.White,
+                disabledContainerColor = Color.Unspecified,
+                disabledContentColor = Color.Unspecified),
+        ) {
+            Icon(Icons.Default.Delete, contentDescription = "Delete")
+        }
+    }
+}
