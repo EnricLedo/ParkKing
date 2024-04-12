@@ -34,4 +34,15 @@ class ParkingViewModel : ViewModel() {
             }
         }
     }
+
+    fun deleteParking(parking: Parking) {
+        viewModelScope.launch {
+            try {
+                //db.collection("parkings").document(parking.).delete().await()
+                getParkingList()
+            } catch (e: Exception) {
+                _error.value = "Error al borrar el parking: ${e.message}"
+            }
+        }
+    }
 }

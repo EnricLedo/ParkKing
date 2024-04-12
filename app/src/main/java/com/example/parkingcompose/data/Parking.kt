@@ -7,7 +7,6 @@ data class Location(
 )
 
 data class Parking(
-    val parkingId: Int = 0,
     val location: Location = Location(),
     val name: String = "",
     val description: String = "",

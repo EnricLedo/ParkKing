@@ -42,7 +42,6 @@ class CreateParkingViewModel : ViewModel() {
         // Comprueba si imageUrl es null
         if (imageUrl != null) {
             val parking = Parking(
-                parkingId = 0,
                 location = Location(0.0, 0.0),
                 name = name.value,
                 description = description.value,
