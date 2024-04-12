@@ -68,8 +68,8 @@ fun ParkingListScreen(parkingViewModel: ParkingViewModel = viewModel(), createPa
     val errorState = parkingViewModel.error.collectAsState()
 
     // Observe the update event
-    LaunchedEffect(createParkingViewModel.updateEvent) {
-        createParkingViewModel.updateEvent.collect {
+    LaunchedEffect(createParkingViewModel.parkingAddedEvent) {
+        createParkingViewModel.parkingAddedEvent.collect {
             parkingViewModel.getParkingList()
         }
     }
@@ -268,3 +268,4 @@ fun AdminButtons(
         }
     }
 }
+

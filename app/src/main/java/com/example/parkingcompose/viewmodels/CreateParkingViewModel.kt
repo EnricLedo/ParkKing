@@ -20,9 +20,12 @@ class CreateParkingViewModel : ViewModel() {
     var name = mutableStateOf("")
     var description = mutableStateOf("")
     var priceMinute = mutableStateOf("")
+    var latitude = mutableStateOf(0.0)
+    var longitude = mutableStateOf(0.0)
+    var selectedImage = mutableStateOf<Uri?>(null)
 
-    private val _updateEvent = MutableSharedFlow<Unit>()
-    val updateEvent: SharedFlow<Unit> = _updateEvent
+    private val _parkingAddedEvent = MutableSharedFlow<Unit>()
+    val parkingAddedEvent: SharedFlow<Unit> = _parkingAddedEvent
 
     fun onNameChange(newValue: String) {
         name.value = newValue
@@ -36,22 +39,37 @@ class CreateParkingViewModel : ViewModel() {
         priceMinute.value = newValue
     }
 
-    suspend fun onAddParking(context: Context, image: Uri?) {
-        val imageUrl = StorageUtil.uploadImageToFirebaseStorage(image)
+    suspend fun onAddParking(context: Context, selectLocationViewModel: SelectLocationViewModel) {
+        val imageUrl = StorageUtil.uploadImageToFirebaseStorage(selectedImage.value)
 
         // Comprueba si imageUrl es null
         if (imageUrl != null) {
-            val parking = Parking(
-                location = Location(0.0, 0.0),
-                name = name.value,
-                description = description.value,
-                image = imageUrl, // Usa la URL obtenida
-                parkingRating = 0.0f,
-                reviewList = emptyList(),
-                tagList = emptyList(),
-                priceMinute = priceMinute.value.toFloat()
-            )
-            addParking(parking, context)
+            // Obtiene la ubicación seleccionada
+            val selectedLocation = selectLocationViewModel.selectedLocation.value
+
+            if (selectedLocation != null) {
+                val price = if (priceMinute.value.isNotEmpty()) {
+                    priceMinute.value.toFloat()
+                } else {
+                    // Set a default value or show an error message
+                    Toast.makeText(context, "Please enter a price -> OnAddParking Method", Toast.LENGTH_SHORT).show()
+                    return
+                }
+
+                val parking = Parking(
+                    location = Location(selectedLocation.latitude, selectedLocation.longitude),
+                    name = name.value,
+                    description = description.value,
+                    image = imageUrl, // Usa la URL obtenida
+                    parkingRating = 0.0f,
+                    reviewList = emptyList(),
+                    tagList = emptyList(),
+                    priceMinute = price
+                )
+                addParking(parking, context)
+            } else {
+                Toast.makeText(context, "Please select a location -> OnAddParking Method", Toast.LENGTH_SHORT).show()
+            }
         } else {
             Toast.makeText(context, "Failed to upload image -> OnAddParking Method", Toast.LENGTH_SHORT).show()
         }
@@ -66,7 +84,7 @@ class CreateParkingViewModel : ViewModel() {
             .addOnSuccessListener { documentReference ->
                 Log.d(TAG, "Parking added with ID: ${documentReference.id}")
                 viewModelScope.launch {
-                    _updateEvent.emit(Unit) // Emit an update event
+                    _parkingAddedEvent.emit(Unit) // Emit an update event
                 }
             }
             .addOnFailureListener { e ->
