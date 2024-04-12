@@ -3,17 +3,14 @@ package com.example.parkingcompose.screens
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -26,12 +23,21 @@ import com.example.parkingcompose.ui.theme.DaleComposeTheme
 import com.example.parkingcompose.viewmodels.MapViewModel
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.android.gms.maps.model.LatLng
 import com.example.parkingcompose.navegacion.BottomNavigationBar
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.rememberMarkerState
+
+
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun MapScreen(mapViewModel: MapViewModel, navController: NavHostController) {
     val cameraPositionState = rememberCameraPositionState()
+    val parkingListState = mapViewModel.parkingList.collectAsState()
+    val parkingList = parkingListState.value
+
 
     DaleComposeTheme {
         Scaffold(
@@ -44,7 +50,15 @@ fun MapScreen(mapViewModel: MapViewModel, navController: NavHostController) {
                     modifier = Modifier.fillMaxSize().padding(bottom = 70.dp),
                     cameraPositionState = cameraPositionState,
                     // Resto de las propiedades del mapa
-                )
+                ) {
+                    parkingList.forEach { parking ->
+                        val markerState = mapViewModel.rememberCustomMarkerState("${parking.location.latitude},${parking.location.longitude}")
+                        Marker(
+                            state = markerState,
+                            title = parking.name
+                        )
+                    }
+                }
 
                 Button(
                     onClick = {
@@ -64,5 +78,6 @@ fun MapScreen(mapViewModel: MapViewModel, navController: NavHostController) {
             }
         }
     }
+
 }
 
