@@ -20,9 +20,12 @@ class CreateParkingViewModel : ViewModel() {
     var name = mutableStateOf("")
     var description = mutableStateOf("")
     var priceMinute = mutableStateOf("")
+    var latitude = mutableStateOf(0.0)
+    var longitude = mutableStateOf(0.0)
+    var selectedImage = mutableStateOf<Uri?>(null)
 
-    private val _updateEvent = MutableSharedFlow<Unit>()
-    val updateEvent: SharedFlow<Unit> = _updateEvent
+    private val _parkingAddedEvent = MutableSharedFlow<Unit>()
+    val parkingAddedEvent: SharedFlow<Unit> = _parkingAddedEvent
 
     fun onNameChange(newValue: String) {
         name.value = newValue
@@ -36,8 +39,8 @@ class CreateParkingViewModel : ViewModel() {
         priceMinute.value = newValue
     }
 
-    suspend fun onAddParking(context: Context, image: Uri?) {
-        val imageUrl = StorageUtil.uploadImageToFirebaseStorage(image)
+    suspend fun onAddParking(context: Context, selectLocationViewModel: SelectLocationViewModel) {
+        val imageUrl = StorageUtil.uploadImageToFirebaseStorage(selectedImage.value)
 
         // Comprueba si imageUrl es null
         if (imageUrl != null) {
@@ -73,5 +76,23 @@ class CreateParkingViewModel : ViewModel() {
         } else {
             Toast.makeText(context, "Failed to upload image -> OnAddParking Method", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun addParking(parking: Parking, localContext: Context) {
+        val db = FirebaseFirestore.getInstance()
+
+        // Añade un nuevo documento a la colección "parkings"
+        db.collection("parkings")
+            .add(parking)
+            .addOnSuccessListener { documentReference ->
+                Log.d(TAG, "Parking added with ID: ${documentReference.id}")
+                viewModelScope.launch {
+                    _parkingAddedEvent.emit(Unit) // Emit an update event
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.w(TAG, "Error adding parking", e)
+                Toast.makeText (localContext, "Error adding parking -> addParking Method", Toast.LENGTH_SHORT).show()
+            }
     }
 }

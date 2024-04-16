@@ -1,5 +1,6 @@
 package com.example.parkingcompose
 
+
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
@@ -33,6 +34,7 @@ import com.example.parkingcompose.viewmodels.SignInGoogleViewModel
 import com.google.android.gms.auth.api.identity.Identity
 import com.example.parkingcompose.screens.ProfileScreen
 import com.example.parkingcompose.screens.RegisterScreen
+import com.example.parkingcompose.screens.SelectLocationScreen
 import com.example.parkingcompose.screens.UpdateUsernameScreen
 import com.example.parkingcompose.ui.theme.DaleComposeTheme
 import com.example.parkingcompose.viewmodels.CreateParkingViewModel
@@ -40,6 +42,7 @@ import com.example.parkingcompose.viewmodels.LoginMailViewModel
 import com.example.parkingcompose.viewmodels.MapViewModel
 import com.example.parkingcompose.viewmodels.ParkingViewModel
 import com.example.parkingcompose.viewmodels.RegisterViewModel
+import com.example.parkingcompose.viewmodels.SelectLocationViewModel
 import com.example.parkingcompose.viewmodels.UpdateUsernameViewModel
 
 
@@ -64,6 +67,7 @@ class MainActivity : ComponentActivity() {
         val createParkingViewModel: CreateParkingViewModel by viewModels()
         val forgotPasswordViewModel: ForgotPasswordViewModel by viewModels()
         val updateUsernameViewModel: UpdateUsernameViewModel by viewModels()
+        val selectLocationScreen : SelectLocationViewModel by viewModels()
         val locationRepository = LocationRepository(this)
 
         val mapViewModel: MapViewModel by viewModels { MapViewModelFactory(locationRepository) }
@@ -158,7 +162,7 @@ class MainActivity : ComponentActivity() {
 
                         composable("mapa") {
 
-                            MapScreen(mapViewModel,navController)
+                            MapScreen(createParkingViewModel,mapViewModel,navController)
                         }
 
                         composable("parkingList") {
@@ -168,7 +172,7 @@ class MainActivity : ComponentActivity() {
                             RegisterScreen(registerViewModel,navController, googleAuthUiClient)
                         }
                         composable("crearparking"){
-                            CreateParkingScreen(createParkingViewModel,navController)
+                            CreateParkingScreen(createParkingViewModel,selectLocationScreen,navController)
                         }
                         composable("forgotpassword"){
                             ForgotPasswordScreen(forgotPasswordViewModel)

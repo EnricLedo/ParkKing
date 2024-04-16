@@ -15,5 +15,6 @@ data class Parking(
     val parkingRating: Float = 0.0f,
     val reviewList: List<Review> = emptyList(),
     val tagList: List<Tag> = emptyList(),
-    val priceMinute: Float = 0.0f
+    val priceMinute: Float = 0.0f,
+    val checked: Boolean = false
 )
