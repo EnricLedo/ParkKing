@@ -41,7 +41,13 @@ class CreateParkingViewModel : ViewModel() {
 
         // Comprueba si imageUrl es null
         if (imageUrl != null) {
+            val db = FirebaseFirestore.getInstance()
+
+            // Crea un nuevo documento en la colección "parkings" con un ID automático
+            val newParkingRef = db.collection("parkings").document()
+
             val parking = Parking(
+                id = newParkingRef.id, // Usa el ID del nuevo documento
                 location = Location(0.0, 0.0),
                 name = name.value,
                 description = description.value,
@@ -51,27 +57,21 @@ class CreateParkingViewModel : ViewModel() {
                 tagList = emptyList(),
                 priceMinute = priceMinute.value.toFloat()
             )
-            addParking(parking, context)
+
+            // Sube el objeto Parking a Firestore
+            newParkingRef.set(parking)
+                .addOnSuccessListener {
+                    Log.d(TAG, "Parking added with ID: ${newParkingRef.id}")
+                    viewModelScope.launch {
+                        _updateEvent.emit(Unit) // Emit an update event
+                    }
+                }
+                .addOnFailureListener { e ->
+                    Log.w(TAG, "Error adding parking", e)
+                    Toast.makeText(context, "Error adding parking -> addParking Method", Toast.LENGTH_SHORT).show()
+                }
         } else {
             Toast.makeText(context, "Failed to upload image -> OnAddParking Method", Toast.LENGTH_SHORT).show()
         }
-    }
-
-    private fun addParking(parking: Parking, localContext: Context) {
-        val db = FirebaseFirestore.getInstance()
-
-        // Añade un nuevo documento a la colección "parkings"
-        db.collection("parkings")
-            .add(parking)
-            .addOnSuccessListener { documentReference ->
-                Log.d(TAG, "Parking added with ID: ${documentReference.id}")
-                viewModelScope.launch {
-                    _updateEvent.emit(Unit) // Emit an update event
-                }
-            }
-            .addOnFailureListener { e ->
-                Log.w(TAG, "Error adding parking", e)
-                Toast.makeText (localContext, "Error adding parking -> addParking Method", Toast.LENGTH_SHORT).show()
-            }
     }
 }

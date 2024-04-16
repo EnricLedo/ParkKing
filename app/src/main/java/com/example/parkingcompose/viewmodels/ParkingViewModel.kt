@@ -1,5 +1,8 @@
 package com.example.parkingcompose.viewmodels
 
+import android.content.ContentValues.TAG
+import android.util.Log
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.parkingcompose.data.Parking
@@ -34,15 +37,17 @@ class ParkingViewModel : ViewModel() {
             }
         }
     }
+    suspend fun getParkingById(id: String): Parking? {
+        return try {
+            val querySnapshot = db.collection("parkings").whereEqualTo("id", id).get().await()
+            val parking = querySnapshot.documents.mapNotNull { document ->
+                document.toObject(Parking::class.java)
+            }.firstOrNull()
 
-    fun deleteParking(parking: Parking) {
-        viewModelScope.launch {
-            try {
-                //db.collection("parkings").document(parking.).delete().await()
-                getParkingList()
-            } catch (e: Exception) {
-                _error.value = "Error al borrar el parking: ${e.message}"
-            }
+            parking // Returns the Parking object
+        } catch (e: Exception) {
+            Log.e(TAG, "Error al cargar el parking: ${e.message}")
+            null
         }
     }
 }
