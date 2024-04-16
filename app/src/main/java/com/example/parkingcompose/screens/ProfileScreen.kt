@@ -58,6 +58,12 @@ fun ProfileScreen(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                 }
+                Button(onClick = { navController.navigate("moderate") }){
+                    Text(text = "MODERATE PARKINGS", style = ButtonTextStyle)
+                }
+
+                Spacer(modifier = Modifier.height(46.dp))
+
                 Button(onClick = { navController.navigate("updateusername") }){
                     Text(text = "CHANGE USERNAME", style = ButtonTextStyle)
                 }

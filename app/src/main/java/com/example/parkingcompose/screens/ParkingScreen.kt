@@ -167,7 +167,7 @@ fun ParkingItem(
 
 
 @Composable
-private fun ParkingItemButton(
+fun ParkingItemButton(
     expanded: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier

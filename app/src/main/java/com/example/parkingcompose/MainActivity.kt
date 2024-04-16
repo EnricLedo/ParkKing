@@ -28,6 +28,7 @@ import com.example.parkingcompose.screens.CreateParkingScreen
 import com.example.parkingcompose.screens.ForgotPasswordScreen
 import com.example.parkingcompose.screens.LoginScreen
 import com.example.parkingcompose.screens.MapScreen
+import com.example.parkingcompose.screens.ModerateScreen
 import com.example.parkingcompose.screens.ParkingListScreen
 import com.example.parkingcompose.viewmodels.SignInGoogleViewModel
 import com.google.android.gms.auth.api.identity.Identity
@@ -181,6 +182,9 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("SelectLocationScreen") { backStackEntry ->
                             SelectLocationScreen(selectLocationScreen, navController)
+                        }
+                        composable("moderate"){
+                            ModerateScreen(parkingViewModel,navController)
                         }
                     }
                 }
