@@ -53,10 +53,12 @@ class ModerateViewModel : ViewModel() {
     }
 
     fun enableParking(id: String) {
-        parkingDao.enableParking(id).addOnSuccessListener {
-            viewModelScope.launch {
-                _parkingEnabledEvent.emit(Unit) // Emit an update event
-            }
+        val parkingDocument = db.collection("parkings").document(id)
+        parkingDocument.update("checked", true).addOnSuccessListener {
+            // After the update is successful, refresh the parking list
+            getParkingList()
+        }.addOnFailureListener {
+            // Handle failure
         }
     }
 }

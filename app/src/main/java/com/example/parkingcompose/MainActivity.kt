@@ -176,6 +176,7 @@ class MainActivity : ComponentActivity() {
                             ParkingListScreen(
                                 parkingViewModel,
                                 createParkingViewModel,
+                                moderateViewModel,
                                 navController
                             )
                         }
@@ -206,7 +207,7 @@ class MainActivity : ComponentActivity() {
                             SelectLocationScreen(selectLocationScreen, navController)
                         }
                         composable("moderate") {
-                            ModerateScreen(parkingViewModel, navController)
+                            ModerateScreen(moderateViewModel,createParkingViewModel, navController)
                         }
                         }
                     }

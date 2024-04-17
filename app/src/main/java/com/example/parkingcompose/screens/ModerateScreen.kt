@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,15 +33,28 @@ import coil.transform.CircleCropTransformation
 import com.example.parkingcompose.data.Parking
 import com.example.parkingcompose.navegacion.BottomNavigationBar
 import com.example.parkingcompose.ui.theme.OrangeLight
+import com.example.parkingcompose.viewmodels.CreateParkingViewModel
 import com.example.parkingcompose.viewmodels.ModerateViewModel
 import com.example.parkingcompose.viewmodels.ParkingViewModel
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun ModerateScreen(parkingViewModel: ParkingViewModel = viewModel(), navController: NavHostController) {
-    val parkingListState = parkingViewModel.parkingList.collectAsState()
-    val errorState = parkingViewModel.error.collectAsState()
+fun ModerateScreen(moderateViewModel: ModerateViewModel = viewModel(), createParkingViewModel: CreateParkingViewModel = viewModel(), navController: NavHostController) {
+    val parkingListState = moderateViewModel.parkingList.collectAsState()
+    val errorState = moderateViewModel.error.collectAsState()
+
+    // Fetch the parking list when ModerateScreen appears
+    LaunchedEffect(key1 = Unit) {
+        moderateViewModel.getParkingList()
+    }
+
+    // Observe the parking added event
+    LaunchedEffect(createParkingViewModel.parkingAddedEvent) {
+        createParkingViewModel.parkingAddedEvent.collect {
+            moderateViewModel.getParkingList()
+        }
+    }
 
     val parkingList = parkingListState.value
 
@@ -58,7 +72,7 @@ fun ModerateScreen(parkingViewModel: ParkingViewModel = viewModel(), navControll
                     if (parking.checked == false) {
                         ParkingModerateItem(
                             parking = parking,
-                            moderateViewModel = viewModel<ModerateViewModel>(),
+                            moderateViewModel = moderateViewModel,
                             modifier = Modifier.padding(8.dp),
                             navController = navController
                         )
@@ -134,7 +148,6 @@ fun ParkingModerateItem(
                     Button(
                         onClick = {
                             moderateViewModel.enableParking(parking.id)
-
                         },
                         modifier = Modifier.padding(end = 8.dp)
                     ) {
