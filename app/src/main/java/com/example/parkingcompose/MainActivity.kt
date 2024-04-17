@@ -124,8 +124,12 @@ class MainActivity : ComponentActivity() {
                                 registerViewModel = registerViewModel,
                                 googleAuthUiClient = googleAuthUiClient,
                                 onLogin = { email, password ->
-                                    lifecycleScope.launch {
-                                        loginViewModel.login(this@MainActivity, email, password)
+                                    if (email.isEmpty() || password.isEmpty()) {
+                                        Toast.makeText(this@MainActivity, "El correo electrónico o la contraseña no pueden estar vacíos", Toast.LENGTH_SHORT).show()
+                                    } else {
+                                        lifecycleScope.launch {
+                                            loginViewModel.login(this@MainActivity, email, password)
+                                        }
                                     }
                                 },
                                 onRegister = { navController.navigate("register") },
@@ -140,6 +144,7 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
                             )
+
 
 
                         }
