@@ -103,11 +103,18 @@ fun ParkingListScreen(parkingViewModel: ParkingViewModel = viewModel(), createPa
                 }
             }
             Button(
-                onClick = { navController.navigate("review")},
+                onClick = { navController.navigate("createReview") },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Crear Reseña")
             }
+            Button(
+                onClick = { navController.navigate("listReviews") },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Volver a la Lista de Reseñas")
+            }
+
         }
     }
 }

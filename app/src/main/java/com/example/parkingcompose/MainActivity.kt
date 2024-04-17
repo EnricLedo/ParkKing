@@ -1,5 +1,7 @@
 package com.example.parkingcompose
 
+
+import ReviewViewModel
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
@@ -20,28 +22,33 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.parkingcompose.dao.ReviewDaoImpl
 import com.example.parkingcompose.data.LocationRepository
 import com.example.parkingcompose.data.MapViewModelFactory
+import com.example.parkingcompose.screens.CreateParkingScreen
+import com.example.parkingcompose.screens.CreateReviewScreen
 import com.example.parkingcompose.screens.ForgotPasswordScreen
+import com.example.parkingcompose.screens.ListReviewScreen
 import com.example.parkingcompose.screens.LoginScreen
 import com.example.parkingcompose.screens.MapScreen
 import com.example.parkingcompose.screens.ParkingListScreen
-import com.example.parkingcompose.viewmodels.SignInGoogleViewModel
-import com.google.android.gms.auth.api.identity.Identity
 import com.example.parkingcompose.screens.ProfileScreen
 import com.example.parkingcompose.screens.RegisterScreen
-import com.example.parkingcompose.screens.ReviewScreen
+import com.example.parkingcompose.screens.UpdateUsernameScreen
 import com.example.parkingcompose.ui.theme.DaleComposeTheme
 import com.example.parkingcompose.util.GoogleAuthUiClient
+import com.example.parkingcompose.viewmodels.CreateParkingViewModel
 import com.example.parkingcompose.viewmodels.LoginMailViewModel
 import com.example.parkingcompose.viewmodels.MapViewModel
 import com.example.parkingcompose.viewmodels.ParkingViewModel
 import com.example.parkingcompose.viewmodels.RegisterViewModel
-import com.example.parkingcompose.viewmodels.ReviewViewModel
-
+import com.example.parkingcompose.viewmodels.SignInGoogleViewModel
+import com.example.parkingcompose.viewmodels.UpdateUsernameViewModel
+import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
+
 
     private val googleAuthUiClient by lazy {
         GoogleAuthUiClient(
@@ -53,17 +60,25 @@ class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Crear una instancia de ReviewDao
+        val reviewDao = ReviewDaoImpl()
+
+        // Crear una instancia de ReviewViewModel con la instancia de ReviewDao
+        val reviewViewModel = ReviewViewModel(reviewDao)
+
         val signInViewModel: SignInGoogleViewModel by viewModels()
         val loginViewModel: LoginMailViewModel by viewModels()
         val parkingViewModel: ParkingViewModel by viewModels()
         val registerViewModel: RegisterViewModel by viewModels()
-        val crearParkingViewModel: CrearParkingViewModel by viewModels()
+        val createParkingViewModel: CreateParkingViewModel by viewModels()
         val forgotPasswordViewModel: ForgotPasswordViewModel by viewModels()
+        val updateUsernameViewModel: UpdateUsernameViewModel by viewModels()
         val locationRepository = LocationRepository(this)
-        val reviewViewModel: ReviewViewModel by viewModels()
+
         val mapViewModel: MapViewModel by viewModels { MapViewModelFactory(locationRepository) }
         setContent {
-            DaleComposeTheme{
+            DaleComposeTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize()
                 ) {
@@ -73,7 +88,7 @@ class MainActivity : ComponentActivity() {
                             val state by signInViewModel.state.collectAsStateWithLifecycle()
 
                             LaunchedEffect(key1 = Unit) {
-                                if(googleAuthUiClient.getSignedInUser() != null) {
+                                if (googleAuthUiClient.getSignedInUser() != null) {
                                     navController.navigate("mapa")
                                 }
                             }
@@ -81,7 +96,7 @@ class MainActivity : ComponentActivity() {
                             val launcher = rememberLauncherForActivityResult(
                                 contract = ActivityResultContracts.StartIntentSenderForResult(),
                                 onResult = { result ->
-                                    if(result.resultCode == RESULT_OK) {
+                                    if (result.resultCode == RESULT_OK) {
                                         lifecycleScope.launch {
                                             val signInResult = googleAuthUiClient.signInWithIntent(
                                                 intent = result.data ?: return@launch
@@ -93,13 +108,13 @@ class MainActivity : ComponentActivity() {
                             )
 
                             LaunchedEffect(key1 = state.isSignInSuccessful) {
-                                if(state.isSignInSuccessful) {
+                                if (state.isSignInSuccessful) {
                                     Toast.makeText(
                                         applicationContext,
                                         "Sign in successful",
                                         Toast.LENGTH_LONG
                                     ).show()
-
+                                    RegisterViewModel().registerUser(googleAuthUiClient)
                                     navController.navigate("mapa")
                                     signInViewModel.resetState()
                                 }
@@ -109,14 +124,14 @@ class MainActivity : ComponentActivity() {
                                 navHostController = navController,
                                 state = state,
                                 loginViewModel = loginViewModel,
+                                registerViewModel = registerViewModel,
+                                googleAuthUiClient = googleAuthUiClient,
                                 onLogin = { email, password ->
                                     lifecycleScope.launch {
                                         loginViewModel.login(this@MainActivity, email, password)
                                     }
-                                }
-
-                            ,
-                                onRegister = {navController.navigate("register")},
+                                },
+                                onRegister = { navController.navigate("register") },
                                 onSignInClick = {
                                     lifecycleScope.launch {
                                         val signInIntentSender = googleAuthUiClient.signIn()
@@ -128,8 +143,6 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
                             )
-
-
                         }
                         composable("profile") {
                             ProfileScreen(
@@ -142,7 +155,6 @@ class MainActivity : ComponentActivity() {
                                             "Signed out",
                                             Toast.LENGTH_LONG
                                         ).show()
-
                                         navController.navigate("sign_in")
                                     }
                                 },
@@ -151,24 +163,37 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable("mapa") {
-
-                            MapScreen(mapViewModel,navController)
+                            MapScreen(mapViewModel, navController)
                         }
 
                         composable("parkingList") {
-                            ParkingListScreen(parkingViewModel,createParkingViewModel,navController)
+                            ParkingListScreen(
+                                parkingViewModel,
+                                createParkingViewModel,
+                                navController
+                            )
                         }
-                        composable("register"){
-                            RegisterScreen(registerViewModel,navController)
+                        composable("register") {
+                            RegisterScreen(registerViewModel, navController, googleAuthUiClient)
                         }
-                        composable("crearparking"){
-                            CrearParkingScreen(crearParkingViewModel)
+                        composable("crearparking") {
+                            CreateParkingScreen(createParkingViewModel, navController)
                         }
-                        composable("forgotpassword"){
+                        composable("forgotpassword") {
                             ForgotPasswordScreen(forgotPasswordViewModel)
                         }
-                        composable("review"){
-                            ReviewScreen(reviewViewModel)
+                        composable("updateusername") {
+                            UpdateUsernameScreen(updateUsernameViewModel, navController)
+                        }
+
+                        composable("createReview") {
+                            CreateReviewScreen(
+                                navController = navController,
+                                viewModel = reviewViewModel
+                            )
+                        }
+                        composable("listReviewScreen") {
+                            ListReviewScreen(viewModel = reviewViewModel)
                         }
                     }
                 }

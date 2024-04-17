@@ -3,6 +3,7 @@ package com.example.parkingcompose.data
 import java.util.Date
 
 data class Review(
+    val id: String? = null,
     var review_rating: Float,
     val comment: String,
     val title: String,
