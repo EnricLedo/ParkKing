@@ -94,7 +94,7 @@ fun CreateParkingScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text("Location: Lat = ${createParkingViewModel.latitude.value}, Lon = ${createParkingViewModel.longitude.value}")
-            Button(onClick = { navController.navigate("SelectLocationScreen") }) {
+            Button(onClick = { navController.navigate("selectLocation") }) {
                 Text("Select Location")
             }
 

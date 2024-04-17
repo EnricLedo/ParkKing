@@ -50,4 +50,9 @@ class ParkingViewModel : ViewModel() {
             null
         }
     }
+
+    fun updateParkingList() {
+        getParkingList()
+    }
+
 }

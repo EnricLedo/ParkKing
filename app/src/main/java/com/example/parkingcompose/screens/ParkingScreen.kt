@@ -96,12 +96,14 @@ fun ParkingListScreen(parkingViewModel: ParkingViewModel = viewModel(), createPa
 
             LazyColumn {
                 items(parkingList) { parking ->
+                    if(parking.checked == true){
                     ParkingItem(
                         parking = parking,
                         parkingViewModel = parkingViewModel,
                         modifier = Modifier.padding(8.dp),
                         navController
                     )
+                    }
                 }
             }
         }
@@ -214,6 +216,7 @@ fun ParkingInformation(
     navController: NavHostController
 ) {
     Column(modifier = modifier) {
+        Text( text = parkingId)
         Text(
             text = parkingName,
             style = MaterialTheme.typography.displaySmall.copy(color = Color.Black),

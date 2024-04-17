@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
-import com.example.parkingcompose.viewmodels.ParkingViewModel
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -32,6 +32,9 @@ import coil.transform.CircleCropTransformation
 import com.example.parkingcompose.data.Parking
 import com.example.parkingcompose.navegacion.BottomNavigationBar
 import com.example.parkingcompose.ui.theme.OrangeLight
+import com.example.parkingcompose.viewmodels.ModerateViewModel
+import com.example.parkingcompose.viewmodels.ParkingViewModel
+
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -51,11 +54,15 @@ fun ModerateScreen(parkingViewModel: ParkingViewModel = viewModel(), navControll
 
             LazyColumn {
                 items(parkingList) { parking ->
-                    ParkingModerateItem(
-                        parking = parking,
-                        parkingViewModel = parkingViewModel,
-                        modifier = Modifier.padding(8.dp)
-                    )
+
+                    if (parking.checked == false) {
+                        ParkingModerateItem(
+                            parking = parking,
+                            moderateViewModel = viewModel<ModerateViewModel>(),
+                            modifier = Modifier.padding(8.dp),
+                            navController = navController
+                        )
+                    }
                 }
             }
         }
@@ -65,8 +72,10 @@ fun ModerateScreen(parkingViewModel: ParkingViewModel = viewModel(), navControll
 @Composable
 fun ParkingModerateItem(
     parking: Parking,
-    parkingViewModel: ParkingViewModel,
-    modifier: Modifier = Modifier
+    moderateViewModel: ModerateViewModel,
+    modifier: Modifier = Modifier,
+    navController: NavHostController
+
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -95,7 +104,7 @@ fun ParkingModerateItem(
                     .padding(8.dp)
             ) {
                 ParkingIcon(parking.image)
-                ParkingInformation(parking.name, parking.parkingRating)
+                ParkingModerateInformation(parking.id, parking.name, parking.parkingRating, modifier)
                 Spacer(Modifier.weight(1f))
                 ParkingItemButton(
                     expanded = expanded,
@@ -123,12 +132,39 @@ fun ParkingModerateItem(
                     }
 
                     Button(
-                        onClick = { /* Aquí va el código para aceptar el parking */ }
+                        onClick = {
+                            moderateViewModel.enableParking(parking.id)
+
+                        },
+                        modifier = Modifier.padding(end = 8.dp)
                     ) {
                         Text("Aceptar")
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+fun ParkingModerateInformation(
+    parkingId: String,
+    parkingName: String,
+    parkingRating: Float,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier = modifier) {
+        Text( text = parkingId)
+        Text(
+            text = parkingName,
+            style = MaterialTheme.typography.displaySmall.copy(color = Color.Black),
+            modifier = Modifier
+                .padding(top = 8.dp)
+
+        )
+        Text(
+            text = parkingRating.toString(),
+            style = MaterialTheme.typography.bodyMedium
+        )
     }
 }

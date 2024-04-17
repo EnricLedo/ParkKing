@@ -1,6 +1,5 @@
 package com.example.parkingcompose
 
-
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
@@ -28,6 +27,7 @@ import com.example.parkingcompose.screens.CreateParkingScreen
 import com.example.parkingcompose.screens.ForgotPasswordScreen
 import com.example.parkingcompose.screens.LoginScreen
 import com.example.parkingcompose.screens.MapScreen
+import com.example.parkingcompose.screens.ModerateScreen
 import com.example.parkingcompose.screens.ParkingDetailsScreen
 import com.example.parkingcompose.screens.ParkingListScreen
 import com.example.parkingcompose.viewmodels.SignInGoogleViewModel
@@ -40,6 +40,7 @@ import com.example.parkingcompose.ui.theme.DaleComposeTheme
 import com.example.parkingcompose.viewmodels.CreateParkingViewModel
 import com.example.parkingcompose.viewmodels.LoginMailViewModel
 import com.example.parkingcompose.viewmodels.MapViewModel
+import com.example.parkingcompose.viewmodels.ModerateViewModel
 import com.example.parkingcompose.viewmodels.ParkingViewModel
 import com.example.parkingcompose.viewmodels.RegisterViewModel
 import com.example.parkingcompose.viewmodels.SelectLocationViewModel
@@ -68,6 +69,7 @@ class MainActivity : ComponentActivity() {
         val forgotPasswordViewModel: ForgotPasswordViewModel by viewModels()
         val updateUsernameViewModel: UpdateUsernameViewModel by viewModels()
         val selectLocationScreen : SelectLocationViewModel by viewModels()
+        val moderateViewModel: ModerateViewModel by viewModels()
         val locationRepository = LocationRepository(this)
 
         val mapViewModel: MapViewModel by viewModels { MapViewModelFactory(locationRepository) }
@@ -82,7 +84,7 @@ class MainActivity : ComponentActivity() {
                             val state by signInViewModel.state.collectAsStateWithLifecycle()
 
                             LaunchedEffect(key1 = Unit) {
-                                if(googleAuthUiClient.getSignedInUser() != null) {
+                                if (googleAuthUiClient.getSignedInUser() != null) {
                                     navController.navigate("mapa")
                                 }
                             }
@@ -90,7 +92,7 @@ class MainActivity : ComponentActivity() {
                             val launcher = rememberLauncherForActivityResult(
                                 contract = ActivityResultContracts.StartIntentSenderForResult(),
                                 onResult = { result ->
-                                    if(result.resultCode == RESULT_OK) {
+                                    if (result.resultCode == RESULT_OK) {
                                         lifecycleScope.launch {
                                             val signInResult = googleAuthUiClient.signInWithIntent(
                                                 intent = result.data ?: return@launch
@@ -102,7 +104,7 @@ class MainActivity : ComponentActivity() {
                             )
 
                             LaunchedEffect(key1 = state.isSignInSuccessful) {
-                                if(state.isSignInSuccessful) {
+                                if (state.isSignInSuccessful) {
 
                                     Toast.makeText(
                                         applicationContext,
@@ -116,28 +118,28 @@ class MainActivity : ComponentActivity() {
                             }
 
                             LoginScreen(
-                                        navHostController = navController,
-                                        state = state,
-                                        loginViewModel = loginViewModel,
-                                        registerViewModel = registerViewModel,
-                                        googleAuthUiClient = googleAuthUiClient,
-                                        onLogin = { email, password ->
-                                            lifecycleScope.launch {
-                                                loginViewModel.login(this@MainActivity, email, password)
-                                            }
-                                        },
-                                        onRegister = { navController.navigate("register") },
-                                        onSignInClick = {
-                                            lifecycleScope.launch {
-                                                val signInIntentSender = googleAuthUiClient.signIn()
-                                                launcher.launch(
-                                                    IntentSenderRequest.Builder(
-                                                        signInIntentSender ?: return@launch
-                                                    ).build()
-                                                )
-                                            }
-                                        }
-                                    )
+                                navHostController = navController,
+                                state = state,
+                                loginViewModel = loginViewModel,
+                                registerViewModel = registerViewModel,
+                                googleAuthUiClient = googleAuthUiClient,
+                                onLogin = { email, password ->
+                                    lifecycleScope.launch {
+                                        loginViewModel.login(this@MainActivity, email, password)
+                                    }
+                                },
+                                onRegister = { navController.navigate("register") },
+                                onSignInClick = {
+                                    lifecycleScope.launch {
+                                        val signInIntentSender = googleAuthUiClient.signIn()
+                                        launcher.launch(
+                                            IntentSenderRequest.Builder(
+                                                signInIntentSender ?: return@launch
+                                            ).build()
+                                        )
+                                    }
+                                }
+                            )
 
 
                         }
@@ -162,29 +164,46 @@ class MainActivity : ComponentActivity() {
 
                         composable("mapa") {
 
-                            MapScreen(createParkingViewModel,mapViewModel,navController)
+                            MapScreen(createParkingViewModel, mapViewModel, navController)
                         }
 
                         composable("parkingList") {
-                            ParkingListScreen(parkingViewModel,createParkingViewModel,navController)
+                            ParkingListScreen(
+                                parkingViewModel,
+                                createParkingViewModel,
+                                navController
+                            )
                         }
-                        composable("register"){
-                            RegisterScreen(registerViewModel,navController, googleAuthUiClient)
+                        composable("register") {
+                            RegisterScreen(registerViewModel, navController, googleAuthUiClient)
                         }
-                        composable("crearparking"){
-                            CreateParkingScreen(createParkingViewModel,selectLocationScreen,navController)
+                        composable("crearparking") {
+                            CreateParkingScreen(
+                                createParkingViewModel,
+                                selectLocationScreen,
+                                navController
+                            )
                         }
-                        composable("forgotpassword"){
+                        composable("forgotpassword") {
                             ForgotPasswordScreen(forgotPasswordViewModel)
                         }
-                        composable("updateusername"){
-                            UpdateUsernameScreen(updateUsernameViewModel,navController)
+                        composable("updateusername") {
+                            UpdateUsernameScreen(updateUsernameViewModel, navController)
                         }
-                        composable("parkingDetails"){
-                                ParkingDetailsScreen(parkingId = it.arguments?.getString("parkingId") ?: "", navController, parkingViewModel)
-                            }
+                        composable("parkingDetailsScreen") {
+                            ParkingDetailsScreen(
+                                parkingId = it.arguments?.getString("parkingId") ?: "",
+                                navController,
+                                parkingViewModel
+                            )
                         }
-
+                        composable("selectLocation") { backStackEntry ->
+                            SelectLocationScreen(selectLocationScreen, navController)
+                        }
+                        composable("moderate") {
+                            ModerateScreen(parkingViewModel, navController)
+                        }
+                        }
                     }
                 }
             }

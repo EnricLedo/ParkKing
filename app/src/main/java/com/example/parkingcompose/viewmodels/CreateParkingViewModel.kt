@@ -23,6 +23,8 @@ class CreateParkingViewModel : ViewModel() {
     var latitude = mutableStateOf(0.0)
     var longitude = mutableStateOf(0.0)
     var selectedImage = mutableStateOf<Uri?>(null)
+    val db = FirebaseFirestore.getInstance()
+    val newParkingRef = db.collection("parkings").document()
 
     private val _parkingAddedEvent = MutableSharedFlow<Unit>()
     val parkingAddedEvent: SharedFlow<Unit> = _parkingAddedEvent
@@ -44,48 +46,43 @@ class CreateParkingViewModel : ViewModel() {
 
         // Comprueba si imageUrl es null
         if (imageUrl != null) {
-            val db = FirebaseFirestore.getInstance()
+            // Obtiene la ubicación seleccionada
+            val selectedLocation = selectLocationViewModel.selectedLocation.value
 
-            // Crea un nuevo documento en la colección "parkings" con un ID automático
-            val newParkingRef = db.collection("parkings").document()
-
-            val parking = Parking(
-                id = newParkingRef.id, // Usa el ID del nuevo documento
-                location = Location(0.0, 0.0),
-                name = name.value,
-                description = description.value,
-                image = imageUrl, // Usa la URL obtenida
-                parkingRating = 0.0f,
-                reviewList = emptyList(),
-                tagList = emptyList(),
-                priceMinute = priceMinute.value.toFloat()
-            )
-
-            // Sube el objeto Parking a Firestore
-            newParkingRef.set(parking)
-                .addOnSuccessListener {
-                    Log.d(TAG, "Parking added with ID: ${newParkingRef.id}")
-                    viewModelScope.launch {
-                        _updateEvent.emit(Unit) // Emit an update event
-                    }
+            if (selectedLocation != null) {
+                val price = if (priceMinute.value.isNotEmpty()) {
+                    priceMinute.value.toFloat()
+                } else {
+                    // Set a default value or show an error message
+                    Toast.makeText(context, "Please enter a price -> OnAddParking Method", Toast.LENGTH_SHORT).show()
+                    return
                 }
-                .addOnFailureListener { e ->
-                    Log.w(TAG, "Error adding parking", e)
-                    Toast.makeText(context, "Error adding parking -> addParking Method", Toast.LENGTH_SHORT).show()
-                }
+
+                val parking = Parking(
+                    id = newParkingRef.id,
+                    location = Location(selectedLocation.latitude, selectedLocation.longitude),
+                    name = name.value,
+                    description = description.value,
+                    image = imageUrl, // Usa la URL obtenida
+                    parkingRating = 0.0f,
+                    reviewList = emptyList(),
+                    tagList = emptyList(),
+                    priceMinute = price
+                )
+                addParking(parking, context)
+            } else {
+                Toast.makeText(context, "Please select a location -> OnAddParking Method", Toast.LENGTH_SHORT).show()
+            }
         } else {
             Toast.makeText(context, "Failed to upload image -> OnAddParking Method", Toast.LENGTH_SHORT).show()
         }
     }
 
     private fun addParking(parking: Parking, localContext: Context) {
-        val db = FirebaseFirestore.getInstance()
-
         // Añade un nuevo documento a la colección "parkings"
-        db.collection("parkings")
-            .add(parking)
-            .addOnSuccessListener { documentReference ->
-                Log.d(TAG, "Parking added with ID: ${documentReference.id}")
+        newParkingRef.set(parking)
+            .addOnSuccessListener {
+                Log.d(TAG, "Parking added with ID: ${newParkingRef.id}")
                 viewModelScope.launch {
                     _parkingAddedEvent.emit(Unit) // Emit an update event
                 }
