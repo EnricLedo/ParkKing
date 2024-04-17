@@ -41,14 +41,14 @@ class ModerateViewModel : ViewModel() {
         }
     }
 
-    fun deleteParking(parking: Parking) {
-        viewModelScope.launch {
-            try {
-                //db.collection("parkings").document(parking.).delete().await()
-                getParkingList()
-            } catch (e: Exception) {
-                _error.value = "Error al borrar el parking: ${e.message}"
-            }
+    fun denyParking(id: String) {
+        val parkingDocument = db.collection("parkings").document(id)
+        parkingDocument.delete().addOnSuccessListener {
+            // After the deletion is successful, refresh the parking list
+            getParkingList()
+        }.addOnFailureListener { e ->
+            // Handle failure
+            _error.value = "Error al eliminar el parking: ${e.message}"
         }
     }
 

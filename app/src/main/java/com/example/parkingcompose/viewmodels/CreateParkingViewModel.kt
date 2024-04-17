@@ -11,6 +11,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.parkingcompose.data.Location
 import com.example.parkingcompose.data.Parking
 import com.example.parkingcompose.util.StorageUtil
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -24,7 +25,6 @@ class CreateParkingViewModel : ViewModel() {
     var longitude = mutableStateOf(0.0)
     var selectedImage = mutableStateOf<Uri?>(null)
     val db = FirebaseFirestore.getInstance()
-    val newParkingRef = db.collection("parkings").document()
 
     private val _parkingAddedEvent = MutableSharedFlow<Unit>()
     val parkingAddedEvent: SharedFlow<Unit> = _parkingAddedEvent
@@ -59,7 +59,7 @@ class CreateParkingViewModel : ViewModel() {
                 }
 
                 val parking = Parking(
-                    id = newParkingRef.id,
+                    id = db.collection("parkings").document().id,
                     location = Location(selectedLocation.latitude, selectedLocation.longitude),
                     name = name.value,
                     description = description.value,
@@ -70,6 +70,8 @@ class CreateParkingViewModel : ViewModel() {
                     priceMinute = price
                 )
                 addParking(parking, context)
+                selectLocationViewModel.resetSelectedLocation() // Reset the selected location after a parking is added
+                resetFields()
             } else {
                 Toast.makeText(context, "Please select a location -> OnAddParking Method", Toast.LENGTH_SHORT).show()
             }
@@ -80,6 +82,7 @@ class CreateParkingViewModel : ViewModel() {
 
     private fun addParking(parking: Parking, localContext: Context) {
         // Añade un nuevo documento a la colección "parkings"
+        val newParkingRef = db.collection("parkings").document(parking.id)
         newParkingRef.set(parking)
             .addOnSuccessListener {
                 Log.d(TAG, "Parking added with ID: ${newParkingRef.id}")
@@ -91,5 +94,14 @@ class CreateParkingViewModel : ViewModel() {
                 Log.w(TAG, "Error adding parking", e)
                 Toast.makeText (localContext, "Error adding parking -> addParking Method", Toast.LENGTH_SHORT).show()
             }
+    }
+
+    private fun resetFields() {
+        name.value = ""
+        description.value = ""
+        priceMinute.value = ""
+        latitude.value = 0.0
+        longitude.value = 0.0
+        selectedImage.value = null
     }
 }

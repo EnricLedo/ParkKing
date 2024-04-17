@@ -139,7 +139,7 @@ fun ParkingModerateItem(
                     horizontalArrangement = Arrangement.End
                 ) {
                     Button(
-                        onClick = { /* Aquí va el código para eliminar el parking */ },
+                        onClick = { moderateViewModel.denyParking(parking.id) },
                         modifier = Modifier.padding(end = 8.dp)
                     ) {
                         Text("Eliminar")
