@@ -8,6 +8,7 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -68,8 +69,8 @@ fun ParkingListScreen(parkingViewModel: ParkingViewModel = viewModel(), createPa
     val errorState = parkingViewModel.error.collectAsState()
 
     // Observe the update event
-    LaunchedEffect(createParkingViewModel.updateEvent) {
-        createParkingViewModel.updateEvent.collect {
+    LaunchedEffect(createParkingViewModel.parkingAddedEvent) {
+        createParkingViewModel.parkingAddedEvent.collect {
             parkingViewModel.getParkingList()
         }
     }
@@ -95,11 +96,14 @@ fun ParkingListScreen(parkingViewModel: ParkingViewModel = viewModel(), createPa
 
             LazyColumn {
                 items(parkingList) { parking ->
+                    if(parking.checked == true){
                     ParkingItem(
                         parking = parking,
                         parkingViewModel = parkingViewModel,
-                        modifier = Modifier.padding(8.dp)
+                        modifier = Modifier.padding(8.dp),
+                        navController
                     )
+                    }
                 }
             }
             Button(
@@ -119,15 +123,13 @@ fun ParkingListScreen(parkingViewModel: ParkingViewModel = viewModel(), createPa
     }
 }
 
-// ... Resto de los composables ...
-
-
 
 @Composable
 fun ParkingItem(
     parking: Parking,
     parkingViewModel: ParkingViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navController: NavHostController
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -156,14 +158,14 @@ fun ParkingItem(
                     .padding(8.dp)
             ) {
                 ParkingIcon(parking.image)
-                ParkingInformation(parking.name, parking.parkingRating)
+                ParkingInformation(parking.id, parking.name, parking.parkingRating, modifier, navController)
                 Spacer(Modifier.weight(1f))
                 ParkingItemButton(
                     expanded = expanded,
                     onClick = { expanded = !expanded },
                 )
             }
-            if (expanded) { //Aqui deben ir las reviews
+            if (expanded) {
                 ParkingDescription(
                     parking.description, modifier = Modifier.padding(
                         start = 16.dp,
@@ -180,7 +182,7 @@ fun ParkingItem(
 
 
 @Composable
-private fun ParkingItemButton(
+fun ParkingItemButton(
     expanded: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -190,7 +192,7 @@ private fun ParkingItemButton(
         modifier = modifier
     ) {
         Icon(
-            imageVector = if (expanded) Icons.Filled.KeyboardArrowDown else Icons.Filled.KeyboardArrowUp,
+            imageVector = if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
             contentDescription = "See more or less information about a parking",
             tint = MaterialTheme.colorScheme.secondary
         )
@@ -220,15 +222,20 @@ fun ParkingIcon(
 }
 @Composable
 fun ParkingInformation(
+    parkingId: String,
     parkingName: String,
     parkingRating: Float,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navController: NavHostController
 ) {
     Column(modifier = modifier) {
+        Text( text = parkingId)
         Text(
             text = parkingName,
             style = MaterialTheme.typography.displaySmall.copy(color = Color.Black),
-            modifier = Modifier.padding(top = 8.dp)
+            modifier = Modifier
+                .padding(top = 8.dp)
+                .clickable(onClick = { navController.navigate("parkingDetailsScreen") })
         )
         Text(
             text = parkingRating.toString(),
@@ -236,6 +243,7 @@ fun ParkingInformation(
         )
     }
 }
+
 
 @Composable
 fun ParkingDescription(
@@ -282,3 +290,4 @@ fun AdminButtons(
         }
     }
 }
+

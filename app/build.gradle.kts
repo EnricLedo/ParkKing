@@ -63,7 +63,7 @@ dependencies {
     implementation(libs.play.services.maps)
     implementation(libs.play.services.location)
     implementation("com.google.maps.android:maps-compose:4.3.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.0")
+    implementation(libs.kotlinx.coroutines.play.services)
     implementation(libs.firebase.auth.ktx)
     implementation(platform("com.google.firebase:firebase-bom:32.7.4"))
     implementation(libs.androidx.navigation.compose)
