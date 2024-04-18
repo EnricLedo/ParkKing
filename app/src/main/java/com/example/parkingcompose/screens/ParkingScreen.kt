@@ -136,18 +136,17 @@ fun ParkingItem(
                 )
         ) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
-            ) {
-                ParkingIcon(parking.image, parking.parkingRating)
-                ParkingInformation(parking.id, parking.name, modifier, navController)
-                Spacer(Modifier.weight(1f))
-                ParkingItemButton(
-                    expanded = expanded,
-                    onClick = { expanded = !expanded },
-                )
-            }
+    modifier = Modifier
+        .fillMaxWidth()
+        .padding(8.dp)
+) {
+    ParkingIcon(parking.image, parking.parkingRating)
+    ParkingInformation(parking.id, parking.name, modifier.weight(1f, fill = false), navController)
+    ParkingItemButton(
+        expanded = expanded,
+        onClick = { expanded = !expanded },
+    )
+}
             if (expanded) {
                 ParkingDescription(
                     parking.description, modifier = Modifier.padding(
@@ -220,7 +219,7 @@ fun ParkingInformation(
     navController: NavHostController
 ) {
     Column(modifier = modifier) {
-        Text( text = parkingId)
+
         Text(
             text = parkingName,
             style = ButtonTextStyle,
@@ -230,6 +229,7 @@ fun ParkingInformation(
                 .padding(top = 8.dp)
 
         )
+        Text( text = parkingId)
     }
 }
 

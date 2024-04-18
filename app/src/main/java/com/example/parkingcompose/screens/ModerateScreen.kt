@@ -86,7 +86,6 @@ fun ParkingModerateItem(
     moderateViewModel: ModerateViewModel,
     modifier: Modifier = Modifier,
     navController: NavHostController
-
 ) {
     var expanded by remember { mutableStateOf(false) }
     val context = LocalContext.current
@@ -96,8 +95,8 @@ fun ParkingModerateItem(
             containerColor = OrangeLight,
             contentColor = Color.White,
             disabledContainerColor = Color.Unspecified,
-            disabledContentColor = Color.Unspecified),
-
+            disabledContentColor = Color.Unspecified
+        ),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Column(
@@ -112,11 +111,11 @@ fun ParkingModerateItem(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(8.dp)
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 ParkingIcon(parking.image, parking.parkingRating)
-                ParkingModerateInformation(parking.id, parking.name, parking.parkingRating, modifier)
-                Spacer(Modifier.weight(1f))
+                ParkingModerateInformation(parking.id, parking.name, parking.parkingRating, modifier.weight(1f, fill = false),)
                 ParkingItemButton(
                     expanded = expanded,
                     onClick = { expanded = !expanded },
