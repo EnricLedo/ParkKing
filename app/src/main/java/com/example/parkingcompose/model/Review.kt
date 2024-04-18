@@ -1,4 +1,4 @@
-package com.example.parkingcompose.data
+package com.example.parkingcompose.model
 
 import java.util.Date
 data class Review(

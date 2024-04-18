@@ -1,5 +1,7 @@
 package com.example.parkingcompose.screens
 
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -16,14 +18,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.parkingcompose.data.LoginState
+import com.example.parkingcompose.model.LoginState
 import com.example.parkingcompose.ui.theme.ButtonTextStyle
 import com.example.parkingcompose.util.GoogleAuthUiClient
 import com.example.parkingcompose.viewmodels.LoginMailViewModel
@@ -41,8 +43,12 @@ fun LoginScreen(
     onRegister: () -> Unit,
     onSignInClick: () -> Unit
 )  {
+    val activity = LocalContext.current as ComponentActivity
     val loginState by loginViewModel.loginState.collectAsState()
-
+    BackHandler {
+        // Minimiza la aplicación
+        activity.moveTaskToBack(true)
+    }
     Column(
         modifier = Modifier.fillMaxSize().padding(14.dp),
         verticalArrangement = Arrangement.Center,
