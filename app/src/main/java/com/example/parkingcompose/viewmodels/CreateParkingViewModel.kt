@@ -8,10 +8,9 @@ import android.widget.Toast
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.parkingcompose.data.Location
-import com.example.parkingcompose.data.Parking
+import com.example.parkingcompose.model.Location
+import com.example.parkingcompose.model.Parking
 import com.example.parkingcompose.util.StorageUtil
-import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow

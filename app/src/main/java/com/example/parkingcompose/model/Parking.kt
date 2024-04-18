@@ -1,4 +1,4 @@
-package com.example.parkingcompose.data
+package com.example.parkingcompose.model
 
 
 data class Location(

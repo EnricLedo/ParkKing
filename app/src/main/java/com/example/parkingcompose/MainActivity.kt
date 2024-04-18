@@ -1,6 +1,5 @@
 package com.example.parkingcompose
 
-import android.Manifest
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
@@ -23,8 +22,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.parkingcompose.dao.ParkingDAO
-import com.example.parkingcompose.data.LocationRepository
-import com.example.parkingcompose.data.MapViewModelFactory
+import com.example.parkingcompose.model.LocationRepository
+import com.example.parkingcompose.model.MapViewModelFactory
 import com.example.parkingcompose.util.GoogleAuthUiClient
 import com.example.parkingcompose.screens.CreateParkingScreen
 import com.example.parkingcompose.screens.ForgotPasswordScreen
@@ -40,7 +39,7 @@ import com.example.parkingcompose.screens.RegisterScreen
 import com.example.parkingcompose.screens.SelectLocationScreen
 import com.example.parkingcompose.screens.UpdateUsernameScreen
 import com.example.parkingcompose.ui.theme.DaleComposeTheme
-import com.example.parkingcompose.util.ParkingDetailsViewModelFactory
+import com.example.parkingcompose.model.ParkingDetailsViewModelFactory
 import com.example.parkingcompose.viewmodels.CreateParkingViewModel
 import com.example.parkingcompose.viewmodels.LoginMailViewModel
 import com.example.parkingcompose.viewmodels.MapViewModel

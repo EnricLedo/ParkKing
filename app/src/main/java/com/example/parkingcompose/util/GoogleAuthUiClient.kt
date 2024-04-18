@@ -10,8 +10,8 @@ import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.example.parkingcompose.data.SignInResult
-import com.example.parkingcompose.data.UserData
+import com.example.parkingcompose.model.SignInResult
+import com.example.parkingcompose.model.UserData
 import kotlinx.coroutines.tasks.await
 import kotlin.coroutines.cancellation.CancellationException
 

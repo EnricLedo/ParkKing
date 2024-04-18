@@ -2,7 +2,7 @@ package com.example.parkingcompose.viewmodels
 
 
 import android.util.Log
-import com.example.parkingcompose.data.Tag
+import com.example.parkingcompose.model.Tag
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow

@@ -1,11 +1,9 @@
 package com.example.parkingcompose.dao
 
 
-import android.util.Log
-import com.example.parkingcompose.data.Parking
+import com.example.parkingcompose.model.Parking
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
 
 class ParkingDAO {

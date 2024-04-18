@@ -34,9 +34,8 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
-import com.example.parkingcompose.data.Parking
+import com.example.parkingcompose.model.Parking
 import com.example.parkingcompose.navegacion.BottomNavigationBar
-import com.example.parkingcompose.ui.theme.BlueGrey
 import com.example.parkingcompose.ui.theme.BlueGreyDark
 import com.example.parkingcompose.ui.theme.ButtonTextStyle
 import com.example.parkingcompose.ui.theme.OrangeLight

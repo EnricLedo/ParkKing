@@ -1,4 +1,4 @@
-package com.example.parkingcompose.data
+package com.example.parkingcompose.model
 
 import android.Manifest
 import android.content.Context

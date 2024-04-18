@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
-import com.example.parkingcompose.data.UserData
+import com.example.parkingcompose.model.UserData
 import com.example.parkingcompose.navegacion.BottomNavigationBar
 import com.example.parkingcompose.ui.theme.ButtonTextStyle
 import com.example.parkingcompose.ui.theme.DaleComposeTheme

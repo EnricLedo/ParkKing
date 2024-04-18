@@ -1,8 +1,8 @@
 package com.example.parkingcompose.dao
 
 import android.util.Log
-import com.example.parkingcompose.data.Rol
-import com.example.parkingcompose.data.User
+import com.example.parkingcompose.model.Rol
+import com.example.parkingcompose.model.User
 import com.example.parkingcompose.util.GoogleAuthUiClient
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
