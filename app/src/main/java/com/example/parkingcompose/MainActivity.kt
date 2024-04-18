@@ -22,6 +22,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.parkingcompose.dao.ParkingDAO
+import com.example.parkingcompose.dao.UserDao
 import com.example.parkingcompose.model.LocationRepository
 import com.example.parkingcompose.model.MapViewModelFactory
 import com.example.parkingcompose.util.GoogleAuthUiClient
@@ -78,7 +79,7 @@ class MainActivity : ComponentActivity() {
         val parkingDAO = ParkingDAO() // Replace this with your actual ParkingDAO instance
         val parkingDetailsViewModelFactory = ParkingDetailsViewModelFactory(parkingDAO)
         val mapViewModel: MapViewModel by viewModels { MapViewModelFactory(locationRepository) }
-
+        val userDao = UserDao()
 
         setContent {
             DaleComposeTheme{
@@ -194,7 +195,8 @@ class MainActivity : ComponentActivity() {
                             CreateParkingScreen(
                                 createParkingViewModel,
                                 selectLocationScreen,
-                                navController
+                                navController,
+                                userDao = userDao
                             )
                         }
                         composable("forgotpassword") {

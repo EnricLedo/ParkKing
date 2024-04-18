@@ -4,6 +4,7 @@ import android.util.Log
 import com.example.parkingcompose.model.Rol
 import com.example.parkingcompose.model.User
 import com.example.parkingcompose.util.GoogleAuthUiClient
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
@@ -73,6 +74,21 @@ class UserDao() {
             }
             .addOnSuccessListener {
                 onSuccess()
+            }
+    }
+
+    fun getCurrentUsername(onSuccess: (String) -> Unit) {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        db.collection("users")
+            .whereEqualTo("user_id", userId)
+            .get()
+            .addOnSuccessListener { documents ->
+                for (document in documents) {
+                    val username = document.getString("username")
+                    if (username != null) {
+                        onSuccess(username)
+                    }
+                }
             }
     }
 }
