@@ -4,11 +4,13 @@ import android.annotation.SuppressLint
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.BorderStroke
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -25,6 +27,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
@@ -32,6 +35,7 @@ import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.example.parkingcompose.data.Parking
 import com.example.parkingcompose.navegacion.BottomNavigationBar
+import com.example.parkingcompose.ui.theme.ButtonTextStyle
 import com.example.parkingcompose.ui.theme.OrangeLight
 import com.example.parkingcompose.viewmodels.CreateParkingViewModel
 import com.example.parkingcompose.viewmodels.ModerateViewModel
@@ -92,7 +96,7 @@ fun ParkingModerateItem(
 
 ) {
     var expanded by remember { mutableStateOf(false) }
-
+    val context = LocalContext.current
     Card(
         modifier = modifier,
         colors = CardColors(
@@ -117,7 +121,7 @@ fun ParkingModerateItem(
                     .fillMaxWidth()
                     .padding(8.dp)
             ) {
-                ParkingIcon(parking.image)
+                ParkingIcon(parking.image, parking.parkingRating)
                 ParkingModerateInformation(parking.id, parking.name, parking.parkingRating, modifier)
                 Spacer(Modifier.weight(1f))
                 ParkingItemButton(
@@ -135,23 +139,28 @@ fun ParkingModerateItem(
                     )
                 )
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().padding(0.dp, 0.dp, 8.dp, 12.dp),
                     horizontalArrangement = Arrangement.End
                 ) {
                     Button(
                         onClick = { moderateViewModel.denyParking(parking.id) },
-                        modifier = Modifier.padding(end = 8.dp)
+                        modifier = Modifier.padding(end = 8.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                        border = BorderStroke(1.dp, Color.Black)
                     ) {
-                        Text("Eliminar")
+                        Icon(Icons.Default.Delete, contentDescription = "Delete", tint = Color.Black)
+
                     }
 
                     Button(
                         onClick = {
-                            moderateViewModel.enableParking(parking.id)
+                            moderateViewModel.enableParking(parking.id, context)
                         },
-                        modifier = Modifier.padding(end = 8.dp)
+                        modifier = Modifier.padding(end = 8.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Green),
+                        border = BorderStroke(1.dp, Color.Black)
                     ) {
-                        Text("Aceptar")
+                        Icon(Icons.Default.Check, contentDescription = "Enable", tint = Color.Black)
                     }
                 }
             }
@@ -170,7 +179,8 @@ fun ParkingModerateInformation(
         Text( text = parkingId)
         Text(
             text = parkingName,
-            style = MaterialTheme.typography.displaySmall.copy(color = Color.Black),
+            style = ButtonTextStyle,
+            fontSize = 40.sp,
             modifier = Modifier
                 .padding(top = 8.dp)
 

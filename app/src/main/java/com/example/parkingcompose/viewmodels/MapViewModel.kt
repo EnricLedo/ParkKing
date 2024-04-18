@@ -52,6 +52,7 @@ class MapViewModel(private val locationRepository: LocationRepository) : ViewMod
         }
     }
 
+
     fun getParkingList() {
         viewModelScope.launch {
             try {

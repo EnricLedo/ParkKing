@@ -1,5 +1,6 @@
 package com.example.parkingcompose
 
+import android.Manifest
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
@@ -17,9 +18,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.parkingcompose.dao.ParkingDAO
 import com.example.parkingcompose.data.LocationRepository
 import com.example.parkingcompose.data.MapViewModelFactory
 import com.example.parkingcompose.util.GoogleAuthUiClient
@@ -37,10 +40,12 @@ import com.example.parkingcompose.screens.RegisterScreen
 import com.example.parkingcompose.screens.SelectLocationScreen
 import com.example.parkingcompose.screens.UpdateUsernameScreen
 import com.example.parkingcompose.ui.theme.DaleComposeTheme
+import com.example.parkingcompose.util.ParkingDetailsViewModelFactory
 import com.example.parkingcompose.viewmodels.CreateParkingViewModel
 import com.example.parkingcompose.viewmodels.LoginMailViewModel
 import com.example.parkingcompose.viewmodels.MapViewModel
 import com.example.parkingcompose.viewmodels.ModerateViewModel
+import com.example.parkingcompose.viewmodels.ParkingDetailsViewModel
 import com.example.parkingcompose.viewmodels.ParkingViewModel
 import com.example.parkingcompose.viewmodels.RegisterViewModel
 import com.example.parkingcompose.viewmodels.SelectLocationViewModel
@@ -71,8 +76,11 @@ class MainActivity : ComponentActivity() {
         val selectLocationScreen : SelectLocationViewModel by viewModels()
         val moderateViewModel: ModerateViewModel by viewModels()
         val locationRepository = LocationRepository(this)
-
+        val parkingDAO = ParkingDAO() // Replace this with your actual ParkingDAO instance
+        val parkingDetailsViewModelFactory = ParkingDetailsViewModelFactory(parkingDAO)
         val mapViewModel: MapViewModel by viewModels { MapViewModelFactory(locationRepository) }
+
+
         setContent {
             DaleComposeTheme{
                 Surface(
@@ -196,11 +204,13 @@ class MainActivity : ComponentActivity() {
                         composable("updateusername") {
                             UpdateUsernameScreen(updateUsernameViewModel, navController)
                         }
-                        composable("parkingDetailsScreen") {
+                        composable("parkingDetailsScreen/{parkingId}") { backStackEntry ->
+                            val parkingId = backStackEntry.arguments?.getString("parkingId") ?: ""
+                            val parkingDetailsViewModel = viewModel<ParkingDetailsViewModel>(factory = parkingDetailsViewModelFactory)
                             ParkingDetailsScreen(
-                                parkingId = it.arguments?.getString("parkingId") ?: "",
-                                navController,
-                                parkingViewModel
+                                parkingId = parkingId,
+                                navController = navController,
+                                parkingDetailsViewModel = parkingDetailsViewModel
                             )
                         }
                         composable("selectLocation") { backStackEntry ->
@@ -209,10 +219,9 @@ class MainActivity : ComponentActivity() {
                         composable("moderate") {
                             ModerateScreen(moderateViewModel,createParkingViewModel, navController)
                         }
-                        }
                     }
                 }
             }
         }
     }
-
+}
