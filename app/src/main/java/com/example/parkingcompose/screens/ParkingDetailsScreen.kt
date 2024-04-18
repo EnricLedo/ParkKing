@@ -75,7 +75,7 @@ fun ParkingDetailsScreen(
                                 modifier = Modifier
                                     .padding(top = 8.dp)
                             )
-                            ParkingIcon(parking!!.image)
+                            ParkingIcon(parking!!.image, parking!!.parkingRating)
                         }
 
                         //ParkingInformation(parking.name, parking.parkingRating, modifier, navController)

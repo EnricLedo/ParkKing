@@ -1,5 +1,6 @@
 package com.example.parkingcompose
 
+import android.Manifest
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
@@ -73,6 +74,8 @@ class MainActivity : ComponentActivity() {
         val locationRepository = LocationRepository(this)
 
         val mapViewModel: MapViewModel by viewModels { MapViewModelFactory(locationRepository) }
+
+
         setContent {
             DaleComposeTheme{
                 Surface(
@@ -209,10 +212,9 @@ class MainActivity : ComponentActivity() {
                         composable("moderate") {
                             ModerateScreen(moderateViewModel,createParkingViewModel, navController)
                         }
-                        }
                     }
                 }
             }
         }
     }
-
+}

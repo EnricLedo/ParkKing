@@ -29,6 +29,9 @@ class CreateParkingViewModel : ViewModel() {
     private val _parkingAddedEvent = MutableSharedFlow<Unit>()
     val parkingAddedEvent: SharedFlow<Unit> = _parkingAddedEvent
 
+    private val _parkingEnabledEvent = MutableSharedFlow<Unit>()
+    val parkingEnabledEvent: SharedFlow<Unit> = _parkingEnabledEvent
+
     fun onNameChange(newValue: String) {
         name.value = newValue
     }
@@ -70,6 +73,7 @@ class CreateParkingViewModel : ViewModel() {
                     priceMinute = price
                 )
                 addParking(parking, context)
+                Toast.makeText(context, "Parking created. It will be published once moderated", Toast.LENGTH_LONG).show()
                 selectLocationViewModel.resetSelectedLocation() // Reset the selected location after a parking is added
                 resetFields()
             } else {
@@ -88,6 +92,7 @@ class CreateParkingViewModel : ViewModel() {
                 Log.d(TAG, "Parking added with ID: ${newParkingRef.id}")
                 viewModelScope.launch {
                     _parkingAddedEvent.emit(Unit) // Emit an update event
+                    _parkingEnabledEvent.emit(Unit) // Emit an update event
                 }
             }
             .addOnFailureListener { e ->

@@ -77,6 +77,8 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.6.0")
     implementation(libs.firebase.auth)
     implementation(libs.firebase.storage.ktx)
+    implementation ("androidx.activity:activity-ktx:1.3.1")
+    implementation ("androidx.fragment:fragment-ktx:1.3.6")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

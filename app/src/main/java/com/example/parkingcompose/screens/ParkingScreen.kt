@@ -22,11 +22,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
@@ -34,6 +36,8 @@ import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.example.parkingcompose.data.Parking
 import com.example.parkingcompose.navegacion.BottomNavigationBar
+import com.example.parkingcompose.ui.theme.BlueGrey
+import com.example.parkingcompose.ui.theme.BlueGreyDark
 import com.example.parkingcompose.ui.theme.ButtonTextStyle
 import com.example.parkingcompose.ui.theme.OrangeLight
 import com.example.parkingcompose.viewmodels.CreateParkingViewModel
@@ -132,8 +136,8 @@ fun ParkingItem(
                     .fillMaxWidth()
                     .padding(8.dp)
             ) {
-                ParkingIcon(parking.image)
-                ParkingInformation(parking.id, parking.name, parking.parkingRating, modifier, navController)
+                ParkingIcon(parking.image, parking.parkingRating)
+                ParkingInformation(parking.id, parking.name, modifier, navController)
                 Spacer(Modifier.weight(1f))
                 ParkingItemButton(
                     expanded = expanded,
@@ -176,6 +180,7 @@ fun ParkingItemButton(
 @Composable
 fun ParkingIcon(
     parkingIcon: String,
+    parkingRating: Float,
     modifier: Modifier = Modifier
 ) {
     val painter = rememberAsyncImagePainter(
@@ -184,21 +189,29 @@ fun ParkingIcon(
         }).build()
     )
 
-    Image(
-        painter = painter,
-        contentDescription = null,
-        modifier = modifier
-            .size(64.dp)
-            .padding(8.dp)
-            .clip(MaterialTheme.shapes.small)
-    )
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Image(
+            painter = painter,
+            contentDescription = null,
+            modifier = Modifier
+                .size(64.dp)
+                .padding(8.dp)
+                .clip(MaterialTheme.shapes.small)
+        )
+        Text(
+            text = parkingRating.toString(),
+            style = MaterialTheme.typography.bodyMedium
+        )
+    }
 }
 
 @Composable
 fun ParkingInformation(
     parkingId: String,
     parkingName: String,
-    parkingRating: Float,
     modifier: Modifier = Modifier,
     navController: NavHostController
 ) {
@@ -206,14 +219,12 @@ fun ParkingInformation(
         Text( text = parkingId)
         Text(
             text = parkingName,
-            style = MaterialTheme.typography.displaySmall.copy(color = Color.Black),
+            style = ButtonTextStyle,
+            fontSize = 40.sp,
+            color = BlueGreyDark,
             modifier = Modifier
                 .padding(top = 8.dp)
                 .clickable(onClick = { navController.navigate("parkingDetailsScreen") })
-        )
-        Text(
-            text = parkingRating.toString(),
-            style = MaterialTheme.typography.bodyMedium
         )
     }
 }
