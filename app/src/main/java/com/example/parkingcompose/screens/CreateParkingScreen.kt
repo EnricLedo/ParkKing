@@ -1,5 +1,6 @@
 package com.example.parkingcompose.screens
 
+import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -13,6 +14,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,7 +25,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
-import com.example.parkingcompose.dao.UserDao
 import com.example.parkingcompose.viewmodels.CreateParkingViewModel
 import com.example.parkingcompose.viewmodels.SelectLocationViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -33,8 +35,7 @@ import kotlinx.coroutines.launch
 fun CreateParkingScreen(
     createParkingViewModel: CreateParkingViewModel,
     selectLocationViewModel: SelectLocationViewModel,
-    navController: NavHostController,
-    userDao: UserDao
+    navController: NavHostController
 ) {
     val context = LocalContext.current
     val selectedLocation by selectLocationViewModel.selectedLocation.collectAsState()
@@ -118,7 +119,7 @@ fun CreateParkingScreen(
                     if (createParkingViewModel.selectedImage.value != null) {
                         // Lanza una corrutina para llamar a onAddParking
                         CoroutineScope(Dispatchers.Main).launch {
-                            createParkingViewModel.onAddParking(context, selectLocationViewModel,userDao)
+                            createParkingViewModel.onAddParking(context, selectLocationViewModel)
                         }
                     } else {
                         Toast.makeText(

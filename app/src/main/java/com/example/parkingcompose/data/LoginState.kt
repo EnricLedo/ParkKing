@@ -1,4 +1,4 @@
-package com.example.parkingcompose.model
+package com.example.parkingcompose.data
 
 data class LoginState(
     val isSignInSuccessful: Boolean = false,

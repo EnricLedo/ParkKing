@@ -17,14 +17,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.parkingcompose.dao.ParkingDAO
-import com.example.parkingcompose.dao.UserDao
-import com.example.parkingcompose.model.LocationRepository
-import com.example.parkingcompose.model.MapViewModelFactory
+import com.example.parkingcompose.data.LocationRepository
+import com.example.parkingcompose.data.MapViewModelFactory
 import com.example.parkingcompose.util.GoogleAuthUiClient
 import com.example.parkingcompose.screens.CreateParkingScreen
 import com.example.parkingcompose.screens.ForgotPasswordScreen
@@ -40,12 +37,10 @@ import com.example.parkingcompose.screens.RegisterScreen
 import com.example.parkingcompose.screens.SelectLocationScreen
 import com.example.parkingcompose.screens.UpdateUsernameScreen
 import com.example.parkingcompose.ui.theme.DaleComposeTheme
-import com.example.parkingcompose.model.ParkingDetailsViewModelFactory
 import com.example.parkingcompose.viewmodels.CreateParkingViewModel
 import com.example.parkingcompose.viewmodels.LoginMailViewModel
 import com.example.parkingcompose.viewmodels.MapViewModel
 import com.example.parkingcompose.viewmodels.ModerateViewModel
-import com.example.parkingcompose.viewmodels.ParkingDetailsViewModel
 import com.example.parkingcompose.viewmodels.ParkingViewModel
 import com.example.parkingcompose.viewmodels.RegisterViewModel
 import com.example.parkingcompose.viewmodels.SelectLocationViewModel
@@ -76,11 +71,8 @@ class MainActivity : ComponentActivity() {
         val selectLocationScreen : SelectLocationViewModel by viewModels()
         val moderateViewModel: ModerateViewModel by viewModels()
         val locationRepository = LocationRepository(this)
-        val parkingDAO = ParkingDAO() // Replace this with your actual ParkingDAO instance
-        val parkingDetailsViewModelFactory = ParkingDetailsViewModelFactory(parkingDAO)
-        val mapViewModel: MapViewModel by viewModels { MapViewModelFactory(locationRepository) }
-        val userDao = UserDao()
 
+        val mapViewModel: MapViewModel by viewModels { MapViewModelFactory(locationRepository) }
         setContent {
             DaleComposeTheme{
                 Surface(
@@ -132,12 +124,8 @@ class MainActivity : ComponentActivity() {
                                 registerViewModel = registerViewModel,
                                 googleAuthUiClient = googleAuthUiClient,
                                 onLogin = { email, password ->
-                                    if (email.isEmpty() || password.isEmpty()) {
-                                        Toast.makeText(this@MainActivity, "El correo electrónico o la contraseña no pueden estar vacíos", Toast.LENGTH_SHORT).show()
-                                    } else {
-                                        lifecycleScope.launch {
-                                            loginViewModel.login(this@MainActivity, email, password)
-                                        }
+                                    lifecycleScope.launch {
+                                        loginViewModel.login(this@MainActivity, email, password)
                                     }
                                 },
                                 onRegister = { navController.navigate("register") },
@@ -152,7 +140,6 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
                             )
-
 
 
                         }
@@ -184,7 +171,6 @@ class MainActivity : ComponentActivity() {
                             ParkingListScreen(
                                 parkingViewModel,
                                 createParkingViewModel,
-                                moderateViewModel,
                                 navController
                             )
                         }
@@ -195,8 +181,7 @@ class MainActivity : ComponentActivity() {
                             CreateParkingScreen(
                                 createParkingViewModel,
                                 selectLocationScreen,
-                                navController,
-                                userDao = userDao
+                                navController
                             )
                         }
                         composable("forgotpassword") {
@@ -205,24 +190,23 @@ class MainActivity : ComponentActivity() {
                         composable("updateusername") {
                             UpdateUsernameScreen(updateUsernameViewModel, navController)
                         }
-                        composable("parkingDetailsScreen/{parkingId}") { backStackEntry ->
-                            val parkingId = backStackEntry.arguments?.getString("parkingId") ?: ""
-                            val parkingDetailsViewModel = viewModel<ParkingDetailsViewModel>(factory = parkingDetailsViewModelFactory)
+                        composable("parkingDetailsScreen") {
                             ParkingDetailsScreen(
-                                parkingId = parkingId,
-                                navController = navController,
-                                parkingDetailsViewModel = parkingDetailsViewModel
+                                parkingId = it.arguments?.getString("parkingId") ?: "",
+                                navController,
+                                parkingViewModel
                             )
                         }
                         composable("selectLocation") { backStackEntry ->
                             SelectLocationScreen(selectLocationScreen, navController)
                         }
                         composable("moderate") {
-                            ModerateScreen(moderateViewModel,createParkingViewModel, navController)
+                            ModerateScreen(parkingViewModel, navController)
+                        }
                         }
                     }
                 }
             }
         }
     }
-}
+
