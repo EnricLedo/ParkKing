@@ -1,5 +1,5 @@
 package com.example.parkingcompose.dao
-import com.example.parkingcompose.data.Review
+import com.example.parkingcompose.model.Review
 
 interface ReviewDao {
         fun loadReviews(callback: (List<Review>) -> Unit)

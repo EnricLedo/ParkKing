@@ -23,8 +23,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.parkingcompose.dao.ReviewDaoImpl
-import com.example.parkingcompose.data.LocationRepository
-import com.example.parkingcompose.data.MapViewModelFactory
+import com.example.parkingcompose.dao.UserDao
+
+import com.example.parkingcompose.model.LocationRepository
+import com.example.parkingcompose.model.MapViewModelFactory
 import com.example.parkingcompose.screens.CreateParkingScreen
 import com.example.parkingcompose.screens.CreateReviewScreen
 import com.example.parkingcompose.screens.ForgotPasswordScreen
@@ -66,6 +68,8 @@ import kotlinx.coroutines.launch
             super.onCreate(savedInstanceState)
             // Crear una instancia de ReviewDao
             val reviewDao = ReviewDaoImpl()
+
+            val userDao = UserDao()
 
             // Crear una instancia de ReviewViewModel con la instancia de ReviewDao
             val reviewViewModel = ReviewViewModel(reviewDao)
@@ -190,7 +194,8 @@ import kotlinx.coroutines.launch
                                 CreateParkingScreen(
                                     createParkingViewModel,
                                     selectLocationScreen,
-                                    navController
+                                    navController,
+                                    userDao = userDao
                                 )
                             }
                             composable("forgotpassword") {
@@ -210,7 +215,7 @@ import kotlinx.coroutines.launch
                                 SelectLocationScreen(selectLocationScreen, navController)
                             }
                             composable("moderate") {
-                                ModerateScreen(parkingViewModel, navController)
+                                ModerateScreen(moderateViewModel, navController)
                             }
 
                             composable("createReview") {

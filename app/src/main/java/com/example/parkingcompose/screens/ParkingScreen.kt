@@ -46,7 +46,8 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
-import com.example.parkingcompose.data.Parking
+
+import com.example.parkingcompose.model.Parking
 import com.example.parkingcompose.navegacion.BottomNavigationBar
 import com.example.parkingcompose.ui.theme.ButtonTextStyle
 import com.example.parkingcompose.ui.theme.OrangeLight
@@ -97,6 +98,18 @@ fun ParkingListScreen(parkingViewModel: ParkingViewModel = viewModel(), createPa
                     )
                     }
                 }
+            }
+            Button(
+                onClick = { navController.navigate("createReview") },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Crear Reseña")
+            }
+            Button(
+                onClick = { navController.navigate("listReviews") },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Lista de Reseñas")
             }
         }
     }

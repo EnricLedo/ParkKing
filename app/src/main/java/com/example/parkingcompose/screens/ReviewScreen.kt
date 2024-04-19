@@ -40,7 +40,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.parkingcompose.data.Review
+import com.example.parkingcompose.model.Review
 import com.example.parkingcompose.ui.theme.OrangeLight
 import com.google.firebase.auth.FirebaseAuth
 import java.util.Date
@@ -130,7 +130,7 @@ fun ListReviewScreen(
                 onClick = { sortReviews() },
                 modifier = Modifier.padding(bottom = 16.dp)
             ) {
-                Text(if (sortOrder) "Ordenar de menor a mayor" else "Ordenar de mayor a menor")
+                Text(if (sortOrder) "Ordenar de mayor a menor" else "Ordenar de menor a mayor")
             }
 
             reviews?.let { reviewsList ->
