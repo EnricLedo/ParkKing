@@ -4,7 +4,8 @@ package com.example.parkingcompose.dao
 import com.example.parkingcompose.model.Review
 import com.google.firebase.firestore.FirebaseFirestore
 
-class ReviewDaoImpl : ReviewDao {
+class ReviewDaoImpl() : ReviewDao {
+    lateinit var parkingDao: ParkingDAO
     private val db = FirebaseFirestore.getInstance()
     private val reviewsCollection = db.collection("reviews")
 
@@ -25,8 +26,12 @@ class ReviewDaoImpl : ReviewDao {
 
     override fun addReview(review: Review) {
         reviewsCollection.add(review)
-            .addOnSuccessListener {
-                // Handle success if needed
+            .addOnSuccessListener { documentReference ->
+                val reviewWithId = review.copy(id = documentReference.id)
+                documentReference.set(reviewWithId).addOnSuccessListener {
+                    // Después de agregar la reseña, actualizar el parkingRating del estacionamiento
+                    parkingDao.updateParkingRating(review.parking_id.toString())
+                }
             }
             .addOnFailureListener {
                 // Handle error if needed

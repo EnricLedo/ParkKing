@@ -64,7 +64,7 @@ class CreateParkingViewModel : ViewModel() {
                         name = name.value,
                         description = description.value,
                         image = imageUrl,
-                        parkingRating = 0.0f,
+                        parkingRating = 0.0,
                         reviewList = emptyList(),
                         tagList = emptyList(),
                         priceMinute = price,

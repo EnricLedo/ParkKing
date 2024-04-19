@@ -164,7 +164,7 @@ fun ParkingModerateItem(
 fun ParkingModerateInformation(
     parkingId: String,
     parkingName: String,
-    parkingRating: Float,
+    parkingRating: Double,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {

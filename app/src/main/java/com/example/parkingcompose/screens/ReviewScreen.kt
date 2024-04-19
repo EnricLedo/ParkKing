@@ -81,6 +81,7 @@ fun RatingBar(rating: Float, onRatingChanged: (Float) -> Unit) {
 
 @Composable
 fun ListReviewScreen(
+    parkingId: String,
     viewModel: ReviewViewModel
 ) {
     // Cargar las reseñas cuando la pantalla sea visible
@@ -134,15 +135,17 @@ fun ListReviewScreen(
             }
 
             reviews?.let { reviewsList ->
+                // Filtrar las reseñas que coinciden con el parkingId
+                val filteredReviews = reviewsList.filter { it.parking_id == parkingId }
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth(),
                     contentPadding = PaddingValues(vertical = 16.dp)
                 ) {
-                    reviewsList.groupBy { it.user_email }.forEach { (user, userReviews) ->
+                    filteredReviews.groupBy { it.user_email }.forEach { (user, userReviews) ->
                         // Mostrar el nombre del usuario como encabezado
                         item {
                             Text(
-                                text = "Reseñas de $user:",
+                                text = "Reseñas:",
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 18.sp,
                                 modifier = Modifier.padding(bottom = 8.dp)
@@ -187,17 +190,19 @@ fun ReviewItem(review: Review) {
     }
 }
 
+
 @Composable
 fun CreateReviewScreen(
+    parkingId: String, // Recuperar el ID del estacionamiento de la ruta
     navController: NavController,
     viewModel: ReviewViewModel
-) {
+){
     val context = LocalContext.current
     var rating by remember { mutableStateOf(0f) }
     var comment by remember { mutableStateOf("") }
     var title by remember { mutableStateOf("") }
     var userEmail by remember { mutableStateOf("") }
-    var parkingId by remember { mutableStateOf("") }
+
 
     Column(
         modifier = Modifier
@@ -227,30 +232,22 @@ fun CreateReviewScreen(
             maxLines = 3,
             modifier = Modifier.fillMaxWidth()
         )
-        Spacer(modifier = Modifier.height(16.dp))
 
-        TextField(
-            value = parkingId,
-            onValueChange = { newParkingId -> parkingId = newParkingId },
-            label = { Text("ID del estacionamiento") },
-            modifier = Modifier.fillMaxWidth()
-        )
         Spacer(modifier = Modifier.height(16.dp))
         Button(
             onClick = {
                 val review = Review(
-                    id = null,
                     review_rating = rating,
                     comment = comment,
                     title = title,
                     user_email = FirebaseAuth.getInstance().currentUser?.email ?: "",
                     date = Date(),
-                    parking_id = parkingId?.toLongOrNull() // Convert parkingId to Long
+                    parking_id = parkingId // Usar el ID del estacionamiento para el parking_id de la reseña
                 )
                 try {
                     viewModel.addReview(review)
                     Toast.makeText(context, "Reseña enviada", Toast.LENGTH_SHORT).show()
-                    navController.popBackStack()
+                    navController.navigate("parkingDetailsScreen/$parkingId?rating=${review.review_rating}")
                 } catch (e: Exception) {
                     Toast.makeText(
                         context,
