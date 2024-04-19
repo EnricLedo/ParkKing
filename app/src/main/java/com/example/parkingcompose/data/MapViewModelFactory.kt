@@ -1,4 +1,4 @@
-package com.example.parkingcompose.model
+package com.example.parkingcompose.data
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

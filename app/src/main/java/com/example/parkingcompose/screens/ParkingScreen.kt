@@ -98,6 +98,19 @@ fun ParkingListScreen(parkingViewModel: ParkingViewModel = viewModel(), createPa
                     }
                 }
             }
+            Button(
+                onClick = { navController.navigate("createReview") },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Crear Reseña")
+            }
+            Button(
+                onClick = { navController.navigate("listReviews") },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Lista de Reseñas")
+            }
+
         }
     }
 }
@@ -241,6 +254,7 @@ fun ParkingDescription(
             style = MaterialTheme.typography.bodyLarge
         )
     }
+
 }
 
 @Composable

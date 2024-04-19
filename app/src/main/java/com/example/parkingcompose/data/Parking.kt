@@ -1,4 +1,4 @@
-package com.example.parkingcompose.model
+package com.example.parkingcompose.data
 
 
 data class Location(
@@ -16,6 +16,5 @@ data class Parking(
     val reviewList: List<Review> = emptyList(),
     val tagList: List<Tag> = emptyList(),
     val priceMinute: Float = 0.0f,
-    val checked: Boolean = false,
-    val createdBy : String = ""
+    val checked: Boolean = false
 )
