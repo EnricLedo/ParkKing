@@ -1,7 +1,9 @@
 package com.example.parkingcompose.screens
 
-
 import android.annotation.SuppressLint
+import com.example.parkingcompose.viewmodels.ParkingViewModel
+
+
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -13,6 +15,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -39,19 +42,24 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
+import com.example.parkingcompose.R
 import com.example.parkingcompose.data.Parking
 import com.example.parkingcompose.navegacion.BottomNavigationBar
 import com.example.parkingcompose.ui.theme.ButtonTextStyle
 import com.example.parkingcompose.ui.theme.OrangeLight
+import com.example.parkingcompose.ui.theme.OrangeSuperLight
 import com.example.parkingcompose.viewmodels.CreateParkingViewModel
-import com.example.parkingcompose.viewmodels.ParkingViewModel
+import com.google.common.math.Quantiles
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -108,7 +116,7 @@ fun ParkingListScreen(parkingViewModel: ParkingViewModel = viewModel(), createPa
                 onClick = { navController.navigate("listReviews") },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Lista de Reseñas")
+                Text("Volver a la Lista de Reseñas")
             }
 
         }
