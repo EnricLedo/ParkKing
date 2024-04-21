@@ -175,17 +175,17 @@ fun ReviewItem(review: Review) {
     Column(
         modifier = Modifier.padding(16.dp)
     ) {
-        Text(text = "Title: " ,fontWeight = FontWeight.Bold)
-        Text(text = review.title ?: "")
+        Text(text = "Title: " ,fontWeight = FontWeight.Bold, color = Color.Black)
+        Text(text = review.title ?: "", color = Color.Black)
         Spacer(modifier = Modifier.height(4.dp))
-        Text(text = "Rating : " ,fontWeight = FontWeight.Bold)
-        Text(text = "Rating: ${review.review_rating}")
+        Text(text = "Rating : " ,fontWeight = FontWeight.Bold, color = Color.Black)
+        Text(text = "${review.review_rating}", color = Color.Black)
         Spacer(modifier = Modifier.height(4.dp))
-        Text(text = "Comment: " ,fontWeight = FontWeight.Bold)
-        Text(text = review.comment ?: "")
+        Text(text = "Comment: " ,fontWeight = FontWeight.Bold, color = Color.Black)
+        Text(text = review.comment ?: "", color = Color.Black)
         Spacer(modifier = Modifier.height(4.dp))
-        Text(text = "Date: " ,fontWeight = FontWeight.Bold)
-        Text(text = review.date?.toString() ?: "")
+        Text(text = "Date: " ,fontWeight = FontWeight.Bold, color = Color.Black)
+        Text(text = review.date?.toString() ?: "", color = Color.Black)
         Spacer(modifier = Modifier.height(4.dp))
     }
 }

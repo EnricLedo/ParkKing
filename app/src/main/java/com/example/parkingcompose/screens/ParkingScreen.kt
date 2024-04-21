@@ -141,7 +141,7 @@ fun ParkingItem(
                     .padding(8.dp)
             ) {
                 ParkingIcon(parking.image, parking.parkingRating)
-                ParkingInformation(parking.id, parking.name, modifier.weight(1f, fill = false), navController)
+                ParkingInformation(parking.name, modifier.weight(1f, fill = false), navController)
                 ParkingItemButton(
                     expanded = expanded,
                     onClick = { expanded = !expanded },
@@ -156,7 +156,6 @@ fun ParkingItem(
                         end = 16.dp
                     )
                 )
-                AdminButtons(parkingViewModel)
             }
         }
     }
@@ -213,7 +212,6 @@ fun ParkingIcon(
 
 @Composable
 fun ParkingInformation(
-    parkingId: String,
     parkingName: String,
     modifier: Modifier = Modifier,
     navController: NavHostController
@@ -229,7 +227,7 @@ fun ParkingInformation(
                 .padding(top = 8.dp)
 
         )
-        Text( text = parkingId)
+
     }
 }
 

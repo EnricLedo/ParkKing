@@ -54,18 +54,22 @@ class MapViewModel(private val locationRepository: LocationRepository) : ViewMod
 
 
     fun getParkingList() {
-        viewModelScope.launch {
-            try {
-                val querySnapshot = db.collection("parkings").get().await()
-                val list = querySnapshot.documents.mapNotNull { document: DocumentSnapshot? ->
-                    document?.toObject(Parking::class.java)
-                }
-                _parkingList.value = list
-            } catch (e: Exception) {
-                _error.value = "Error al cargar la lista de parkings: ${e.message}"
+    viewModelScope.launch {
+        try {
+            val querySnapshot = db.collection("parkings")
+                .whereEqualTo("checked", true)
+                .get()
+                .await()
+
+            val list = querySnapshot.documents.mapNotNull { document: DocumentSnapshot? ->
+                document?.toObject(Parking::class.java)
             }
+            _parkingList.value = list
+        } catch (e: Exception) {
+            _error.value = "Error al cargar la lista de parkings: ${e.message}"
         }
     }
+}
 
     @Composable
     public fun rememberCustomMarkerState(

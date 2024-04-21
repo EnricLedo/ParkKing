@@ -1,10 +1,12 @@
 package com.example.parkingcompose.screens
 
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,7 +44,12 @@ fun ParkingDetailsScreen(
 ) {
     val parking by parkingDetailsViewModel.parking.collectAsState(null)
 
-    LaunchedEffect(key1 = parkingId) {
+    BackHandler {
+        // Minimiza la aplicación
+        navController.navigate("parkingList")
+    }
+
+        LaunchedEffect(key1 = parkingId) {
         parkingDetailsViewModel.getParkingById(parkingId)
     }
 
@@ -76,6 +83,9 @@ fun ParkingDetailsScreen(
                     modifier = Modifier
                         .height(200.dp)
                         .fillMaxWidth()
+                        .clickable {
+                            navController.navigate("mapa/${parking!!.location.latitude}/${parking!!.location.longitude}")
+                        }
                 )
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween){
                     Text(

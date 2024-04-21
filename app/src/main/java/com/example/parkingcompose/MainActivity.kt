@@ -186,8 +186,12 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
+                        composable("mapa/{latitude}/{longitude}") { backStackEntry ->
+                            val latitude = backStackEntry.arguments?.getString("latitude")?.toDoubleOrNull() ?: 0.0
+                            val longitude = backStackEntry.arguments?.getString("longitude")?.toDoubleOrNull() ?: 0.0
+                            MapScreen(createParkingViewModel, mapViewModel, navController, latitude, longitude)
+                        }
                         composable("mapa") {
-
                             MapScreen(createParkingViewModel, mapViewModel, navController)
                         }
 
