@@ -8,6 +8,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.tasks.await
 
 class UserDao() {
     private val auth = Firebase.auth
@@ -59,23 +60,41 @@ class UserDao() {
             }
     }
 
+
+    fun createUser(user: Map<String, Any>) {
+        db.collection("users")
+            .add(user)
+            .addOnSuccessListener { documentReference ->
+                Log.d(TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
+            }
+            .addOnFailureListener { e ->
+                Log.w(TAG, "Error adding document", e)
+            }
+    }
+
     companion object {
         private const val TAG = "UserDao"
     }
 
-    fun updateUsernameInDb(userId: String?, username: String, onSuccess: () -> Unit) {
-        db.collection("users")
+    suspend fun updateUsernameInDb(userId: String?, newUsername: String): Boolean {
+    val db = FirebaseFirestore.getInstance()
+    var isUpdated = false
+
+    try {
+        val documents = db.collection("users")
             .whereEqualTo("user_id", userId)
             .get()
-            .addOnSuccessListener { documents ->
-                for (document in documents) {
-                    document.reference.update("username", username)
-                }
-            }
-            .addOnSuccessListener {
-                onSuccess()
-            }
+            .await()
+
+        for (document in documents) {
+            document.reference.update("username", newUsername).await()
+        }
+        isUpdated = true
+    } catch (e: Exception) {
+        isUpdated = false
     }
+    return isUpdated
+}
 
     fun getCurrentUsername(onSuccess: (String) -> Unit) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid
@@ -90,6 +109,20 @@ class UserDao() {
                     }
                 }
             }
+    }
+
+    suspend fun checkUsernameAvailable(username: String): Boolean {
+        val db = FirebaseFirestore.getInstance()
+        var isAvailable = false
+
+        val task = db.collection("users")
+            .whereEqualTo("username", username)
+            .get()
+            .await()
+
+        isAvailable = task.isEmpty
+
+        return isAvailable
     }
 }
 

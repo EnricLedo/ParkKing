@@ -1,5 +1,6 @@
 package com.example.parkingcompose.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
@@ -8,18 +9,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.example.parkingcompose.ui.theme.ButtonTextStyle
 import com.example.parkingcompose.ui.theme.Orange
 import com.example.parkingcompose.ui.theme.OrangeDark
-import com.example.parkingcompose.ui.theme.OrangeLight
 import com.example.parkingcompose.viewmodels.UpdateUsernameViewModel
+import kotlinx.coroutines.launch
+
 
 @Composable
 fun UpdateUsernameScreen(viewModel: UpdateUsernameViewModel, navHostController: NavHostController) {
+    val context = LocalContext.current
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -60,8 +65,17 @@ fun UpdateUsernameScreen(viewModel: UpdateUsernameViewModel, navHostController: 
         )
 
         Button(
-            onClick = { viewModel.updateUsername()
-                        navHostController.navigate("profile") },
+            onClick = {
+                viewModel.viewModelScope.launch {
+                    val isUpdated = viewModel.updateUsername()
+                    if (isUpdated) {
+                        Toast.makeText(context, "Nombre de usuario cambiado", Toast.LENGTH_SHORT).show()
+                        navHostController.navigate("profile")
+                    } else {
+                        Toast.makeText(context, "El nombre de usuario ya está en uso", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("SAVE", style = ButtonTextStyle)
