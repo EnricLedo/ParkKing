@@ -1,18 +1,27 @@
 package com.example.parkingcompose.screens
 
+import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,8 +45,15 @@ fun CreateParkingScreen(
     navController: NavHostController,
     userDao: UserDao
 ) {
+    var image by remember { mutableStateOf<Uri?>(null) }
     val context = LocalContext.current
     val selectedLocation by selectLocationViewModel.selectedLocation.collectAsState()
+
+    LaunchedEffect(key1 = true) {
+        createParkingViewModel.parkingAddedEvent.collect {
+            navController.navigate("parkingList") // Adjust the route name as per your NavGraph
+        }
+    }
 
     // Actualiza la latitud y longitud cuando la ubicación seleccionada cambie
     createParkingViewModel.latitude.value = selectedLocation?.latitude ?: 0.0
@@ -110,6 +126,8 @@ fun CreateParkingScreen(
                     modifier = Modifier.padding(10.dp).height(300.dp)
                 )
             }
+            AddTagSection(createParkingViewModel)
+
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -133,6 +151,32 @@ fun CreateParkingScreen(
             ) {
                 Text("Crear Parking")
             }
+        }
+    }
+}
+@Composable
+fun AddTagSection(viewModel: CreateParkingViewModel) {
+    val tags = viewModel.tags.value  // Asegúrate de que Tag tiene un campo 'id'
+
+    LazyRow(
+        modifier = Modifier.padding(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(tags) { tag ->
+            val isSelected = tag.id in viewModel.selectedTagIds.value
+            Text(
+                text = tag.title,
+                modifier = Modifier
+                    .background(
+                        color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                        shape = MaterialTheme.shapes.small
+                    )
+                    .clickable {
+                        tag.id?.let { viewModel.selectTag(it, !isSelected) }
+                    }
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }

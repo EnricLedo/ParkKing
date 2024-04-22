@@ -16,6 +16,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -45,6 +47,7 @@ import com.example.parkingcompose.ui.theme.DaleComposeTheme
 import com.example.parkingcompose.model.ParkingDetailsViewModelFactory
 import com.example.parkingcompose.screens.CreateReviewScreen
 import com.example.parkingcompose.screens.ListReviewScreen
+import com.example.parkingcompose.screens.TagsScreen
 import com.example.parkingcompose.viewmodels.CreateParkingViewModel
 import com.example.parkingcompose.viewmodels.LoginMailViewModel
 import com.example.parkingcompose.viewmodels.MapViewModel
@@ -53,6 +56,7 @@ import com.example.parkingcompose.viewmodels.ParkingDetailsViewModel
 import com.example.parkingcompose.viewmodels.ParkingViewModel
 import com.example.parkingcompose.viewmodels.RegisterViewModel
 import com.example.parkingcompose.viewmodels.SelectLocationViewModel
+import com.example.parkingcompose.viewmodels.TagViewModel
 import com.example.parkingcompose.viewmodels.UpdateUsernameViewModel
 
 
@@ -90,7 +94,9 @@ class MainActivity : ComponentActivity() {
         val parkingDAO = ParkingDAO() // Replace this with your actual ParkingDAO instance
         val parkingDetailsViewModelFactory = ParkingDetailsViewModelFactory(parkingDAO)
         val mapViewModel: MapViewModel by viewModels { MapViewModelFactory(locationRepository) }
-
+        val tagViewModel = TagViewModel() // Asegúrate de instanciarlo correctamente según tu aplicación
+        val factory = CreateParkingViewModelFactory(tagViewModel)
+        val viewModel = ViewModelProvider(this, factory).get(CreateParkingViewModel::class.java)
 
         setContent {
             DaleComposeTheme{
@@ -200,6 +206,7 @@ class MainActivity : ComponentActivity() {
                                 parkingViewModel,
                                 createParkingViewModel,
                                 moderateViewModel,
+                                tagViewModel,
                                 navController
                             )
                         }
@@ -247,6 +254,9 @@ class MainActivity : ComponentActivity() {
                             val parkingId   = backStackEntry.arguments?.getString("parkingId") ?: ""
                             ListReviewScreen(parkingId = parkingId, viewModel = reviewViewModel)
                         }
+                        composable("tagsscreen"){
+                            TagsScreen(tagViewModel,navController)
+                        }
 
                     }
                 }
@@ -254,3 +264,15 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
+class CreateParkingViewModelFactory(private val tagViewModel: TagViewModel) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(CreateParkingViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return CreateParkingViewModel(tagViewModel) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}
+
+

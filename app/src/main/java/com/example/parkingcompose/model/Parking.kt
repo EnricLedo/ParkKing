@@ -1,5 +1,7 @@
 package com.example.parkingcompose.model
 
+import com.google.firebase.Timestamp
+
 
 data class Location(
     val latitude: Double = 0.0,
@@ -14,8 +16,10 @@ data class Parking(
     val image: String = "", // URL del Storage
     val parkingRating: Double = 0.0,
     val reviewList: List<Review> = emptyList(),
-    val tagList: List<Tag> = emptyList(),
     val priceMinute: Float = 0.0f,
     val checked: Boolean = false,
-    val createdBy: String = ""
+    val createdBy: String = "",
+    var tags: List<String> = emptyList(), // Asegúrate de que 'tags' está definido como una lista mutable
+    val createdAt: Timestamp = Timestamp.now()
+
 )

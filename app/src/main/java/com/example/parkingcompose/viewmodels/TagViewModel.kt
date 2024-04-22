@@ -1,30 +1,79 @@
 package com.example.parkingcompose.viewmodels
 
 
+import android.content.ContentValues.TAG
 import android.util.Log
+import androidx.lifecycle.ViewModel
 import com.example.parkingcompose.model.Tag
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
+import java.io.InputStream
+import com.google.firebase.storage.FirebaseStorage
+import java.util.UUID
 
-class TagViewModel {
+
+class TagViewModel : ViewModel() {
     private val firestore = FirebaseFirestore.getInstance()
+    private val storageReference = FirebaseStorage.getInstance().reference
 
-    suspend fun addTag(tag: Tag) {
-        try {
-            firestore.collection("tags").add(tag).await()
-        } catch (e: Exception) {
-            Log.e("FirestoreManager", "Error adding tag", e)
-            // Considera mostrar un mensaje de error al usuario.
-        }
+    fun addTag(tag: Tag, onSuccess: () -> Unit, onTagExists: () -> Unit) {
+        // Primero verifica si ya existe un tag con el mismo título
+        firestore.collection("tags")
+            .whereEqualTo("title", tag.title)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                if (querySnapshot.isEmpty) {
+                    // Si no existe ningún tag con ese título, procede a añadir el nuevo tag
+                    firestore.collection("tags").add(tag)
+                        .addOnSuccessListener {
+                            Log.d(TAG, "Tag added successfully with ID: ${it.id}")
+                            onSuccess()  // Llama al callback de éxito
+                        }
+                        .addOnFailureListener { e ->
+                            Log.w(TAG, "Error adding tag", e)
+                        }
+                } else {
+                    // Si ya existe un tag con ese título, llama al callback de error
+                    onTagExists()
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.w(TAG, "Error checking for existing tags", e)
+            }
     }
 
-    suspend fun updateTag(tag: Tag) {
-        val tagRef = tag.id?.let { firestore.collection("tags").document(it) }
-        tagRef?.set(tag)?.await()
+
+    fun updateTag(tag: Tag, onSuccess: () -> Unit, onTagExists: () -> Unit) {
+        // Verifica primero si ya existe un tag con el mismo título y diferente ID
+        firestore.collection("tags")
+            .whereEqualTo("title", tag.title)
+            .get()
+            .addOnSuccessListener { documents ->
+                if (documents.any { it.id != tag.id }) {
+                    onTagExists()
+                } else {
+                    // No hay conflictos, procede a actualizar
+                    tag.id?.let { id ->
+                        firestore.collection("tags").document(id).set(tag)
+                            .addOnSuccessListener {
+                                onSuccess()
+                            }
+                            .addOnFailureListener {
+                                Log.w(TAG, "Error updating tag", it)
+                            }
+                    }
+                }
+            }
+            .addOnFailureListener {
+                Log.w(TAG, "Error checking for existing tags", it)
+            }
     }
+
+
 
     suspend fun deleteTag(tagId: String) {
         val tagRef = firestore.collection("tags").document(tagId)
@@ -47,4 +96,24 @@ class TagViewModel {
         }
         awaitClose { subscription.remove() }
     }
+
+    fun uploadImageToFirebaseStorage(inputStream: InputStream, onSuccess: (String) -> Unit, onFailure: () -> Unit) {
+        val ref = storageReference.child("images/${UUID.randomUUID()}")
+        val uploadTask = ref.putStream(inputStream)
+        uploadTask.continueWithTask { task ->
+            if (!task.isSuccessful) {
+                task.exception?.let {
+                    throw it
+                }
+            }
+            ref.downloadUrl
+        }.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                onSuccess(task.result.toString())
+            } else {
+                onFailure()
+            }
+        }
+    }
+
 }

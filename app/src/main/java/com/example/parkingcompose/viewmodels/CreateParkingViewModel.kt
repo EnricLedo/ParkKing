@@ -16,11 +16,15 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 import com.example.parkingcompose.dao.UserDao
+import com.example.parkingcompose.model.Tag
+import com.google.firebase.firestore.FieldValue
 
-class CreateParkingViewModel : ViewModel() {
+class CreateParkingViewModel(private val tagViewModel: TagViewModel) : ViewModel() {
     var name = mutableStateOf("")
     var description = mutableStateOf("")
     var priceMinute = mutableStateOf("")
+    var tags = mutableStateOf(listOf<Tag>())
+    var selectedTagIds = mutableStateOf(listOf<String>())
     var latitude = mutableStateOf(0.0)
     var longitude = mutableStateOf(0.0)
     var selectedImage = mutableStateOf<Uri?>(null)
@@ -33,6 +37,17 @@ class CreateParkingViewModel : ViewModel() {
     private val _parkingEnabledEvent = MutableSharedFlow<Unit>()
     val parkingEnabledEvent: SharedFlow<Unit> = _parkingEnabledEvent
 
+    init {
+        observeTags()
+    }
+
+    private fun observeTags() {
+        viewModelScope.launch {
+            tagViewModel.getTagsFlow().collect { tagsList ->
+                tags.value = tagsList
+            }
+        }
+    }
     fun onNameChange(newValue: String) {
         name.value = newValue
     }
@@ -43,6 +58,14 @@ class CreateParkingViewModel : ViewModel() {
 
     fun onPriceMinuteChange(newValue: String) {
         priceMinute.value = newValue
+    }
+
+    fun selectTag(tagId: String, isSelected: Boolean) {
+        selectedTagIds.value = if (isSelected) {
+            selectedTagIds.value + tagId
+        } else {
+            selectedTagIds.value - tagId
+        }
     }
 
     suspend fun onAddParking(context: Context, selectLocationViewModel: SelectLocationViewModel, userDAO: UserDao) {
@@ -66,7 +89,7 @@ class CreateParkingViewModel : ViewModel() {
                         image = imageUrl,
                         parkingRating = 0.0,
                         reviewList = emptyList(),
-                        tagList = emptyList(),
+                        tags = selectedTagIds.value,
                         priceMinute = price,
                         createdBy = username
                     )
@@ -93,6 +116,8 @@ class CreateParkingViewModel : ViewModel() {
                     _parkingAddedEvent.emit(Unit) // Emit an update event
                     _parkingEnabledEvent.emit(Unit) // Emit an update event
                 }
+                updateTagsWithParkingId(newParkingRef.id) // Consider updating tags before emitting the event if necessary
+
             }
             .addOnFailureListener { e ->
                 Log.w(TAG, "Error adding parking", e)
@@ -107,5 +132,18 @@ class CreateParkingViewModel : ViewModel() {
         latitude.value = 0.0
         longitude.value = 0.0
         selectedImage.value = null
+    }
+    private fun updateTagsWithParkingId(parkingId: String) {
+        val db = FirebaseFirestore.getInstance()
+        selectedTagIds.value.forEach { tagId ->
+            db.collection("tags").document(tagId)
+                .update("parkingIds", FieldValue.arrayUnion(parkingId))
+                .addOnSuccessListener {
+                    Log.d(TAG, "Parking ID added to tag successfully: $parkingId")
+                }
+                .addOnFailureListener { e ->
+                    Log.w(TAG, "Error adding parking ID to tag", e)
+                }
+        }
     }
 }

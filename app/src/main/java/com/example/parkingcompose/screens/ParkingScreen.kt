@@ -1,6 +1,8 @@
 package com.example.parkingcompose.screens
 
 import android.annotation.SuppressLint
+import android.content.ContentValues
+import android.util.Log
 import com.example.parkingcompose.viewmodels.ParkingViewModel
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
@@ -9,6 +11,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
@@ -21,6 +24,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,6 +45,8 @@ import com.example.parkingcompose.ui.theme.ButtonTextStyle
 import com.example.parkingcompose.ui.theme.OrangeLight
 import com.example.parkingcompose.viewmodels.CreateParkingViewModel
 import com.example.parkingcompose.viewmodels.ModerateViewModel
+import com.example.parkingcompose.viewmodels.TagViewModel
+import com.google.android.gms.maps.model.LatLng
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -48,12 +54,29 @@ fun ParkingListScreen(
     parkingViewModel: ParkingViewModel = viewModel(),
     createParkingViewModel: CreateParkingViewModel = viewModel(),
     moderateViewModel: ModerateViewModel = viewModel(),
-    navController: NavHostController
+    tagViewModel: TagViewModel = viewModel(),
+    navController: NavHostController, userLocation: LatLng = LatLng(0.0, 0.0) // Este valor debería ser obtenido dinámicamente
 ){
-    val parkingListState = parkingViewModel.parkingList.collectAsState()
+    val parkingListState = parkingViewModel.filteredParkings.collectAsState()
     val errorState = parkingViewModel.error.collectAsState()
-
+    var showFilteredParkings by remember { mutableStateOf(false) }
+    val tagsState = tagViewModel.getTagsFlow().collectAsState(initial = emptyList())
+    var selectedTags by remember { mutableStateOf(setOf<String>()) }
+    val coroutineScope = rememberCoroutineScope()
     // Fetch the parking list when ParkingScreen appears
+
+    var minDistance by remember { mutableStateOf(1f) } // Kilómetros
+    var maxDistance by remember { mutableStateOf(5f) } // Kilómetros
+
+    LaunchedEffect(minDistance, maxDistance) {
+        parkingViewModel.filterParkings(
+            userLat = userLocation.latitude,
+            userLng = userLocation.longitude,
+            minDist = minDistance * 1000,  // Convertir km a metros
+            maxDist = maxDistance * 1000   // Convertir km a metros
+        )
+        showFilteredParkings = true
+    }
     LaunchedEffect(key1 = Unit) {
         parkingViewModel.getParkingList()
     }
@@ -72,12 +95,57 @@ fun ParkingListScreen(
         }
     }
 
+    LaunchedEffect(selectedTags) {
+        Log.d(ContentValues.TAG, "Selected tags changed: $selectedTags")
+    }
+
     val parkingList = parkingListState.value
 
     Scaffold(
         bottomBar = { BottomNavigationBar(navController) }
     ) {
         Column {
+            ParkingSearchBar(onQueryChanged = parkingViewModel::updateSearchQuery)
+
+            LazyRow {
+                items(tagsState.value) { tag ->
+                    // Ejemplo de cómo se debe manejar el clic en un tag
+                    TagItem(
+                        tag = tag.title,
+                        isSelected = selectedTags.contains(tag.id),
+                        onClick = {
+                            // Aquí asumimos que tag.id no es nulo
+                            val tagId = tag.id!!
+                            selectedTags = if (selectedTags.contains(tagId)) {
+                                selectedTags - tagId
+                            } else {
+                                selectedTags + tagId
+                            }
+                            parkingViewModel.updateSelectedTags(tagId)
+                        }
+                    )
+                }
+            }
+            Button(
+                onClick = { parkingViewModel.orderParkingsByDistance(true) },
+                modifier = Modifier.padding(8.dp)
+            ) {
+                Text("Ordenar por Distancia Ascendente")
+            }
+            Button(
+                onClick = { parkingViewModel.orderParkingsByDistance(false) },
+                modifier = Modifier.padding(8.dp)
+            ) {
+                Text("Ordenar por Distancia Descendente")
+            }
+            Button(
+                onClick = { parkingViewModel.orderByCreationDate() },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+            ) {
+                Text("ORDER BY CREATION DATE")
+            }
             Button(
                 onClick = { navController.navigate("crearparking") },
                 modifier = Modifier
@@ -85,6 +153,18 @@ fun ParkingListScreen(
                     .padding(8.dp)
             ) {
                 Text("ADD NEW PARKING", style = ButtonTextStyle)
+            }
+
+            if (errorState.value != null) {
+                Text("Error: ${errorState.value}")
+            }
+            Button(
+                onClick = { navController.navigate("tagsscreen") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+            ) {
+                Text("MANAGE TAGS", style = ButtonTextStyle)
             }
 
             if (errorState.value != null) {
@@ -107,6 +187,41 @@ fun ParkingListScreen(
     }
 }
 
+@Composable
+fun TagItem(tag: String, isSelected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    Card(
+        modifier = modifier
+            .padding(horizontal = 4.dp, vertical = 8.dp)
+            .clickable(onClick = onClick),
+        colors = CardDefaults.cardColors(
+            containerColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
+        )
+    ) {
+        Text(
+            text = tag,
+            modifier = Modifier.padding(8.dp),
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+    }
+}
+
+@Composable
+fun ParkingSearchBar(onQueryChanged: (String) -> Unit) {
+    var text by remember { mutableStateOf("") }
+
+    OutlinedTextField(
+        value = text,
+        onValueChange = {
+            text = it
+            onQueryChanged(it)
+        },
+        label = { Text("Search Parkings") },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    )
+}
 @Composable
 fun ParkingItem(
     parking: Parking,
