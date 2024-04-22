@@ -5,15 +5,20 @@ import com.example.parkingcompose.viewmodels.ParkingViewModel
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -26,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -36,8 +42,8 @@ import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.example.parkingcompose.model.Parking
 import com.example.parkingcompose.navegacion.BottomNavigationBar
-import com.example.parkingcompose.ui.theme.BlueGreyDark
 import com.example.parkingcompose.ui.theme.ButtonTextStyle
+import com.example.parkingcompose.ui.theme.OrangeDark
 import com.example.parkingcompose.ui.theme.OrangeLight
 import com.example.parkingcompose.viewmodels.CreateParkingViewModel
 import com.example.parkingcompose.viewmodels.ModerateViewModel
@@ -82,7 +88,13 @@ fun ParkingListScreen(
                 onClick = { navController.navigate("crearparking") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(8.dp)
+                    .padding(8.dp),
+                colors = ButtonColors(
+                    containerColor = OrangeDark,
+                    contentColor = Color.Unspecified,
+                    disabledContainerColor = Color.Unspecified,
+                    disabledContentColor = Color.Unspecified
+                )
             ) {
                 Text("ADD NEW PARKING", style = ButtonTextStyle)
             }
@@ -93,12 +105,11 @@ fun ParkingListScreen(
 
             LazyColumn {
                 items(parkingList) { parking ->
-                    if(parking.checked == true){
+                    if(parking.checked){
                         ParkingItem(
                             parking = parking,
-                            parkingViewModel = parkingViewModel,
-                            modifier = Modifier.padding(8.dp),
-                            navController
+                            modifier = Modifier.padding(6.dp),
+                            navController = navController
                         )
                     }
                 }
@@ -110,7 +121,6 @@ fun ParkingListScreen(
 @Composable
 fun ParkingItem(
     parking: Parking,
-    parkingViewModel: ParkingViewModel,
     modifier: Modifier = Modifier,
     navController: NavHostController
 ) {
@@ -123,7 +133,6 @@ fun ParkingItem(
             contentColor = Color.White,
             disabledContainerColor = Color.Unspecified,
             disabledContentColor = Color.Unspecified),
-
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Column(
@@ -138,28 +147,63 @@ fun ParkingItem(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(8.dp)
             ) {
-                ParkingIcon(parking.image, parking.parkingRating)
-                ParkingInformation(parking.name, modifier.weight(1f, fill = false), navController)
-                ParkingItemButton(
-                    expanded = expanded,
-                    onClick = { expanded = !expanded },
-                )
+                //Column 1
+                Column(
+                    modifier = Modifier,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    ParkingImage(parking.image)
+                    ParkingRating(parking.parkingRating)
+                }
+                //Column 2
+                Column(
+                    modifier = Modifier.padding(start = 6.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ){
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        ParkingName(parking.name,
+                            Modifier
+                                .weight(1f)
+                                .padding(start = 2.dp))
+                        ParkingItemButton(
+                            expanded = expanded,
+                            onClick = { expanded = !expanded }
+                        )
+                    }
+                    val exampleList = listOf("Free", "Open now", "+4 Stars", "Electric", "Motorcycles", "24/7", "Wasteland")
+                    LazyRow(
+                        Modifier.padding(2.dp).padding(top = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        items(exampleList) { tag ->
+                            TagItem(
+                                tagName = tag,
+                                tagIcon = Icons.Filled.AccountBox
+                            )
+                        }
+                    }
+                }
             }
-            if (expanded) {
-                ParkingDescription(
-                    parking.description, modifier = Modifier.padding(
-                        start = 16.dp,
-                        top = 8.dp,
-                        bottom = 16.dp,
-                        end = 16.dp
-                    )
+        }
+        if (expanded) {
+            ParkingDescription(
+                parking.description, modifier = Modifier.padding(
+                    start = 16.dp,
+                    top = 8.dp,
+                    bottom = 16.dp,
+                    end = 16.dp
                 )
-            }
+            )
         }
     }
 }
+
 
 @Composable
 fun ParkingItemButton(
@@ -179,11 +223,22 @@ fun ParkingItemButton(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ParkingIcon(
-    parkingIcon: String,
-    parkingRating: Double,
-    modifier: Modifier = Modifier
+fun ParkingName(
+    parkingName: String,
+    modifier: Modifier
+) {
+    Text(
+        text = parkingName,
+        fontSize = 34.sp,
+        modifier = modifier
+            .basicMarquee()
+    )
+}
+@Composable
+fun ParkingImage(
+    parkingIcon: String
 ) {
     val painter = rememberAsyncImagePainter(
         ImageRequest.Builder(LocalContext.current).data(data = parkingIcon).apply(block = fun ImageRequest.Builder.() {
@@ -192,42 +247,37 @@ fun ParkingIcon(
     )
 
     Column(
-        modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
             painter = painter,
             contentDescription = null,
             modifier = Modifier
-                .size(64.dp)
-                .padding(8.dp)
+                .size(90.dp)
+                .padding(4.dp)
                 .clip(MaterialTheme.shapes.small)
-        )
-        Text(
-            text = parkingRating.toString(),
-            style = MaterialTheme.typography.bodyMedium
         )
     }
 }
 
 @Composable
-fun ParkingInformation(
-    parkingName: String,
-    modifier: Modifier = Modifier,
-    navController: NavHostController
+fun ParkingRating(
+    parkingRating: Double,
+    modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier) {
-
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         Text(
-            text = parkingName,
-            style = ButtonTextStyle,
-            fontSize = 40.sp,
-            color = BlueGreyDark,
-            modifier = Modifier
-                .padding(top = 8.dp)
-
+            text = parkingRating.toString(),
+            style = MaterialTheme.typography.bodyLarge
         )
-
+        Icon(
+            imageVector = Icons.Filled.Star,
+            contentDescription = "Star Icon",
+            modifier = Modifier.size(12.dp)
+        )
     }
 }
 
@@ -251,27 +301,32 @@ fun ParkingDescription(
 }
 
 @Composable
-fun AdminButtons(
-    parkingViewModel: ParkingViewModel
-) {
-    Row(
+fun TagItem(
+    tagName: String,
+    tagIcon: ImageVector
+){
+    Card(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
+            .clip(RoundedCornerShape(1000.dp)),
+        colors = CardColors(
+            containerColor = OrangeDark,
+            contentColor = Color.White,
+            disabledContainerColor = Color.Unspecified,
+            disabledContentColor = Color.Unspecified
+        )
     ) {
-
-        Button(
-            onClick = { /*parkingViewModel.deleteParking(parking = )*/ },
-            modifier = Modifier
-                .weight(1f)
-                .padding(8.dp),
-            colors = ButtonColors(
-                containerColor = Color.Red,
-                contentColor = Color.White,
-                disabledContainerColor = Color.Unspecified,
-                disabledContentColor = Color.Unspecified),
+        Row(
+            Modifier.padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(Icons.Default.Delete, contentDescription = "Delete")
+            Icon(
+                imageVector = tagIcon,
+                contentDescription = null
+            )
+            Text(
+                text = tagName
+            )
         }
     }
 }
+
