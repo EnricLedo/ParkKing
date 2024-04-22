@@ -76,7 +76,7 @@ fun RegisterScreen(viewModel: RegisterViewModel, navController: NavHostControlle
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = { viewModel.registerUser(googleAuthUiClient)
+            onClick = { viewModel.registerUser()
                 navController.navigate("mapa")},
             modifier = Modifier.fillMaxWidth()
         ) {
