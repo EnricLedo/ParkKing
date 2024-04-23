@@ -48,6 +48,7 @@ import com.example.parkingcompose.ui.theme.ButtonTextStyle
 import com.example.parkingcompose.ui.theme.OrangeDark
 import com.example.parkingcompose.ui.theme.OrangeLight
 import com.example.parkingcompose.viewmodels.ParkingDetailsViewModel
+import okhttp3.internal.userAgent
 
 
 @Composable
@@ -102,25 +103,25 @@ fun ParkingDetailsScreen(
                     textAlign = TextAlign.Center
                 )
                 Row(
-    modifier = Modifier.fillMaxWidth(),
-    horizontalArrangement = Arrangement.Center,
-    verticalAlignment = Alignment.CenterVertically
-) {
-    Text(
-        text = "Rating: ${parking!!.parkingRating}",
-        color = OrangeDark,
-        style = ButtonTextStyle,
-        textAlign = TextAlign.Center,
-        modifier = Modifier.align(Alignment.CenterVertically)
-    )
-    Icon(
-        imageVector = Icons.Filled.Star,
-        contentDescription = "Star Icon",
-        modifier = Modifier
-            .size(12.dp)
-            .align(Alignment.CenterVertically)
-    )
-}
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Rating: ${parking!!.parkingRating}",
+                        color = OrangeDark,
+                        style = ButtonTextStyle,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.align(Alignment.CenterVertically)
+                    )
+                    Icon(
+                        imageVector = Icons.Filled.Star,
+                        contentDescription = "Star Icon",
+                        modifier = Modifier
+                            .size(12.dp)
+                            .align(Alignment.CenterVertically)
+                    )
+                }
                 Image(
                     painter = rememberAsyncImagePainter(parking!!.image),
                     contentDescription = "Parking Image",
@@ -204,6 +205,27 @@ fun ParkingDetailsScreen(
                             style = ButtonTextStyle
                         )
                     }
+                }
+                Button(
+                    onClick = { navController.navigate(
+                        "editparking/${parking!!.id}"
+                    ) },
+                    modifier = Modifier
+                        .fillMaxWidth(0.7F)
+                        .align(Alignment.CenterHorizontally)
+                        .padding(4.dp),
+                    colors = ButtonColors(
+                        containerColor = OrangeDark,
+                        contentColor = Color.Unspecified,
+                        disabledContainerColor = Color.Unspecified,
+                        disabledContentColor = Color.Unspecified
+                    )
+                ) {
+                    Text(
+                        "EDIT PARKING",
+                        color = Color.White,
+                        style = ButtonTextStyle
+                    )
                 }
             }
         }

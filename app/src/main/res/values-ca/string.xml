@@ -75,5 +75,5 @@
     <string name="enter_new_username">Introdueix el teu nou nom d\'usuari:</string>
     <string name="username">Nom d\'usuari</string>
     <string name="save">DESA</string>
-
+    <string name="edit_parking">Editar aparcament</string>
 </resources>
