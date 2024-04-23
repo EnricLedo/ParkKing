@@ -36,11 +36,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.parkingcompose.R
 import com.example.parkingcompose.model.Review
 import com.example.parkingcompose.ui.theme.OrangeLight
 import com.google.firebase.auth.FirebaseAuth
@@ -210,6 +212,8 @@ fun CreateReviewScreen(
     var title by remember { mutableStateOf("") }
     var userEmail by remember { mutableStateOf("") }
 
+    val reviewSubmittedText = stringResource(id = R.string.review_submitted)
+    val errorSendingReviewText = stringResource(id = R.string.error_sending_review)
 
 
     Column(
@@ -219,7 +223,7 @@ fun CreateReviewScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(text = "Deja tu reseña")
+        Text(text = stringResource(id = R.string.leave_your_review))
         RatingBar(
             rating = rating,
             onRatingChanged = { newRating -> rating = newRating }
@@ -229,14 +233,14 @@ fun CreateReviewScreen(
         TextField(
             value = title,
             onValueChange = { newTitle -> title = newTitle },
-            label = { Text("Título") },
+            label = { Text(stringResource(id = R.string.title)) },
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(16.dp))
         TextField(
             value = comment,
             onValueChange = { newComment -> comment = newComment },
-            label = { Text("Comentario") },
+            label = { Text(stringResource(id = R.string.comment)) },
             maxLines = 3,
             modifier = Modifier.fillMaxWidth()
         )
@@ -254,19 +258,19 @@ fun CreateReviewScreen(
                 )
                 try {
                     viewModel.addReview(review)
-                    Toast.makeText(context, "Reseña enviada", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, reviewSubmittedText, Toast.LENGTH_SHORT).show()
                     navController.navigate("listReviews/$parkingId?rating=${review.review_rating}")
                 } catch (e: Exception) {
                     Toast.makeText(
                         context,
-                        "Error al enviar la reseña: ${e.message}",
+                        "$errorSendingReviewText ${e.message}",
                         Toast.LENGTH_SHORT
                     ).show()
                 }
             },
             modifier = Modifier.align(Alignment.End)
         ) {
-            Text("Enviar")
+            Text(stringResource(id = R.string.send))
         }
     }
 }

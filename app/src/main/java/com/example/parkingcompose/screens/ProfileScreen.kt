@@ -21,6 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -73,7 +74,7 @@ fun ProfileScreen(
                             contentDescription = "Logout icon",
                             tint = Color.Black
                         )
-                        Text(text = "LOGOUT", style = ButtonTextStyle, color = Color.Black)
+                        Text(text = stringResource(id = R.string.logout), style = ButtonTextStyle, color = Color.Black)
                     }
                 }
                 Spacer(modifier = Modifier.height(76.dp))
@@ -86,7 +87,7 @@ fun ProfileScreen(
 
                 Image(
                     painter = painter,
-                    contentDescription = "Profile picture",
+                    contentDescription = stringResource(id = R.string.profile_picture),
                     modifier = Modifier
                         .size(150.dp)
                         .clip(CircleShape),
@@ -103,13 +104,13 @@ fun ProfileScreen(
                     Spacer(modifier = Modifier.height(26.dp))
 
                 Button(onClick = { navController.navigate("moderate") }){
-                    Text(text = "MODERATE PARKINGS", style = ButtonTextStyle)
+                    Text(text = stringResource(id = R.string.moderate_parkings), style = ButtonTextStyle)
                 }
 
                 Spacer(modifier = Modifier.height(46.dp))
 
                 Button(onClick = { navController.navigate("updateusername") }){
-                    Text(text = "CHANGE USERNAME", style = ButtonTextStyle)
+                    Text(text = stringResource(id = R.string.change_username), style = ButtonTextStyle)
                 }
             }
         }

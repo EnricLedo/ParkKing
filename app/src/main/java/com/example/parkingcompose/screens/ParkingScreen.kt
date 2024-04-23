@@ -36,6 +36,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -43,6 +44,7 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
+import com.example.parkingcompose.R
 import com.example.parkingcompose.model.Parking
 import com.example.parkingcompose.navegacion.BottomNavigationBar
 import com.example.parkingcompose.ui.theme.ButtonTextStyle
@@ -52,6 +54,23 @@ import com.example.parkingcompose.viewmodels.CreateParkingViewModel
 import com.example.parkingcompose.viewmodels.ModerateViewModel
 import com.example.parkingcompose.viewmodels.TagViewModel
 import com.google.android.gms.maps.model.LatLng
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.unit.DpOffset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Button
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.Icon
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.runtime.*
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.IntSize
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -68,7 +87,9 @@ fun ParkingListScreen(
     val tagsState = tagViewModel.getTagsFlow().collectAsState(initial = emptyList())
     var selectedTags by remember { mutableStateOf(setOf<String>()) }
     val coroutineScope = rememberCoroutineScope()
-    // Fetch the parking list when ParkingScreen appears
+// Primero, necesitas una variable para manejar la visibilidad del DropdownMenu
+    var expanded by remember { mutableStateOf(false) }
+    val dropdownOffset = remember { mutableStateOf(DpOffset(0.dp, 0.dp)) }
 
     var minDistance by remember { mutableStateOf(1f) } // Kilómetros
     var maxDistance by remember { mutableStateOf(5f) } // Kilómetros
@@ -131,26 +152,7 @@ fun ParkingListScreen(
                     )
                 }
             }
-            Button(
-                onClick = { parkingViewModel.orderParkingsByDistance(true) },
-                modifier = Modifier.padding(8.dp)
-            ) {
-                Text("Ordenar por Distancia Ascendente")
-            }
-            Button(
-                onClick = { parkingViewModel.orderParkingsByDistance(false) },
-                modifier = Modifier.padding(8.dp)
-            ) {
-                Text("Ordenar por Distancia Descendente")
-            }
-            Button(
-                onClick = { parkingViewModel.orderByCreationDate() },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
-            ) {
-                Text("ORDER BY CREATION DATE")
-            }
+            YourComposableFunction(parkingViewModel)
             Button(
                 onClick = { navController.navigate("crearparking") },
                 modifier = Modifier
@@ -163,7 +165,7 @@ fun ParkingListScreen(
                     disabledContentColor = Color.Unspecified
                 )
             ) {
-                Text("ADD NEW PARKING", style = ButtonTextStyle)
+                Text(stringResource(id = R.string.add_new_parking), style = ButtonTextStyle)
             }
 
             if (errorState.value != null) {
@@ -175,7 +177,7 @@ fun ParkingListScreen(
                     .fillMaxWidth()
                     .padding(8.dp)
             ) {
-                Text("MANAGE TAGS", style = ButtonTextStyle)
+                Text(stringResource(id = R.string.manage_tags), style = ButtonTextStyle)
             }
 
             if (errorState.value != null) {
@@ -193,6 +195,50 @@ fun ParkingListScreen(
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun YourComposableFunction(parkingViewModel: ParkingViewModel = viewModel()) {
+    var expanded by remember { mutableStateOf(false) }
+    var dropdownOffset by remember { mutableStateOf(DpOffset(0.dp, 0.dp)) }
+
+    Button(
+        onClick = { expanded = true },
+        modifier = Modifier
+            .padding(8.dp)
+            .onSizeChanged { size ->
+                // Aquí configuramos el offset para que el menú aparezca justo debajo del botón
+                // El offset x es 0.dp para alinear al inicio, y el offset y es igual a la altura del botón
+                dropdownOffset = DpOffset(0.dp, size.height.dp)
+            }
+    ) {
+        Text("Ordenar por distancia")
+        Icon(imageVector = Icons.Filled.ArrowDropDown, contentDescription = null)
+    }
+
+    DropdownMenu(
+        expanded = expanded,
+        onDismissRequest = { expanded = false },
+        offset = dropdownOffset,  // Aplicamos el offset calculado
+        modifier = Modifier
+    ) {
+        DropdownMenuItem(
+            onClick = {
+                expanded = false
+                parkingViewModel.orderParkingsByDistance(true)  // Orden ascendente
+            }
+        ) {
+            Text(stringResource(id = R.string.sort_by_distance_ascending))
+        }
+        DropdownMenuItem(
+            onClick = {
+                expanded = false
+                parkingViewModel.orderParkingsByDistance(false) // Orden descendente
+            }
+        ) {
+            Text(stringResource(id = R.string.sort_by_distance_descending))
         }
     }
 }
@@ -226,7 +272,7 @@ fun ParkingSearchBar(onQueryChanged: (String) -> Unit) {
             text = it
             onQueryChanged(it)
         },
-        label = { Text("Search Parkings") },
+        label = { Text(stringResource(id = R.string.search_parkings)) },
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
@@ -404,7 +450,7 @@ fun ParkingDescription(
         modifier = modifier
     ) {
         Text(
-            text = "Description",
+            text = stringResource(id = R.string.description),
             style = MaterialTheme.typography.labelSmall
         )
         Text(

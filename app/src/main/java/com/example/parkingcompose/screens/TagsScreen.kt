@@ -49,12 +49,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import com.example.parkingcompose.R
 import com.example.parkingcompose.model.Tag
 import com.example.parkingcompose.viewmodels.TagViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -84,7 +86,7 @@ fun TagsScreen(tagViewModel: TagViewModel, navController: NavController) {
             FloatingActionButton(
                 onClick = { showAddTagDialog = true },
                 content = {
-                    Icon(imageVector = Icons.Default.Add, contentDescription = "Add Tag")
+                    Icon(imageVector = Icons.Default.Add, contentDescription = stringResource(id = R.string.add_tag))
                 }
             )
         }
@@ -212,10 +214,10 @@ fun TagItem(tag: Tag, tagViewModel: TagViewModel, onEdit: (Tag) -> Unit) {
             Spacer(modifier = Modifier.height(8.dp))
             Row {
                 IconButton(onClick = { showDeleteTagDialog = true }) {
-                    Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Icon")
+                    Icon(imageVector = Icons.Default.Delete, contentDescription = stringResource(id = R.string.delet_con))
                 }
                 IconButton(onClick = { showEditTagDialog = true }) {
-                    Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit Icon")
+                    Icon(imageVector = Icons.Default.Edit, contentDescription = stringResource(id = R.string.edit_con))
                 }
             }
         }
@@ -226,11 +228,11 @@ fun TagItem(tag: Tag, tagViewModel: TagViewModel, onEdit: (Tag) -> Unit) {
 fun ShowContentDialog(tag: Tag, onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(text = "Contenido de Tag") },
+        title = { Text(text = stringResource(id = R.string.Contenido_de_Tag))},
         text = { Text(text = tag.content) },
         confirmButton = {
             Button(onClick = onDismiss) {
-                Text("Cerrar")
+                Text(stringResource(id = R.string.cerrar))
             }
         }
     )
@@ -252,8 +254,8 @@ fun EditTagDialog(tag: Tag, onTagUpdated: (Tag) -> Unit, onDialogDismissed: () -
     if (showErrorDialog) {
         AlertDialog(
             onDismissRequest = { showErrorDialog = false },
-            title = { Text("Error") },
-            text = { Text("A tag with this title already exists.") },
+            title = { Text(stringResource(id = R.string.error)) },
+            text = { Text(stringResource(id = R.string.error_tag_exists)) },
             confirmButton = {
                 Button(onClick = { showErrorDialog = false }) {
                     Text("OK")
@@ -264,7 +266,7 @@ fun EditTagDialog(tag: Tag, onTagUpdated: (Tag) -> Unit, onDialogDismissed: () -
 
     AlertDialog(
         onDismissRequest = onDialogDismissed,
-        title = { Text(text = "Editar Tag") },
+        title = { Text(text = stringResource(id = R.string.edit_tag)) },
         confirmButton = {
             Button(onClick = {
                 if (titleText.isNotBlank() && contentText.isNotBlank()) {
@@ -303,12 +305,12 @@ fun EditTagDialog(tag: Tag, onTagUpdated: (Tag) -> Unit, onDialogDismissed: () -
                     }
                 }
             }) {
-                Text(text = "Actualizar")
+                Text(text = stringResource(id = R.string.actualizar))
             }
         },
         dismissButton = {
             Button(onClick = onDialogDismissed) {
-                Text(text = "Cancelar")
+                Text(text = stringResource(id = R.string.cancel))
             }
         },
         text = {
@@ -316,13 +318,13 @@ fun EditTagDialog(tag: Tag, onTagUpdated: (Tag) -> Unit, onDialogDismissed: () -
                 TextField(
                     value = titleText,
                     onValueChange = { titleText = it },
-                    label = { Text(text = "Título") }
+                    label = { Text(text = stringResource(id = R.string.name)) }
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 TextField(
                     value = contentText,
                     onValueChange = { contentText = it },
-                    label = { Text(text = "Contenido") }
+                    label = { Text(text = stringResource(id = R.string.description)) }
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 if (imageUri != null) {
@@ -339,7 +341,7 @@ fun EditTagDialog(tag: Tag, onTagUpdated: (Tag) -> Unit, onDialogDismissed: () -
                     )
                 }
                 Button(onClick = { imagePickerLauncher.launch("image/*") }) {
-                    Text("Seleccionar Imagen")
+                    Text(stringResource(id = R.string.select_image))
                 }
             }
         }
@@ -365,8 +367,8 @@ fun AddTagDialog(
     if (showErrorDialog) {
         AlertDialog(
             onDismissRequest = { showErrorDialog = false },
-            title = { Text("Error") },
-            text = { Text("A tag with this title already exists.") },
+            title = { Text(stringResource(id = R.string.error)) },
+            text = { Text(stringResource(id = R.string.error_tag_exists)) },
             confirmButton = {
                 Button(onClick = { showErrorDialog = false }) {
                     Text("OK")
@@ -377,25 +379,25 @@ fun AddTagDialog(
 
     AlertDialog(
         onDismissRequest = onDialogDismissed,
-        title = { Text("Add New Tag") },
+        title = { Text(stringResource(id = R.string.add_tag))},
         text = {
             Column {
                 TextField(
                     value = titleText,
                     onValueChange = { titleText = it },
-                    label = { Text("Title") }
+                    label = { Text(stringResource(id = R.string.name)) }
                 )
                 TextField(
                     value = contentText,
                     onValueChange = { contentText = it },
-                    label = { Text("Content") }
+                    label = { Text(stringResource(id = R.string.description)) }
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(onClick = { imagePickerLauncher.launch("image/*") }) {
-                    Text("Select Image")
+                    Text(stringResource(id = R.string.select_image))
                 }
                 imageUri?.let { uri ->
-                    Image(painter = rememberAsyncImagePainter(model = uri), contentDescription = "Selected Image", modifier = Modifier.size(100.dp))
+                    Image(painter = rememberAsyncImagePainter(model = uri), contentDescription = stringResource(id = R.string.select_image), modifier = Modifier.size(100.dp))
                 }
             }
         },
@@ -438,12 +440,12 @@ fun AddTagDialog(
                     }
                 }
             ) {
-                Text("Add")
+                Text(stringResource(id = R.string.add))
             }
         },
         dismissButton = {
             Button(onClick = onDialogDismissed) {
-                Text("Cancel")
+                Text(stringResource(id = R.string.cancel))
             }
         }
     )
@@ -454,20 +456,20 @@ fun AddTagDialog(
 fun DeleteTagDialog(onConfirmDelete: () -> Unit, onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Eliminar Tag") },
-        text = { Text("¿Estás seguro que deseas eliminar la Tag?") },
+        title = { Text(stringResource(id = R.string.delete_tag)) },
+        text = { Text(stringResource(id = R.string.are_you_sure_delete)) },
         confirmButton = {
             Button(
                 onClick = onConfirmDelete
             ) {
-                Text("Aceptar")
+                Text(stringResource(id = R.string.accept))
             }
         },
         dismissButton = {
             Button(
                 onClick = onDismiss
             ) {
-                Text("Cancelar")
+                Text(stringResource(id = R.string.cancel))
             }
         }
     )

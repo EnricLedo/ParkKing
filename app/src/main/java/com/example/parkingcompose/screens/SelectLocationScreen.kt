@@ -20,10 +20,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
 import androidx.navigation.NavController
+import com.example.parkingcompose.R
 import com.example.parkingcompose.viewmodels.SelectLocationViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -100,7 +102,7 @@ fun SelectLocationScreen(
                 .height(80.dp)
                 .padding(16.dp)
         ) {
-            Text("Aceptar")
+            Text(stringResource(id = R.string.accept))
         }
     }
 }

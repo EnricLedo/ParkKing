@@ -49,6 +49,7 @@ import com.example.parkingcompose.screens.CreateReviewScreen
 import com.example.parkingcompose.screens.ListReviewScreen
 import com.example.parkingcompose.screens.TagsScreen
 import com.example.parkingcompose.viewmodels.CreateParkingViewModel
+import com.example.parkingcompose.viewmodels.LanguageViewModel
 import com.example.parkingcompose.viewmodels.LoginMailViewModel
 import com.example.parkingcompose.viewmodels.MapViewModel
 import com.example.parkingcompose.viewmodels.ModerateViewModel
@@ -97,6 +98,7 @@ class MainActivity : ComponentActivity() {
         val tagViewModel = TagViewModel() // Asegúrate de instanciarlo correctamente según tu aplicación
         val factory = CreateParkingViewModelFactory(tagViewModel)
         val viewModel = ViewModelProvider(this, factory).get(CreateParkingViewModel::class.java)
+        val languageViewModel : LanguageViewModel by viewModels()
 
         setContent {
             DaleComposeTheme{
@@ -218,7 +220,7 @@ class MainActivity : ComponentActivity() {
                             CreateParkingScreen(
                                 createParkingViewModel,
                                 selectLocationScreen,
-                                navController,
+                                navController,languageViewModel,
                                 userDao = userDao
                             )
                         }
