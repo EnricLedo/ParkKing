@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
+import com.example.parkingcompose.dao.ParkingDAO
 import com.example.parkingcompose.ui.theme.ButtonTextStyle
 import com.example.parkingcompose.ui.theme.Orange
 import com.example.parkingcompose.ui.theme.OrangeDark
@@ -23,7 +24,7 @@ import kotlinx.coroutines.launch
 
 
 @Composable
-fun UpdateUsernameScreen(viewModel: UpdateUsernameViewModel, navHostController: NavHostController) {
+fun UpdateUsernameScreen(viewModel: UpdateUsernameViewModel, parkingDAO: ParkingDAO, navController: NavHostController) {
     val context = LocalContext.current
     Column(
         modifier = Modifier
@@ -47,6 +48,7 @@ fun UpdateUsernameScreen(viewModel: UpdateUsernameViewModel, navHostController: 
             modifier = Modifier.fillMaxWidth().padding(0.dp, 0.dp, 0.dp, 16.dp)
         )
         Text(
+
             text = "Enter your new username:",
             fontSize = 28.sp,
             color = Color.White,
@@ -65,20 +67,23 @@ fun UpdateUsernameScreen(viewModel: UpdateUsernameViewModel, navHostController: 
         )
 
         Button(
-            onClick = {
-                viewModel.viewModelScope.launch {
-                    val isUpdated = viewModel.updateUsername()
-                    if (isUpdated) {
-                        Toast.makeText(context, "Nombre de usuario cambiado", Toast.LENGTH_SHORT).show()
-                        navHostController.navigate("profile")
-                    } else {
-                        Toast.makeText(context, "El nombre de usuario ya está en uso", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("SAVE", style = ButtonTextStyle)
+    onClick = {
+        viewModel.viewModelScope.launch {
+            val oldUsername = viewModel.currentUsername.value
+            val newUsername = viewModel.username.value.text // Obtén el nuevo nombre de usuario antes de llamar a updateUsername()
+            val isUpdated = viewModel.updateUsername()
+            if (isUpdated) {
+                parkingDAO.updateCreatedBy(oldUsername, newUsername)
+                Toast.makeText(context, "Nombre de usuario cambiado", Toast.LENGTH_SHORT).show()
+                navController.navigate("profile")
+            } else {
+                Toast.makeText(context, "El nombre de usuario ya está en uso", Toast.LENGTH_SHORT).show()
+            }
         }
+    },
+    modifier = Modifier.fillMaxWidth()
+) {
+    Text("SAVE", style = ButtonTextStyle)
+}
     }
 }

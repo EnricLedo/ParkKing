@@ -10,17 +10,22 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -37,6 +42,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
+import com.example.parkingcompose.R
 import com.example.parkingcompose.ui.theme.ButtonTextStyle
 import com.example.parkingcompose.ui.theme.OrangeDark
 import com.example.parkingcompose.ui.theme.OrangeLight
@@ -87,14 +94,33 @@ fun ParkingDetailsScreen(
                     text = parking!!.name,
                     style = ButtonTextStyle,
                     fontSize = 40.sp,
-                    color = Color.White,
+                    color = Color.Black,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 8.dp, bottom = 16.dp),
+                        .padding(top = 8.dp, bottom = 10.dp),
                     textAlign = TextAlign.Center
                 )
-
+                Row(
+    modifier = Modifier.fillMaxWidth(),
+    horizontalArrangement = Arrangement.Center,
+    verticalAlignment = Alignment.CenterVertically
+) {
+    Text(
+        text = "Rating: ${parking!!.parkingRating}",
+        color = OrangeDark,
+        style = ButtonTextStyle,
+        textAlign = TextAlign.Center,
+        modifier = Modifier.align(Alignment.CenterVertically)
+    )
+    Icon(
+        imageVector = Icons.Filled.Star,
+        contentDescription = "Star Icon",
+        modifier = Modifier
+            .size(12.dp)
+            .align(Alignment.CenterVertically)
+    )
+}
                 Image(
                     painter = rememberAsyncImagePainter(parking!!.image),
                     contentDescription = "Parking Image",
@@ -108,39 +134,36 @@ fun ParkingDetailsScreen(
 
 
                 )
+
                 Card(
                     colors = CardColors(
-                        containerColor = Color.White,
+                        containerColor = OrangeLight,
                         contentColor = OrangeDark,
                         disabledContainerColor = Color.Unspecified,
                         disabledContentColor = Color.Unspecified),
                     modifier = Modifier.padding(6.dp)
                 ) {
-                    Row(modifier = Modifier.fillMaxWidth().padding(2.dp), horizontalArrangement = Arrangement.SpaceBetween){
+
                         Text(
-                            text = "Rating: ${parking!!.parkingRating}",
+                            text = "·Autor: ${parking!!.createdBy}",
                             color = OrangeDark,
                             style = ButtonTextStyle,
-                            modifier = Modifier.padding(start = 2.dp)
+                            modifier = Modifier.padding(bottom = 6.dp)
                         )
                         Text(
-                            text = "Price/Minute: ${parking!!.priceMinute}",
+                            text = "·Price/Minute: ${parking!!.priceMinute}",
                             color = OrangeDark,
                             style = ButtonTextStyle
                         )
-                        Text(
-                            text = "Autor: ${parking!!.createdBy}",
-                            color = OrangeDark,
-                            style = ButtonTextStyle,
-                            modifier = Modifier.padding(end = 2.dp)
-                        )
-                    }
+
+
                 }
                 Text(
                     text = parking!!.description,
                     style = ButtonTextStyle,
                     modifier = Modifier
-                        .padding(start = 8.dp, end = 8.dp)
+                        .padding(start = 8.dp, end = 8.dp),
+                    color = Color.Black
                 )
                 Row {
                     Button(
@@ -176,7 +199,7 @@ fun ParkingDetailsScreen(
                         )
                     ) {
                         Text(
-                            "CREATE REVIEW",
+                            "NEW REVIEW",
                             color = Color.White,
                             style = ButtonTextStyle
                         )

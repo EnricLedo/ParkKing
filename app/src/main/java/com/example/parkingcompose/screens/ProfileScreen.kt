@@ -12,6 +12,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,18 +27,29 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.rememberImagePainter
+import com.example.parkingcompose.dao.UserDao
 import com.example.parkingcompose.model.UserData
 import com.example.parkingcompose.navegacion.BottomNavigationBar
 import com.example.parkingcompose.ui.theme.ButtonTextStyle
 import com.example.parkingcompose.ui.theme.DaleComposeTheme
+import com.example.parkingcompose.viewmodels.ProfileScreenViewModel
+import com.example.parkingcompose.viewmodels.UpdateUsernameViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ProfileScreen(
     userData: UserData?,
     onSignOut: () -> Unit,
-    navController: NavHostController
+    navController: NavHostController,
+    userDao: UserDao
 ) {
+    val username = remember { mutableStateOf("") }
+
+    LaunchedEffect(key1 = true) {
+        userDao.getCurrentUsername { usernameFromDb ->
+            username.value = usernameFromDb
+        }
+    }
     DaleComposeTheme {
         Scaffold(
             bottomBar = { BottomNavigationBar(navController) }
@@ -80,15 +94,14 @@ fun ProfileScreen(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
-                if(userData?.username != null) {
-                    Text(
-                        text = userData.username,
-                        textAlign = TextAlign.Center,
-                        fontSize = 36.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
+                Text(
+                    text = username.value,
+                    textAlign = TextAlign.Center,
+                    fontSize = 36.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
                     Spacer(modifier = Modifier.height(26.dp))
-                }
+
                 Button(onClick = { navController.navigate("moderate") }){
                     Text(text = "MODERATE PARKINGS", style = ButtonTextStyle)
                 }

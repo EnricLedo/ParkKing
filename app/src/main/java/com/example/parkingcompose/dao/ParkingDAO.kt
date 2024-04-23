@@ -65,4 +65,11 @@ class ParkingDAO() {
             }
         }
     }
+
+    suspend fun updateCreatedBy(oldUsername: String, newUsername: String) {
+        val parkings = parkingsCollection.whereEqualTo("createdBy", oldUsername).get().await()
+        for (document in parkings.documents) {
+            document.reference.update("createdBy", newUsername).await()
+        }
+    }
 }

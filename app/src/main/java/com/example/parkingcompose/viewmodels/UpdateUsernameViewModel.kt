@@ -32,7 +32,7 @@ class UpdateUsernameViewModel() : ViewModel() {
         }
     }
 
-    private fun getCurrentUsername() {
+     fun getCurrentUsername() {
         val email = auth.currentUser?.email
         val db = FirebaseFirestore.getInstance()
 

@@ -111,6 +111,8 @@ class UserDao() {
             }
     }
 
+
+
     suspend fun checkUsernameAvailable(username: String): Boolean {
         val db = FirebaseFirestore.getInstance()
         var isAvailable = false
