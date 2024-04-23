@@ -105,7 +105,11 @@ fun MapScreen(
                         val markerState = mapViewModel.rememberCustomMarkerState("${parking.location.latitude},${parking.location.longitude}")
                         Marker(
                             state = markerState,
-                            title = parking.name
+                            title = parking.name,
+                            snippet = "Price: ${parking.priceMinute} €/min",
+                            onInfoWindowClick = {
+                                navController.navigate("parkingDetailsScreen/${parking.id}")
+                            }
                         )
                     }
                 }

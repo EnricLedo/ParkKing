@@ -6,33 +6,47 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
+import com.example.parkingcompose.R
 import com.example.parkingcompose.ui.theme.ButtonTextStyle
 import com.example.parkingcompose.ui.theme.OrangeDark
+import com.example.parkingcompose.ui.theme.OrangeLight
 import com.example.parkingcompose.viewmodels.ParkingDetailsViewModel
 
 
@@ -42,6 +56,7 @@ fun ParkingDetailsScreen(
     navController: NavHostController,
     parkingDetailsViewModel: ParkingDetailsViewModel = viewModel()
 ) {
+    Modifier.background(OrangeLight)
     val parking by parkingDetailsViewModel.parking.collectAsState(null)
 
     BackHandler {
@@ -53,8 +68,16 @@ fun ParkingDetailsScreen(
         parkingDetailsViewModel.getParkingById(parkingId)
     }
 
-    Box(
-        modifier = Modifier.fillMaxSize()
+    Card(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(8.dp),
+        colors = CardColors(
+            containerColor = OrangeLight,
+            contentColor = Color.White,
+            disabledContainerColor = Color.Unspecified,
+            disabledContentColor = Color.Unspecified),
+        elevation = CardDefaults.cardElevation(4.dp)
     ) {
         if (parking != null) {
             Column(
@@ -71,60 +94,117 @@ fun ParkingDetailsScreen(
                     text = parking!!.name,
                     style = ButtonTextStyle,
                     fontSize = 40.sp,
-                    color = OrangeDark,
+                    color = Color.Black,
+                    fontWeight = FontWeight.Bold,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 8.dp, bottom = 16.dp),
+                        .padding(top = 8.dp, bottom = 10.dp),
                     textAlign = TextAlign.Center
                 )
+                Row(
+    modifier = Modifier.fillMaxWidth(),
+    horizontalArrangement = Arrangement.Center,
+    verticalAlignment = Alignment.CenterVertically
+) {
+    Text(
+        text = "Rating: ${parking!!.parkingRating}",
+        color = OrangeDark,
+        style = ButtonTextStyle,
+        textAlign = TextAlign.Center,
+        modifier = Modifier.align(Alignment.CenterVertically)
+    )
+    Icon(
+        imageVector = Icons.Filled.Star,
+        contentDescription = "Star Icon",
+        modifier = Modifier
+            .size(12.dp)
+            .align(Alignment.CenterVertically)
+    )
+}
                 Image(
-                    painter = rememberImagePainter(parking!!.image),
+                    painter = rememberAsyncImagePainter(parking!!.image),
                     contentDescription = "Parking Image",
                     modifier = Modifier
                         .height(200.dp)
-                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(8.dp))
                         .clickable {
                             navController.navigate("mapa/${parking!!.location.latitude}/${parking!!.location.longitude}")
                         }
+                        .align(Alignment.CenterHorizontally)
+
+
                 )
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween){
-                    Text(
-                        text = "Rating: ${parking!!.parkingRating}",
-                        style = ButtonTextStyle,
-                        modifier = Modifier
-                            .padding(top = 8.dp, start = 8.dp, end = 8.dp)
-                    )
-                    Text(
-                        text = "Autor: ${parking!!.createdBy}",
-                        style = ButtonTextStyle,
-                        modifier = Modifier
-                            .padding(top = 8.dp, start = 8.dp, end = 8.dp)
-                    )
-                }
-                Button(
-                    onClick = { navController.navigate("createReview/${parking!!.id}") },
-                    modifier = Modifier.fillMaxWidth()
+
+                Card(
+                    colors = CardColors(
+                        containerColor = OrangeLight,
+                        contentColor = OrangeDark,
+                        disabledContainerColor = Color.Unspecified,
+                        disabledContentColor = Color.Unspecified),
+                    modifier = Modifier.padding(6.dp)
                 ) {
-                    Text("Crear Reseña")
-                }
-                Button(
-                    onClick = { navController.navigate("listReviews/${parking!!.id}") },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("Lista de Reseñas")
+
+                        Text(
+                            text = "·Autor: ${parking!!.createdBy}",
+                            color = OrangeDark,
+                            style = ButtonTextStyle,
+                            modifier = Modifier.padding(bottom = 6.dp)
+                        )
+                        Text(
+                            text = "·Price/Minute: ${parking!!.priceMinute}",
+                            color = OrangeDark,
+                            style = ButtonTextStyle
+                        )
+
+
                 }
                 Text(
                     text = parking!!.description,
                     style = ButtonTextStyle,
                     modifier = Modifier
-                        .padding(top = 8.dp, start = 8.dp, end = 8.dp)
+                        .padding(start = 8.dp, end = 8.dp),
+                    color = Color.Black
                 )
-                Text(
-                    text = "Price per minute: ${parking!!.priceMinute}",
-                    style = ButtonTextStyle,
-                    modifier = Modifier
-                        .padding(top = 8.dp, start = 8.dp, end = 8.dp)
-                )
+                Row {
+                    Button(
+                        onClick = { navController.navigate("listReviews/${parking!!.id}") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(4.dp)
+                            .weight(0.5f),
+                        colors = ButtonColors(
+                            containerColor = OrangeDark,
+                            contentColor = Color.Unspecified,
+                            disabledContainerColor = Color.Unspecified,
+                            disabledContentColor = Color.Unspecified
+                        )
+                    ) {
+                        Text(
+                            "REVIEWS",
+                            color = Color.White,
+                            style = ButtonTextStyle
+                        )
+                    }
+                    Button(
+                        onClick = { navController.navigate("createReview/${parking!!.id}") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(4.dp)
+                            .weight(0.5f),
+                        colors = ButtonColors(
+                            containerColor = OrangeDark,
+                            contentColor = Color.Unspecified,
+                            disabledContainerColor = Color.Unspecified,
+                            disabledContentColor = Color.Unspecified
+                        )
+                    ) {
+                        Text(
+                            "NEW REVIEW",
+                            color = Color.White,
+                            style = ButtonTextStyle
+                        )
+                    }
+                }
             }
         }
     }

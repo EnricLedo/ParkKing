@@ -188,7 +188,8 @@ class MainActivity : ComponentActivity() {
                                         navController.navigate("sign_in")
                                     }
                                 },
-                                navController = navController
+                                navController = navController,
+                                userDao = userDao
                             )
                         }
 
@@ -225,7 +226,7 @@ class MainActivity : ComponentActivity() {
                             ForgotPasswordScreen(forgotPasswordViewModel)
                         }
                         composable("updateusername") {
-                            UpdateUsernameScreen(updateUsernameViewModel, navController)
+                            UpdateUsernameScreen(updateUsernameViewModel,parkingDAO, navController)
                         }
                         composable("parkingDetailsScreen/{parkingId}") { backStackEntry ->
                             val parkingId = backStackEntry.arguments?.getString("parkingId") ?: ""
@@ -252,7 +253,7 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("listReviews/{parkingId}") { backStackEntry ->
                             val parkingId   = backStackEntry.arguments?.getString("parkingId") ?: ""
-                            ListReviewScreen(parkingId = parkingId, viewModel = reviewViewModel)
+                            ListReviewScreen(parkingId = parkingId, viewModel = reviewViewModel, navController = navController)
                         }
                         composable("tagsscreen"){
                             TagsScreen(tagViewModel,navController)

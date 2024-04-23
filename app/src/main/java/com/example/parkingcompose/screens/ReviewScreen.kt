@@ -2,6 +2,7 @@ package com.example.parkingcompose.screens
 
 import ReviewViewModel
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -82,8 +83,14 @@ fun RatingBar(rating: Float, onRatingChanged: (Float) -> Unit) {
 @Composable
 fun ListReviewScreen(
     parkingId: String,
-    viewModel: ReviewViewModel
+    viewModel: ReviewViewModel,
+    navController: NavController
 ) {
+
+    BackHandler {
+        // Minimiza la aplicación
+        navController.navigate("parkingDetailsScreen/$parkingId")
+    }
     // Cargar las reseñas cuando la pantalla sea visible
     LaunchedEffect(Unit) {
         viewModel.loadReviews()
@@ -204,6 +211,7 @@ fun CreateReviewScreen(
     var userEmail by remember { mutableStateOf("") }
 
 
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -247,7 +255,7 @@ fun CreateReviewScreen(
                 try {
                     viewModel.addReview(review)
                     Toast.makeText(context, "Reseña enviada", Toast.LENGTH_SHORT).show()
-                    navController.navigate("parkingDetailsScreen/$parkingId?rating=${review.review_rating}")
+                    navController.navigate("listReviews/$parkingId?rating=${review.review_rating}")
                 } catch (e: Exception) {
                     Toast.makeText(
                         context,

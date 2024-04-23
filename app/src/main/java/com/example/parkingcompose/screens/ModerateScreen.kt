@@ -8,8 +8,10 @@ import androidx.compose.foundation.BorderStroke
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
@@ -20,6 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -70,8 +73,7 @@ fun ModerateScreen(moderateViewModel: ModerateViewModel = viewModel(), createPar
                         ParkingModerateItem(
                             parking = parking,
                             moderateViewModel = moderateViewModel,
-                            modifier = Modifier.padding(8.dp),
-                            navController = navController
+                            modifier = Modifier.padding(8.dp)
                         )
                     }
                 }
@@ -84,19 +86,16 @@ fun ModerateScreen(moderateViewModel: ModerateViewModel = viewModel(), createPar
 fun ParkingModerateItem(
     parking: Parking,
     moderateViewModel: ModerateViewModel,
-    modifier: Modifier = Modifier,
-    navController: NavHostController
+    modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
     val context = LocalContext.current
     Card(
-        modifier = modifier,
         colors = CardColors(
             containerColor = OrangeLight,
             contentColor = Color.White,
             disabledContainerColor = Color.Unspecified,
-            disabledContentColor = Color.Unspecified
-        ),
+            disabledContentColor = Color.Unspecified),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Column(
@@ -111,49 +110,79 @@ fun ParkingModerateItem(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                ParkingIcon(parking.image, parking.parkingRating)
-                ParkingModerateInformation(parking.id, parking.name, parking.parkingRating, modifier.weight(1f, fill = false),)
-                ParkingItemButton(
-                    expanded = expanded,
-                    onClick = { expanded = !expanded },
-                )
-            }
-            if (expanded) {
-                ParkingDescription(
-                    parking.description, modifier = Modifier.padding(
-                        start = 16.dp,
-                        top = 8.dp,
-                        bottom = 16.dp,
-                        end = 16.dp
-                    )
-                )
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(0.dp, 0.dp, 8.dp, 12.dp),
-                    horizontalArrangement = Arrangement.End
+                //Column 1
+                Column(
+                    modifier = Modifier,
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Button(
-                        onClick = { moderateViewModel.denyParking(parking.id) },
-                        modifier = Modifier.padding(end = 8.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
-                        border = BorderStroke(1.dp, Color.Black)
+                    ParkingImage(parking.image)
+                    ParkingRating(parking.parkingRating)
+                }
+                //Column 2
+                Column(
+                    modifier = Modifier.padding(start = 6.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ){
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(Icons.Default.Delete, contentDescription = "Delete", tint = Color.Black)
-
+                        ParkingModerateInformation(parking.id, parking.name, modifier)
+                        ParkingItemButton(
+                            expanded = expanded,
+                            onClick = { expanded = !expanded }
+                        )
                     }
-
-                    Button(
-                        onClick = {
-                            moderateViewModel.enableParking(parking.id, context)
-                        },
-                        modifier = Modifier.padding(end = 8.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.Green),
-                        border = BorderStroke(1.dp, Color.Black)
+                    val exampleList = listOf("Gratis", "Abierto ahora", "+4 estrellas", "Eléctrico", "Descampado", "Motos")
+                    LazyRow(
+                        Modifier.padding(8.dp).padding(top = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
-                        Icon(Icons.Default.Check, contentDescription = "Enable", tint = Color.Black)
+                        items(exampleList) { tag ->
+                            TagItem(
+                                tagName = tag,
+                                tagIcon = Icons.Filled.AccountBox
+                            )
+                        }
                     }
+                }
+            }
+        }
+        if (expanded) {
+            ParkingDescription(
+                parking.description, modifier = Modifier.padding(
+                    start = 16.dp,
+                    top = 8.dp,
+                    bottom = 16.dp,
+                    end = 16.dp
+                )
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(0.dp, 0.dp, 8.dp, 12.dp),
+                horizontalArrangement = Arrangement.End
+            ) {
+                Button(
+                    onClick = { moderateViewModel.denyParking(parking.id) },
+                    modifier = Modifier.padding(end = 8.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                    border = BorderStroke(1.dp, Color.Black)
+                ) {
+                    Icon(Icons.Default.Delete, contentDescription = "Delete", tint = Color.Black)
+
+                }
+
+                Button(
+                    onClick = {
+                        moderateViewModel.enableParking(parking.id, context)
+                    },
+                    modifier = Modifier.padding(end = 8.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Green),
+                    border = BorderStroke(1.dp, Color.Black)
+                ) {
+                    Icon(Icons.Default.Check, contentDescription = "Enable", tint = Color.Black)
                 }
             }
         }
@@ -164,7 +193,6 @@ fun ParkingModerateItem(
 fun ParkingModerateInformation(
     parkingId: String,
     parkingName: String,
-    parkingRating: Double,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
@@ -176,10 +204,6 @@ fun ParkingModerateInformation(
             modifier = Modifier
                 .padding(top = 8.dp)
 
-        )
-        Text(
-            text = parkingRating.toString(),
-            style = MaterialTheme.typography.bodyMedium
         )
     }
 }
