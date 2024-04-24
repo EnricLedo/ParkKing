@@ -29,7 +29,7 @@
     <string name="sort_by_distance_descending">Ordenar por distancia descendente</string>
     <string name="order_by_creation_date">Ordenar por fecha de creación</string>
     <string name="add_new_parking">Agregar nuevo estacionamiento</string>
-    <string name="manage_tags">Gestionar etiquetas</string>
+    <string name="manage_tags">GESTIONAR TAGS</string>
     <string name="error">Error:</string>
     <string name="description">Descripción</string>
     <string name="logout">CERRAR SESIÓN</string>

@@ -33,6 +33,7 @@ import com.example.parkingcompose.model.UserData
 import com.example.parkingcompose.navegacion.BottomNavigationBar
 import com.example.parkingcompose.ui.theme.ButtonTextStyle
 import com.example.parkingcompose.ui.theme.DaleComposeTheme
+import com.example.parkingcompose.viewmodels.LanguageViewModel
 import com.example.parkingcompose.viewmodels.ProfileScreenViewModel
 import com.example.parkingcompose.viewmodels.UpdateUsernameViewModel
 
@@ -42,7 +43,8 @@ fun ProfileScreen(
     userData: UserData?,
     onSignOut: () -> Unit,
     navController: NavHostController,
-    userDao: UserDao
+    userDao: UserDao,
+    languageViewModel: LanguageViewModel,
 ) {
     val username = remember { mutableStateOf("") }
 
@@ -56,7 +58,7 @@ fun ProfileScreen(
             bottomBar = { BottomNavigationBar(navController) }
         ) {
             Column(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize().padding(bottom = 82.dp),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -64,6 +66,7 @@ fun ProfileScreen(
                     modifier = Modifier.fillMaxWidth().padding(6.dp,8.dp),
                     horizontalArrangement = Arrangement.End
                 ) {
+                    LanguageSelector(languageViewModel)
                     Button(
                         onClick = onSignOut,
                         colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
@@ -77,7 +80,7 @@ fun ProfileScreen(
                         Text(text = stringResource(id = R.string.logout), style = ButtonTextStyle, color = Color.Black)
                     }
                 }
-                Spacer(modifier = Modifier.height(76.dp))
+                Spacer(modifier = Modifier.height(56.dp))
 
                 val painter = if (userData?.profilePictureUrl != null) {
                     rememberImagePainter(data = userData.profilePictureUrl)
@@ -102,16 +105,25 @@ fun ProfileScreen(
                     fontWeight = FontWeight.SemiBold
                 )
                     Spacer(modifier = Modifier.height(26.dp))
+                Button(
+                    onClick = { navController.navigate("tagsscreen") },
+                    modifier = Modifier
+                        .padding(8.dp)
+                ) {
+                    Text(stringResource(id = R.string.manage_tags), style = ButtonTextStyle)
+                }
+                Spacer(modifier = Modifier.height(36.dp))
 
                 Button(onClick = { navController.navigate("moderate") }){
                     Text(text = stringResource(id = R.string.moderate_parkings), style = ButtonTextStyle)
                 }
 
-                Spacer(modifier = Modifier.height(46.dp))
+                Spacer(modifier = Modifier.height(36.dp))
 
                 Button(onClick = { navController.navigate("updateusername") }){
                     Text(text = stringResource(id = R.string.change_username), style = ButtonTextStyle)
                 }
+
             }
         }
     }

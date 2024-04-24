@@ -191,7 +191,8 @@ class MainActivity : ComponentActivity() {
                                     }
                                 },
                                 navController = navController,
-                                userDao = userDao
+                                userDao = userDao,
+                                languageViewModel
                             )
                         }
 
@@ -220,7 +221,7 @@ class MainActivity : ComponentActivity() {
                             CreateParkingScreen(
                                 createParkingViewModel,
                                 selectLocationScreen,
-                                navController,languageViewModel,
+                                navController,
                                 userDao = userDao
                             )
                         }

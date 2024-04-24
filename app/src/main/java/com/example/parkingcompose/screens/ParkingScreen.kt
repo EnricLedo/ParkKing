@@ -10,8 +10,11 @@ import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.basicMarquee
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+
+
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -30,7 +33,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
+
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -57,20 +60,23 @@ import com.google.android.gms.maps.model.LatLng
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.layout.boundsInWindow
-import androidx.compose.ui.layout.onGloballyPositioned
+
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Button
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntSize
+import com.example.parkingcompose.ui.theme.BlueGreyDark
+import com.example.parkingcompose.ui.theme.BlueGreyLight
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -128,8 +134,21 @@ fun ParkingListScreen(
     val parkingList = parkingListState.value
 
     Scaffold(
-        bottomBar = { BottomNavigationBar(navController) }
-    ) {
+        bottomBar = { BottomNavigationBar(navController) },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { navController.navigate("crearparking") },
+                containerColor = BlueGreyLight,
+                contentColor = Color.Unspecified,
+                modifier = Modifier
+                    .border(2.dp, Color.Black, CircleShape)
+                    .clip(CircleShape)  // Añade esta línea
+            ) {
+                Icon(Icons.Filled.Add, contentDescription = "Add")
+            }
+        },
+        floatingActionButtonPosition = FabPosition.Center
+    )  {
         Column {
             ParkingSearchBar(onQueryChanged = parkingViewModel::updateSearchQuery)
 
@@ -153,38 +172,19 @@ fun ParkingListScreen(
                 }
             }
             YourComposableFunction(parkingViewModel)
-            Button(
-                onClick = { navController.navigate("crearparking") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp),
-                colors = ButtonColors(
-                    containerColor = OrangeDark,
-                    contentColor = Color.Unspecified,
-                    disabledContainerColor = Color.Unspecified,
-                    disabledContentColor = Color.Unspecified
-                )
-            ) {
-                Text(stringResource(id = R.string.add_new_parking), style = ButtonTextStyle)
-            }
-
-            if (errorState.value != null) {
-                Text("Error: ${errorState.value}")
-            }
-            Button(
-                onClick = { navController.navigate("tagsscreen") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
-            ) {
-                Text(stringResource(id = R.string.manage_tags), style = ButtonTextStyle)
-            }
 
             if (errorState.value != null) {
                 Text("Error: ${errorState.value}")
             }
 
-            LazyColumn {
+
+            if (errorState.value != null) {
+                Text("Error: ${errorState.value}")
+            }
+
+            LazyColumn(
+                modifier = Modifier.padding(bottom = 70.dp)
+            ) {
                 items(parkingList) { parking ->
                     if(parking.checked){
                         ParkingItem(
@@ -338,7 +338,9 @@ fun ParkingItem(
                     }
                     val exampleList = listOf("Free", "Open now", "+4 Stars", "Electric", "Motorcycles", "24/7", "Wasteland")
                     LazyRow(
-                        Modifier.padding(2.dp).padding(top = 8.dp),
+                        Modifier
+                            .padding(2.dp)
+                            .padding(top = 8.dp),
                         horizontalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
                         items(exampleList) { tag ->

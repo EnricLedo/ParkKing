@@ -45,7 +45,7 @@ import kotlinx.coroutines.launch
 fun CreateParkingScreen(
     createParkingViewModel: CreateParkingViewModel,
     selectLocationViewModel: SelectLocationViewModel,
-    navController: NavHostController, viewModel: LanguageViewModel,
+    navController: NavHostController,
     userDao: UserDao
 ) {
     var image by remember { mutableStateOf<Uri?>(null) }
@@ -76,7 +76,7 @@ fun CreateParkingScreen(
     )
 
     Column {
-        LanguageSelector(viewModel)
+
     }
     LazyColumn(
 
