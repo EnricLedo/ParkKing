@@ -53,6 +53,7 @@ android {
 dependencies {
 
     implementation("androidx.compose.material:material:1.1.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0") // Asegúrate de que la versión sea compatible con tu proyecto
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

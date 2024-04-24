@@ -42,12 +42,14 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -56,6 +58,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
+import coil.transform.CircleCropTransformation
 import com.example.parkingcompose.R
 import com.example.parkingcompose.model.Tag
 import com.example.parkingcompose.viewmodels.TagViewModel
@@ -210,6 +214,7 @@ fun TagItem(tag: Tag, tagViewModel: TagViewModel, onEdit: (Tag) -> Unit) {
         Column(
             modifier = Modifier.padding(12.dp).fillMaxWidth()
         ) {
+            tagImage(tag.image)
             Text(text = tag.title, fontWeight = FontWeight.Bold, fontSize = 20.sp)
             Spacer(modifier = Modifier.height(8.dp))
             Row {
@@ -221,6 +226,30 @@ fun TagItem(tag: Tag, tagViewModel: TagViewModel, onEdit: (Tag) -> Unit) {
                 }
             }
         }
+    }
+}
+
+@Composable
+fun tagImage(
+    tagIcon: String
+) {
+    val painter = rememberAsyncImagePainter(
+        ImageRequest.Builder(LocalContext.current).data(data = tagIcon).apply(block = fun ImageRequest.Builder.() {
+            transformations(CircleCropTransformation())
+        }).build()
+    )
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Image(
+            painter = painter,
+            contentDescription = null,
+            modifier = Modifier
+                .size(90.dp)
+                .padding(4.dp)
+                .clip(MaterialTheme.shapes.small)
+        )
     }
 }
 
