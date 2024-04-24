@@ -10,6 +10,7 @@ import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.basicMarquee
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -59,12 +60,16 @@ import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Button
 import androidx.compose.material.Icon
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.ui.res.painterResource
+import com.example.parkingcompose.ui.theme.BlueGreyLight
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -160,34 +165,9 @@ fun ParkingListScreen(
                     )
                 }
             }
-            RatingFilter(parkingViewModel)
-
-            YourComposableFunction(parkingViewModel)
-            Button(
-                onClick = { navController.navigate("crearparking") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp),
-                colors = ButtonColors(
-                    containerColor = OrangeDark,
-                    contentColor = Color.Unspecified,
-                    disabledContainerColor = Color.Unspecified,
-                    disabledContentColor = Color.Unspecified
-                )
-            ) {
-                Text(stringResource(id = R.string.add_new_parking), style = ButtonTextStyle)
-            }
-
-            if (errorState.value != null) {
-                Text("Error: ${errorState.value}")
-            }
-            Button(
-                onClick = { navController.navigate("tagsscreen") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
-            ) {
-                Text(stringResource(id = R.string.manage_tags), style = ButtonTextStyle)
+            Row(modifier = Modifier.fillMaxWidth()){
+                RatingFilter(parkingViewModel)
+                YourComposableFunction(parkingViewModel)
             }
 
             if (errorState.value != null) {
@@ -217,17 +197,19 @@ fun YourComposableFunction(parkingViewModel: ParkingViewModel = viewModel()) {
     var dropdownOffset by remember { mutableStateOf(DpOffset(0.dp, 0.dp)) }
 
     Button(
-        onClick = { expanded = true },
-        modifier = Modifier
-            .padding(8.dp)
-            .onSizeChanged { size ->
-                // Set the offset for the menu to appear just below the button
-                dropdownOffset = DpOffset(0.dp, size.height.dp)
-            }
-    ) {
-        Text("Ordenar opciones")
-        Icon(imageVector = Icons.Filled.ArrowDropDown, contentDescription = null)
-    }
+    onClick = { expanded = true },
+    modifier = Modifier
+        .padding(8.dp)
+        .onSizeChanged { size ->
+            // Set the offset for the menu to appear just below the button
+            dropdownOffset = DpOffset(0.dp, size.height.dp)
+        }
+) {
+    Icon(
+        painter = painterResource(id = R.drawable.ic_order),
+        contentDescription = null
+    )
+}
 
     DropdownMenu(
         expanded = expanded,
@@ -278,25 +260,39 @@ fun YourComposableFunction(parkingViewModel: ParkingViewModel = viewModel()) {
     }
 }
 
+
 @Composable
 fun RatingFilter(parkingViewModel: ParkingViewModel) {
+    var expanded by remember { mutableStateOf(false) }
     val selectedRating by parkingViewModel.selectedRating.collectAsState()
-    Row(
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        modifier = Modifier.padding(16.dp)
-    ) {
-        (1..5).forEach { rating ->
-            IconToggleButton(
-                checked = (selectedRating == rating),
-                onCheckedChange = {
-                    parkingViewModel.setSelectedRating(if (selectedRating == rating) null else rating)
+
+    Box(modifier = Modifier.padding(16.dp)) {
+        IconButton(onClick = { expanded = true }) {
+            Icon(
+                imageVector = Icons.Filled.Star,
+                contentDescription = "Rating filter",
+                tint = MaterialTheme.colorScheme.primary
+            )
+        }
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            (1..5).forEach { rating ->
+                DropdownMenuItem(
+                    onClick = {
+                        parkingViewModel.setSelectedRating(if (selectedRating == rating) null else rating)
+                        expanded = false
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Star,
+                        contentDescription = "$rating stars",
+                        tint = if (rating <= (selectedRating ?: 0)) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                    )
+                    Text(" $rating")
                 }
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Star,
-                    contentDescription = "$rating stars",
-                    tint = if (rating <= (selectedRating ?: 0)) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
-                )
             }
         }
     }

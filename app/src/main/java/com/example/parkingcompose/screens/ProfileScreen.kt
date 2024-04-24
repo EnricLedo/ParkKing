@@ -66,7 +66,6 @@ fun ProfileScreen(
                     modifier = Modifier.fillMaxWidth().padding(6.dp,8.dp),
                     horizontalArrangement = Arrangement.End
                 ) {
-                    LanguageSelector(languageViewModel)
                     Button(
                         onClick = onSignOut,
                         colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
