@@ -29,8 +29,9 @@ class LoginMailViewModel: ViewModel() {
     }
 
     fun login(context: Context, email: String, password: String) {
+        val trimmedEmail = email.trimEnd()
         val auth = Firebase.auth
-        auth.signInWithEmailAndPassword(email, password)
+        auth.signInWithEmailAndPassword(trimmedEmail, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     // Inicio de sesión exitoso, puedes iniciar tu actividad aquí si lo necesitas
@@ -43,7 +44,6 @@ class LoginMailViewModel: ViewModel() {
                 }
             }
     }
-
 
     fun onSignInResult(result: SignInResult) {
         _signInState.update { it.copy(
