@@ -46,6 +46,7 @@ import com.example.parkingcompose.screens.UpdateUsernameScreen
 import com.example.parkingcompose.ui.theme.DaleComposeTheme
 import com.example.parkingcompose.model.ParkingDetailsViewModelFactory
 import com.example.parkingcompose.screens.CreateReviewScreen
+import com.example.parkingcompose.screens.EditParkingScreen
 import com.example.parkingcompose.screens.ListReviewScreen
 import com.example.parkingcompose.screens.TagsScreen
 import com.example.parkingcompose.viewmodels.CreateParkingViewModel
@@ -222,6 +223,18 @@ class MainActivity : ComponentActivity() {
                                 createParkingViewModel,
                                 selectLocationScreen,
                                 navController,
+                                userDao = userDao
+                            )
+                        }
+                        composable("editparking/{parkingId}") { backStackEntry ->
+                            val parkingId = backStackEntry.arguments?.getString("parkingId") ?: ""
+                            val parkingDetailsViewModel = viewModel<ParkingDetailsViewModel>(factory = parkingDetailsViewModelFactory)
+                            EditParkingScreen(
+                                parkingId,
+                                parkingDetailsViewModel,
+                                createParkingViewModel,
+                                selectLocationScreen,
+                                navController,languageViewModel,
                                 userDao = userDao
                             )
                         }

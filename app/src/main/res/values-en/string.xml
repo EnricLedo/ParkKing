@@ -75,5 +75,5 @@
     <string name="enter_new_username">Enter your new username:</string>
     <string name="username">Username</string>
     <string name="save">SAVE</string>
-
+    <string name="edit_parking">Edit Parking</string>
 </resources>
