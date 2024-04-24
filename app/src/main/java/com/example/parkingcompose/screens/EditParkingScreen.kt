@@ -34,6 +34,7 @@ import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.parkingcompose.R
 import com.example.parkingcompose.dao.UserDao
+import com.example.parkingcompose.model.Parking
 import com.example.parkingcompose.viewmodels.CreateParkingViewModel
 import com.example.parkingcompose.viewmodels.LanguageViewModel
 import com.example.parkingcompose.viewmodels.ParkingDetailsViewModel
@@ -44,14 +45,21 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun EditParkingScreen(
-    parking : String,
+    parkingId : String,
     parkingDetailsViewModel: ParkingDetailsViewModel,
     createParkingViewModel: CreateParkingViewModel,
     selectLocationViewModel: SelectLocationViewModel,
     navController: NavHostController, viewModel: LanguageViewModel,
     userDao: UserDao
 ) {
-    val parking by parkingDetailsViewModel.parking.collectAsState(null)
+    val parking by parkingDetailsViewModel.parking.collectAsState(initial = null)
+    parkingDetailsViewModel.getParkingById(parkingId)
+
+    parking?.let {
+        createParkingViewModel.onNameChange(it.name)
+        createParkingViewModel.onDescriptionChange(it.description)
+        createParkingViewModel.onPriceMinuteChange(it.priceMinute.toString())
+    }
 
     var image by remember { mutableStateOf<Uri?>(null) }
     val context = LocalContext.current
@@ -134,7 +142,13 @@ fun EditParkingScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Button(onClick = { photoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) }) {
+            Button(onClick = {
+                photoPickerLauncher.launch(
+                    PickVisualMediaRequest(
+                        ActivityResultContracts.PickVisualMedia.ImageOnly
+                    )
+                )
+            }) {
                 Text(strSelectImage)
             }
 
@@ -152,8 +166,13 @@ fun EditParkingScreen(
             Button(
                 onClick = {
                     if (createParkingViewModel.selectedImage.value != null) {
+
                         CoroutineScope(Dispatchers.Main).launch {
-                            createParkingViewModel.onAddParking(context, selectLocationViewModel,userDao)
+                            createParkingViewModel.onAddParking(
+                                context,
+                                selectLocationViewModel,
+                                userDao
+                            )
                         }
                     } else {
                         Toast.makeText(

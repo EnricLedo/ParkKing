@@ -75,6 +75,8 @@ class CreateParkingViewModel(private val tagViewModel: TagViewModel) : ViewModel
                 val selectedLocation = selectLocationViewModel.selectedLocation.value
                 if (selectedLocation != null) {
                     val price = if (priceMinute.value.isNotEmpty()) {
+                        priceMinute.value = replaceComaForDot(priceMinute.value)
+                        //Amb aixo canviem la coma per un punt
                         priceMinute.value.toFloat()
                     } else {
                         Toast.makeText(context, "Please enter a price -> OnAddParking Method", Toast.LENGTH_SHORT).show()
@@ -146,4 +148,8 @@ class CreateParkingViewModel(private val tagViewModel: TagViewModel) : ViewModel
                 }
         }
     }
+}
+
+fun replaceComaForDot(str: String): String {
+    return str.replace(",", ".")
 }
