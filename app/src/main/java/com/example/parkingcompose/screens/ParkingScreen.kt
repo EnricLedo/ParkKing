@@ -9,6 +9,7 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -60,6 +61,7 @@ import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Button
 import androidx.compose.material.Icon
@@ -68,7 +70,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.window.Dialog
 import com.example.parkingcompose.ui.theme.BlueGreyLight
 
 
@@ -84,13 +90,7 @@ fun ParkingListScreen(
     val parkingListState = parkingViewModel.filteredParkings.collectAsState()
     val errorState = parkingViewModel.error.collectAsState()
     var showFilteredParkings by remember { mutableStateOf(false) }
-    val tagsState = tagViewModel.getTagsFlow().collectAsState(initial = emptyList())
     var selectedTags by remember { mutableStateOf(setOf<String>()) }
-    val coroutineScope = rememberCoroutineScope()
-// Primero, necesitas una variable para manejar la visibilidad del DropdownMenu
-    var expanded by remember { mutableStateOf(false) }
-    val dropdownOffset = remember { mutableStateOf(DpOffset(0.dp, 0.dp)) }
-
     var minDistance by remember { mutableStateOf(1f) } // Kilómetros
     var maxDistance by remember { mutableStateOf(5f) } // Kilómetros
 
@@ -145,30 +145,17 @@ fun ParkingListScreen(
     )  {
         Column {
             ParkingSearchBar(onQueryChanged = parkingViewModel::updateSearchQuery)
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
 
-            LazyRow {
-                items(tagsState.value) { tag ->
-                    // Ejemplo de cómo se debe manejar el clic en un tag
-                    TagItem(
-                        tag = tag.title,
-                        isSelected = selectedTags.contains(tag.id),
-                        onClick = {
-                            // Aquí asumimos que tag.id no es nulo
-                            val tagId = tag.id!!
-                            selectedTags = if (selectedTags.contains(tagId)) {
-                                selectedTags - tagId
-                            } else {
-                                selectedTags + tagId
-                            }
-                            parkingViewModel.updateSelectedTags(tagId)
-                        }
-                    )
-                }
-            }
-            Row(modifier = Modifier.fillMaxWidth()){
-                RatingFilter(parkingViewModel)
+                ) {
                 YourComposableFunction(parkingViewModel)
-            }
+                RatingFilter(parkingViewModel)
+                TagFilterButton(parkingViewModel, tagViewModel)
+                ResetSearchButton(parkingViewModel, navController)
+                }
 
             if (errorState.value != null) {
                 Text("Error: ${errorState.value}")
@@ -194,68 +181,62 @@ fun ParkingListScreen(
 @Composable
 fun YourComposableFunction(parkingViewModel: ParkingViewModel = viewModel()) {
     var expanded by remember { mutableStateOf(false) }
-    var dropdownOffset by remember { mutableStateOf(DpOffset(0.dp, 0.dp)) }
 
-    Button(
-    onClick = { expanded = true },
-    modifier = Modifier
-        .padding(8.dp)
-        .onSizeChanged { size ->
-            // Set the offset for the menu to appear just below the button
-            dropdownOffset = DpOffset(0.dp, size.height.dp)
+    Box {
+        Button(
+            onClick = { expanded = true }
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_order),
+                contentDescription = null
+            )
         }
-) {
-    Icon(
-        painter = painterResource(id = R.drawable.ic_order),
-        contentDescription = null
-    )
-}
 
-    DropdownMenu(
-        expanded = expanded,
-        onDismissRequest = { expanded = false },
-        offset = dropdownOffset,
-        modifier = Modifier
-    ) {
-        DropdownMenuItem(
-            onClick = {
-                expanded = false
-                parkingViewModel.orderParkingsByDistance(true)  // Ascending order
-            }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.align(Alignment.BottomStart)
         ) {
-            Text(stringResource(id = R.string.sort_by_distance_ascending))
-        }
-        DropdownMenuItem(
-            onClick = {
-                expanded = false
-                parkingViewModel.orderParkingsByDistance(false) // Descending order
+            DropdownMenuItem(
+                onClick = {
+                    expanded = false
+                    parkingViewModel.orderParkingsByDistance(true)  // Ascending order
+                }
+            ) {
+                Text(stringResource(id = R.string.sort_by_distance_ascending))
             }
-        ) {
-            Text(stringResource(id = R.string.sort_by_distance_descending))
-        }
-        DropdownMenuItem(
-            onClick = {
-                expanded = false
-                parkingViewModel.orderParkingsByBestRating()  // Best rating
+            DropdownMenuItem(
+                onClick = {
+                    expanded = false
+                    parkingViewModel.orderParkingsByDistance(false) // Descending order
+                }
+            ) {
+                Text(stringResource(id = R.string.sort_by_distance_descending))
             }
-        ) {
-            Text("Ordenar por mejor calificación")
-        }
-        DropdownMenuItem(
-            onClick = {// sadas
-                expanded = false
-                parkingViewModel.orderParkingsByWorstRating() // Worst rating
+            DropdownMenuItem(
+                onClick = {
+                    expanded = false
+                    parkingViewModel.orderParkingsByBestRating()  // Best rating
+                }
+            ) {
+                Text("Ordenar por mejor calificación")
             }
-        ) {
-            Text("Ordenar por peor calificación")
-        }
-        DropdownMenuItem(
-            onClick = {
-                expanded = false
-                parkingViewModel.orderByCreationDate()
+            DropdownMenuItem(
+                onClick = {
+                    expanded = false
+                    parkingViewModel.orderParkingsByWorstRating() // Worst rating
+                }
+            ) {
+                Text("Ordenar por peor calificación")
             }
-        ) {
-            Text("Ordenar por fecha de creacion")
+            DropdownMenuItem(
+                onClick = {
+                    expanded = false
+                    parkingViewModel.orderByCreationDate()
+                }
+            ) {
+                Text("Ordenar por fecha de creacion")
+            }
         }
     }
 }
@@ -266,8 +247,8 @@ fun RatingFilter(parkingViewModel: ParkingViewModel) {
     var expanded by remember { mutableStateOf(false) }
     val selectedRating by parkingViewModel.selectedRating.collectAsState()
 
-    Box(modifier = Modifier.padding(16.dp)) {
-        IconButton(onClick = { expanded = true }) {
+    Box() {
+        Button(onClick = { expanded = true }) {
             Icon(
                 imageVector = Icons.Filled.Star,
                 contentDescription = "Rating filter",
@@ -295,26 +276,6 @@ fun RatingFilter(parkingViewModel: ParkingViewModel) {
                 }
             }
         }
-    }
-}
-
-
-@Composable
-fun TagItem(tag: String, isSelected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    Card(
-        modifier = modifier
-            .padding(horizontal = 4.dp, vertical = 8.dp)
-            .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(
-            containerColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
-        )
-    ) {
-        Text(
-            text = tag,
-            modifier = Modifier.padding(8.dp),
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurface
-        )
     }
 }
 
@@ -394,7 +355,9 @@ fun ParkingItem(
                     }
                     val exampleList = listOf("Free", "Open now", "+4 Stars", "Electric", "Motorcycles", "24/7", "Wasteland")
                     LazyRow(
-                        Modifier.padding(2.dp).padding(top = 8.dp),
+                        Modifier
+                            .padding(2.dp)
+                            .padding(top = 8.dp),
                         horizontalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
                         items(exampleList) { tag ->
@@ -546,3 +509,80 @@ fun TagItem(
     }
 }
 
+@Composable
+fun ResetSearchButton(parkingViewModel: ParkingViewModel, navController: NavHostController) {
+    Button(
+        onClick = { parkingViewModel.resetSearch()
+            navController.navigate("parkingList") }
+
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_resetsearch),
+            contentDescription = null
+        )
+    }
+}
+@Composable
+fun TagFilterButton(parkingViewModel: ParkingViewModel, tagViewModel: TagViewModel) {
+    val tagsState = tagViewModel.getTagsFlow().collectAsState(initial = emptyList())
+    var selectedTags by remember { mutableStateOf(setOf<String>()) }
+    var showDialog by remember { mutableStateOf(false) }
+
+    Button(onClick = { showDialog = true }) {
+        Text("TAGS")
+    }
+
+    if (showDialog) {
+        Dialog(onDismissRequest = { showDialog = false }) {
+            // Agrega un Box alrededor de tu Column y aplica un color de fondo
+            Box(modifier = Modifier.background(OrangeLight).border(2.dp, Color.Black)) {
+                Column {
+                    Text(
+                        "Seleccione los tags",
+                        modifier = Modifier.padding(8.dp),
+                        color = Color.Black, textAlign = TextAlign.Center
+                    )
+                    LazyColumn {
+                        items(tagsState.value.chunked(3)) { rowTags -> // Ajusta el valor en chunked() para cambiar el número de columnas
+                            Row(Modifier.padding(8.dp)) {
+                                rowTags.forEach { tag ->
+                                        Row(
+                                            Modifier
+                                                .clickable {
+                                                    val tagId = tag.id!!
+                                                    selectedTags =
+                                                        if (selectedTags.contains(tagId)) {
+                                                            selectedTags - tagId
+                                                        } else {
+                                                            selectedTags + tagId
+                                                        }
+                                                }
+                                                .padding(8.dp),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Checkbox(
+                                                checked = selectedTags.contains(tag.id),
+                                                onCheckedChange = null // Ignoramos este evento ya que manejamos el clic en el Row
+                                            )
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Text(tag.title, color = Color.Black)
+                                        }
+
+                                }
+                            }
+                        }
+                    }
+                    Button(
+                        onClick = {
+                            showDialog = false
+                            parkingViewModel.updateSelectedTags(selectedTags)
+                        },
+                        modifier = Modifier.align(Alignment.End).padding(8.dp)
+                    ) {
+                        Text("Apply")
+                    }
+                }
+            }
+        }
+    }
+}

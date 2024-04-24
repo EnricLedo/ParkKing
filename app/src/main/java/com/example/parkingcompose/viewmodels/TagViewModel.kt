@@ -13,12 +13,16 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import java.io.InputStream
 import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import java.util.UUID
 
 
 class TagViewModel : ViewModel() {
     private val firestore = FirebaseFirestore.getInstance()
     private val storageReference = FirebaseStorage.getInstance().reference
+    private val _selectedTags = MutableStateFlow<Set<String>>(emptySet())
+    val selectedTags: StateFlow<Set<String>> = _selectedTags
 
     fun addTag(tag: Tag, onSuccess: () -> Unit, onTagExists: () -> Unit) {
         // Primero verifica si ya existe un tag con el mismo título

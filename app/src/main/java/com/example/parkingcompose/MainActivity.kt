@@ -1,6 +1,5 @@
 package com.example.parkingcompose
 
-import ReviewViewModel
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
@@ -57,6 +56,7 @@ import com.example.parkingcompose.viewmodels.ModerateViewModel
 import com.example.parkingcompose.viewmodels.ParkingDetailsViewModel
 import com.example.parkingcompose.viewmodels.ParkingViewModel
 import com.example.parkingcompose.viewmodels.RegisterViewModel
+import com.example.parkingcompose.viewmodels.ReviewViewModel
 import com.example.parkingcompose.viewmodels.SelectLocationViewModel
 import com.example.parkingcompose.viewmodels.TagViewModel
 import com.example.parkingcompose.viewmodels.UpdateUsernameViewModel

@@ -54,13 +54,17 @@ class ParkingViewModel : ViewModel() {
     fun orderByCreationDate() {
         _parkingList.value = _parkingList.value.sortedByDescending { it.createdAt }
     }
-    fun updateSelectedTags(tagId: String) {
-        _selectedTags.value = if (_selectedTags.value.contains(tagId)) {
-            _selectedTags.value - tagId
-        } else {
-            _selectedTags.value + tagId
-        }
-        Log.d(TAG, "Selected tags updated: ${_selectedTags.value}")
+    fun updateSelectedTags(selectedTags: Set<String>) {
+    _selectedTags.value = selectedTags
+}
+    fun resetSearch() {
+        // Reinicia los filtros aquí...
+        _selectedRating.value = null
+        _selectedTags.value = emptySet()
+        _searchQuery.value = ""
+
+        // Luego obtén la lista de parkings de nuevo
+        getParkingList()
     }
 
     fun orderParkingsByBestRating() {

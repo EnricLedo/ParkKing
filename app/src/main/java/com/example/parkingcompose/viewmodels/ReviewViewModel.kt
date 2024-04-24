@@ -1,3 +1,5 @@
+package com.example.parkingcompose.viewmodels
+
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -33,14 +35,17 @@ class ReviewViewModel(private val reviewDao: ReviewDao) : ViewModel() {
 
     fun addReview(review: Review) {
         reviewDao.addReview(review)
+        loadReviews()
     }
 
     fun updateReview(review: Review) {
         reviewDao.updateReview(review)
+        loadReviews()
     }
 
     fun deleteReview(reviewId: String) {
         reviewDao.deleteReview(reviewId)
+        loadReviews()
     }
 
     // Función para buscar reseñas por puntuación
