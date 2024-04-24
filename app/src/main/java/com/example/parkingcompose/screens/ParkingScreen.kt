@@ -10,11 +10,8 @@ import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.basicMarquee
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-
-
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -33,7 +30,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -60,23 +57,15 @@ import com.google.android.gms.maps.model.LatLng
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.icons.filled.ArrowDropDown
-
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Button
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.IntSize
-import com.example.parkingcompose.ui.theme.BlueGreyDark
-import com.example.parkingcompose.ui.theme.BlueGreyLight
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -171,12 +160,35 @@ fun ParkingListScreen(
                     )
                 }
             }
+            RatingFilter(parkingViewModel)
+
             YourComposableFunction(parkingViewModel)
+            Button(
+                onClick = { navController.navigate("crearparking") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                colors = ButtonColors(
+                    containerColor = OrangeDark,
+                    contentColor = Color.Unspecified,
+                    disabledContainerColor = Color.Unspecified,
+                    disabledContentColor = Color.Unspecified
+                )
+            ) {
+                Text(stringResource(id = R.string.add_new_parking), style = ButtonTextStyle)
+            }
 
             if (errorState.value != null) {
                 Text("Error: ${errorState.value}")
             }
-
+            Button(
+                onClick = { navController.navigate("tagsscreen") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+            ) {
+                Text(stringResource(id = R.string.manage_tags), style = ButtonTextStyle)
+            }
 
             if (errorState.value != null) {
                 Text("Error: ${errorState.value}")
@@ -209,25 +221,24 @@ fun YourComposableFunction(parkingViewModel: ParkingViewModel = viewModel()) {
         modifier = Modifier
             .padding(8.dp)
             .onSizeChanged { size ->
-                // Aquí configuramos el offset para que el menú aparezca justo debajo del botón
-                // El offset x es 0.dp para alinear al inicio, y el offset y es igual a la altura del botón
+                // Set the offset for the menu to appear just below the button
                 dropdownOffset = DpOffset(0.dp, size.height.dp)
             }
     ) {
-        Text("Ordenar por distancia")
+        Text("Ordenar opciones")
         Icon(imageVector = Icons.Filled.ArrowDropDown, contentDescription = null)
     }
 
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = { expanded = false },
-        offset = dropdownOffset,  // Aplicamos el offset calculado
+        offset = dropdownOffset,
         modifier = Modifier
     ) {
         DropdownMenuItem(
             onClick = {
                 expanded = false
-                parkingViewModel.orderParkingsByDistance(true)  // Orden ascendente
+                parkingViewModel.orderParkingsByDistance(true)  // Ascending order
             }
         ) {
             Text(stringResource(id = R.string.sort_by_distance_ascending))
@@ -235,13 +246,62 @@ fun YourComposableFunction(parkingViewModel: ParkingViewModel = viewModel()) {
         DropdownMenuItem(
             onClick = {
                 expanded = false
-                parkingViewModel.orderParkingsByDistance(false) // Orden descendente
+                parkingViewModel.orderParkingsByDistance(false) // Descending order
             }
         ) {
             Text(stringResource(id = R.string.sort_by_distance_descending))
         }
+        DropdownMenuItem(
+            onClick = {
+                expanded = false
+                parkingViewModel.orderParkingsByBestRating()  // Best rating
+            }
+        ) {
+            Text("Ordenar por mejor calificación")
+        }
+        DropdownMenuItem(
+            onClick = {// sadas
+                expanded = false
+                parkingViewModel.orderParkingsByWorstRating() // Worst rating
+            }
+        ) {
+            Text("Ordenar por peor calificación")
+        }
+        DropdownMenuItem(
+            onClick = {
+                expanded = false
+                parkingViewModel.orderByCreationDate()
+            }
+        ) {
+            Text("Ordenar por fecha de creacion")
+        }
     }
 }
+
+@Composable
+fun RatingFilter(parkingViewModel: ParkingViewModel) {
+    val selectedRating by parkingViewModel.selectedRating.collectAsState()
+    Row(
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        modifier = Modifier.padding(16.dp)
+    ) {
+        (1..5).forEach { rating ->
+            IconToggleButton(
+                checked = (selectedRating == rating),
+                onCheckedChange = {
+                    parkingViewModel.setSelectedRating(if (selectedRating == rating) null else rating)
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Star,
+                    contentDescription = "$rating stars",
+                    tint = if (rating <= (selectedRating ?: 0)) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                )
+            }
+        }
+    }
+}
+
 
 @Composable
 fun TagItem(tag: String, isSelected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
@@ -338,9 +398,7 @@ fun ParkingItem(
                     }
                     val exampleList = listOf("Free", "Open now", "+4 Stars", "Electric", "Motorcycles", "24/7", "Wasteland")
                     LazyRow(
-                        Modifier
-                            .padding(2.dp)
-                            .padding(top = 8.dp),
+                        Modifier.padding(2.dp).padding(top = 8.dp),
                         horizontalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
                         items(exampleList) { tag ->
