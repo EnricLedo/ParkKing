@@ -25,18 +25,29 @@ class ParkingViewModel : ViewModel() {
     val error: StateFlow<String?> = _error
     private val userLocation = MutableStateFlow(com.example.parkingcompose.model.Location(0.0, 0.0)) // MutableStateFlow to track user location
     private val _filteredParkings = MutableStateFlow<List<Parking>>(emptyList())
+    private val _selectedRating = MutableStateFlow<Int?>(null)
+    val selectedRating: StateFlow<Int?> = _selectedRating
     val filteredParkings: StateFlow<List<Parking>> = combine(
-        _parkingList, _selectedTags, _searchQuery
-    ) { parkings, selectedTags, query ->
+        _parkingList, _selectedTags, _searchQuery, _selectedRating
+    ) { parkings, selectedTags, query, selectedRating ->
         parkings.filter { parking ->
             (selectedTags.isEmpty() || parking.tags.intersect(selectedTags).isNotEmpty()) &&
-                    (query.isBlank() || parking.name.contains(query, ignoreCase = true))
+                    (query.isBlank() || parking.name.contains(query, ignoreCase = true)) &&
+                    (selectedRating == null || parking.parkingRating.toInt() == selectedRating)
         }
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
+
+
+
+
     init {
         getParkingList()
     }
 
+    fun setSelectedRating(rating: Int?) {
+        _selectedRating.value = rating
+    }
     fun updateSearchQuery(query: String) {
         _searchQuery.value = query
     }
@@ -51,6 +62,21 @@ class ParkingViewModel : ViewModel() {
         }
         Log.d(TAG, "Selected tags updated: ${_selectedTags.value}")
     }
+
+    fun orderParkingsByBestRating() {
+        viewModelScope.launch {
+            val sortedParkings = _parkingList.value.sortedByDescending { it.parkingRating }
+            _parkingList.value = sortedParkings
+        }
+    }
+
+    fun orderParkingsByWorstRating() {
+        viewModelScope.launch {
+            val sortedParkings = _parkingList.value.sortedBy { it.parkingRating }
+            _parkingList.value = sortedParkings
+        }
+    }
+
 
     fun getParkingList() {
         viewModelScope.launch {
