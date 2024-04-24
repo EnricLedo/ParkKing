@@ -181,7 +181,9 @@ fun ParkingListScreen(
                 Text("Error: ${errorState.value}")
             }
 
-            LazyColumn {
+            LazyColumn(
+                modifier = Modifier.padding(bottom = 70.dp)
+            ) {
                 items(parkingList) { parking ->
                     if(parking.checked){
                         ParkingItem(

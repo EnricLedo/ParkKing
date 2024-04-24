@@ -49,7 +49,7 @@ fun UpdateUsernameScreen(viewModel: UpdateUsernameViewModel, parkingDAO: Parking
         )
         Text(
 
-            text = "Enter your new username:",
+            text = "Enter your new username: ",
             fontSize = 28.sp,
             color = Color.White,
             textAlign = TextAlign.Center,
