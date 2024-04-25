@@ -48,7 +48,6 @@ fun CreateParkingScreen(
     navController: NavHostController,
     userDao: UserDao
 ) {
-    createParkingViewModel.resetFields()
 
     var image by remember { mutableStateOf<Uri?>(null) }
     val context = LocalContext.current

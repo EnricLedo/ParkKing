@@ -127,7 +127,7 @@ class CreateParkingViewModel(private val tagViewModel: TagViewModel) : ViewModel
             }
     }
 
-    public fun resetFields() {
+    fun resetFields() {
         name.value = ""
         description.value = ""
         priceMinute.value = ""
