@@ -1,5 +1,6 @@
 package com.example.parkingcompose.screens
 
+import EditParkingViewModel
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -34,159 +35,129 @@ import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.parkingcompose.R
 import com.example.parkingcompose.dao.UserDao
-import com.example.parkingcompose.model.Parking
-import com.example.parkingcompose.viewmodels.CreateParkingViewModel
-import com.example.parkingcompose.viewmodels.LanguageViewModel
-import com.example.parkingcompose.viewmodels.ParkingDetailsViewModel
 import com.example.parkingcompose.viewmodels.SelectLocationViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.parkingcompose.dao.ParkingDAO
+import com.example.parkingcompose.model.EditParkingViewModelFactory
 
 @Composable
 fun EditParkingScreen(
-    parkingId : String,
-    parkingDetailsViewModel: ParkingDetailsViewModel,
-    createParkingViewModel: CreateParkingViewModel,
+    navController: NavHostController,
+    parkingDAO: ParkingDAO,
+    parkingId: String,
     selectLocationViewModel: SelectLocationViewModel,
-    navController: NavHostController, viewModel: LanguageViewModel,
     userDao: UserDao
 ) {
-    val parking by parkingDetailsViewModel.parking.collectAsState(initial = null)
-    parkingDetailsViewModel.getParkingById(parkingId)
+    val editParkingViewModelFactory = EditParkingViewModelFactory(parkingDAO, parkingId)
+    val editParkingViewModel: EditParkingViewModel = viewModel(factory = editParkingViewModelFactory)
+    val parking = editParkingViewModel.parking.value
 
-    parking?.let {
-        createParkingViewModel.onNameChange(it.name)
-        createParkingViewModel.onDescriptionChange(it.description)
-        createParkingViewModel.onPriceMinuteChange(it.priceMinute.toString())
-    }
-
-    var image by remember { mutableStateOf<Uri?>(null) }
     val context = LocalContext.current
     val selectedLocation by selectLocationViewModel.selectedLocation.collectAsState()
 
-    // Recursos de strings localizados
-    val strCreateParking = stringResource(id = R.string.create_parking)
-    val strParkingName = stringResource(id = R.string.parking_name)
-    val strParkingDescription = stringResource(id = R.string.parking_description)
-    val strPriceMinute = stringResource(id = R.string.price_minute)
-    val strSelectLocation = stringResource(id = R.string.select_location)
-    val strSelectImage = stringResource(id = R.string.select_image)
-    val strCreate = stringResource(id = R.string.create)
-
-    LaunchedEffect(key1 = true) {
-        createParkingViewModel.parkingAddedEvent.collect {
-            navController.navigate("parkingList") // Adjust the route name as per your NavGraph
-        }
-    }
-
-    createParkingViewModel.latitude.value = selectedLocation?.latitude ?: 0.0
-    createParkingViewModel.longitude.value = selectedLocation?.longitude ?: 0.0
-
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
-        onResult = { uri -> createParkingViewModel.selectedImage.value = uri }
+        onResult = { uri -> editParkingViewModel.selectedImage.value = uri }
     )
 
-    Column {
-        LanguageSelector(viewModel)
-    }
-    LazyColumn(
+    if (parking != null) {
+        // Mover la inicialización de los estados mutables aquí
+        var name by remember { mutableStateOf(parking.name ?: "") }
+        var description by remember { mutableStateOf(parking.description ?: "") }
+        var priceMinute by remember { mutableStateOf(parking.priceMinute.toString() ?: "") }
 
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            item {
+                Text(
+                    text = "Edit Parking",
+                    fontSize = 28.sp,
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-        item {
-            Text(
-                text = strCreateParking,
-                fontSize = 28.sp,
-                modifier = Modifier.fillMaxWidth()
-            )
+                Spacer(modifier = Modifier.height(16.dp))
 
-            Spacer(modifier = Modifier.height(16.dp))
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text("Parking Name") },
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-            OutlinedTextField(
-                value = createParkingViewModel.name.value,
-                onValueChange = { createParkingViewModel.onNameChange(it) },
-                label = { Text(strParkingName) },
-                modifier = Modifier.fillMaxWidth()
-            )
+                Spacer(modifier = Modifier.height(16.dp))
 
-            Spacer(modifier = Modifier.height(16.dp))
+                OutlinedTextField(
+                    value = description,
+                    onValueChange = { description = it },
+                    label = { Text("Parking Description") },
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-            OutlinedTextField(
-                value = createParkingViewModel.description.value,
-                onValueChange = { createParkingViewModel.onDescriptionChange(it) },
-                label = { Text(strParkingDescription) },
-                modifier = Modifier.fillMaxWidth()
-            )
+                Spacer(modifier = Modifier.height(16.dp))
 
-            Spacer(modifier = Modifier.height(16.dp))
+                OutlinedTextField(
+                    value = priceMinute,
+                    onValueChange = { priceMinute = it },
+                    label = { Text("Price per Minute") },
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-            OutlinedTextField(
-                value = createParkingViewModel.priceMinute.value,
-                onValueChange = { createParkingViewModel.onPriceMinuteChange(it) },
-                label = { Text(strPriceMinute) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
-            )
+                Spacer(modifier = Modifier.height(16.dp))
 
-            Spacer(modifier = Modifier.height(16.dp))
+                Button(onClick = { navController.navigate("selectLocation") }) {
+                    Text("Select Location")
+                }
 
-            Button(onClick = { navController.navigate("selectLocation") }) {
-                Text(strSelectLocation)
-            }
+                Spacer(modifier = Modifier.height(16.dp))
 
-            Spacer(modifier = Modifier.height(16.dp))
+                Button(onClick = { photoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) }) {
+                    Text("Select Image")
+                }
 
-            Button(onClick = {
-                photoPickerLauncher.launch(
-                    PickVisualMediaRequest(
-                        ActivityResultContracts.PickVisualMedia.ImageOnly
+                editParkingViewModel.selectedImage.value?.let {
+                    AsyncImage(
+                        model = it,
+                        contentDescription = null,
+                        modifier = Modifier.padding(10.dp).height(300.dp)
                     )
-                )
-            }) {
-                Text(strSelectImage)
-            }
+                }
 
-            createParkingViewModel.selectedImage.value?.let {
-                AsyncImage(
-                    model = it,
-                    contentDescription = null,
-                    modifier = Modifier.padding(10.dp).height(300.dp)
-                )
-            }
-            AddTagSection(createParkingViewModel)
+                Spacer(modifier = Modifier.height(16.dp))
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Button(
-                onClick = {
-                    if (createParkingViewModel.selectedImage.value != null) {
-
-                        CoroutineScope(Dispatchers.Main).launch {
-                            createParkingViewModel.onAddParking(
+                Button(
+                    onClick = {
+                        if (editParkingViewModel.selectedImage.value != null) {
+                            CoroutineScope(Dispatchers.Main).launch {
+                                // Actualizar el objeto Parking con los nuevos valores antes de llamar a updateParking
+                                parking.name = name
+                                parking.description = description
+                                parking.priceMinute = priceMinute.toFloat()
+                                editParkingViewModel.updateParking(parking)
+                            }
+                        } else {
+                            Toast.makeText(
                                 context,
-                                selectLocationViewModel,
-                                userDao
-                            )
+                                "Please select an image or Location",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
-                    } else {
-                        Toast.makeText(
-                            context,
-                            "Please select an image or Location",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                    navController.navigate("parkingList")
-                },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(strCreate)
+                        navController.navigate("parkingList")
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Update")
+                }
             }
         }
+    } else {
+        Text("Loading...")
     }
 }

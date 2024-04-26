@@ -11,12 +11,12 @@ data class Location(
 data class Parking(
     val id: String = "",
     val location: Location = Location(),
-    val name: String = "",
-    val description: String = "",
+    var name: String = "",
+    var description: String = "",
     val image: String = "", // URL del Storage
     val parkingRating: Double = 0.0,
     val reviewList: List<Review> = emptyList(),
-    val priceMinute: Float = 0.0f,
+    var priceMinute: Float = 0.0f,
     val checked: Boolean = false,
     val createdBy: String = "",
     var tags: List<String> = emptyList(), // Asegúrate de que 'tags' está definido como una lista mutable

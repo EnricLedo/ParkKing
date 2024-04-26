@@ -1,5 +1,6 @@
 package com.example.parkingcompose
 
+import EditParkingViewModel
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
@@ -26,6 +27,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.parkingcompose.dao.ParkingDAO
 import com.example.parkingcompose.dao.ReviewDaoImpl
 import com.example.parkingcompose.dao.UserDao
+import com.example.parkingcompose.model.EditParkingViewModelFactory
 import com.example.parkingcompose.model.LocationRepository
 import com.example.parkingcompose.model.MapViewModelFactory
 import com.example.parkingcompose.util.GoogleAuthUiClient
@@ -228,14 +230,17 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("editparking/{parkingId}") { backStackEntry ->
                             val parkingId = backStackEntry.arguments?.getString("parkingId") ?: ""
-                            val parkingDetailsViewModel = viewModel<ParkingDetailsViewModel>(factory = parkingDetailsViewModelFactory)
+                            val editParkingViewModelFactory = EditParkingViewModelFactory(parkingDAO, parkingId)
+                            val editParkingViewModel: EditParkingViewModel = viewModel(factory = editParkingViewModelFactory)
+                            LaunchedEffect(parkingId) {
+                                parkingDAO.getParkingById(parkingId)
+                            }
                             EditParkingScreen(
+                                navController,
+                                parkingDAO,
                                 parkingId,
-                                parkingDetailsViewModel,
-                                createParkingViewModel,
                                 selectLocationScreen,
-                                navController,languageViewModel,
-                                userDao = userDao
+                                userDao
                             )
                         }
                         composable("forgotpassword") {

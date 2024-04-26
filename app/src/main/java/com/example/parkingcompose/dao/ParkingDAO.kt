@@ -31,6 +31,11 @@ class ParkingDAO() {
         return parkingDocument.update("checked", true)
     }
 
+    fun updateParking(updatedParking: Parking): Task<Void> {
+        val parkingDocument = parkingsCollection.document(updatedParking.id)
+        return parkingDocument.set(updatedParking)
+    }
+
     suspend fun getParkingById(id: String): Parking? {
         return try {
             val querySnapshot = parkingsCollection.whereEqualTo("id", id).get().await()

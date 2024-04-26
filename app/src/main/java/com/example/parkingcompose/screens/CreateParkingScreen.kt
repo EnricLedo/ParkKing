@@ -2,6 +2,7 @@ package com.example.parkingcompose.screens
 
 import android.net.Uri
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -48,7 +49,8 @@ fun CreateParkingScreen(
     navController: NavHostController,
     userDao: UserDao
 ) {
-    createParkingViewModel.resetFields()
+
+
 
     var image by remember { mutableStateOf<Uri?>(null) }
     val context = LocalContext.current
