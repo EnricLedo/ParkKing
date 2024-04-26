@@ -72,9 +72,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInWindow
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.window.Dialog
+import com.example.parkingcompose.model.Tag
 import com.example.parkingcompose.ui.theme.BlueGreyLight
 
 
@@ -299,7 +301,8 @@ fun ParkingSearchBar(onQueryChanged: (String) -> Unit) {
 fun ParkingItem(
     parking: Parking,
     modifier: Modifier = Modifier,
-    navController: NavHostController
+    navController: NavHostController,
+    tagViewModel: TagViewModel = viewModel()
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -340,7 +343,7 @@ fun ParkingItem(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ){
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth().padding(top = 6.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -353,14 +356,15 @@ fun ParkingItem(
                             onClick = { expanded = !expanded }
                         )
                     }
-                    val exampleList = listOf("Free", "Open now", "+4 Stars", "Electric", "Motorcycles", "24/7", "Wasteland")
+                    val parkingTags = parking.tags
+                    var tags by remember { mutableStateOf<Tag?>(null) }
                     LazyRow(
                         Modifier
                             .padding(2.dp)
                             .padding(top = 8.dp),
                         horizontalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
-                        items(exampleList) { tag ->
+                        items(parkingTags) { tag ->
                             TagItem(
                                 tagName = tag,
                                 tagIcon = Icons.Filled.AccountBox
@@ -495,12 +499,14 @@ fun TagItem(
         )
     ) {
         Row(
-            Modifier.padding(8.dp),
+            Modifier.padding(4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 imageVector = tagIcon,
-                contentDescription = null
+                contentDescription = null,
+                modifier = Modifier
+                    .size(16.dp)
             )
             Text(
                 text = tagName

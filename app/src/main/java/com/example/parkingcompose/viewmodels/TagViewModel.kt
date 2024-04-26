@@ -13,8 +13,10 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import java.io.InputStream
 import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.withContext
 import java.util.UUID
 
 
@@ -117,6 +119,12 @@ class TagViewModel : ViewModel() {
             } else {
                 onFailure()
             }
+        }
+    }
+
+    suspend fun getTagsById(tagId: String): Tag {
+        return withContext(Dispatchers.IO) {
+            firestore.collection("tags").document(tagId).get().await().toObject(Tag::class.java) ?: Tag()
         }
     }
 
