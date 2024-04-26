@@ -76,6 +76,8 @@ import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.window.Dialog
+import coil.compose.rememberImagePainter
+import com.example.parkingcompose.dao.TagDAO
 import com.example.parkingcompose.model.Tag
 import com.example.parkingcompose.ui.theme.BlueGreyLight
 
@@ -305,7 +307,7 @@ fun ParkingItem(
     tagViewModel: TagViewModel = viewModel()
 ) {
     var expanded by remember { mutableStateOf(false) }
-
+    val tagDAO = TagDAO()
     Card(
         modifier = modifier.clickable { navController.navigate("parkingDetailsScreen/${parking.id}") },
         colors = CardColors(
@@ -357,17 +359,23 @@ fun ParkingItem(
                         )
                     }
                     val parkingTags = parking.tags
-                    var tags by remember { mutableStateOf<Tag?>(null) }
+                    var tags by remember { mutableStateOf<List<Tag>>(emptyList()) }
+
+                    LaunchedEffect(parkingTags) {
+                        tags = parkingTags.map { tagTitle ->
+                            tagDAO.getTagByTitle(tagTitle)!!
+                        }
+                    }
+
                     LazyRow(
                         Modifier
                             .padding(2.dp)
                             .padding(top = 8.dp),
                         horizontalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
-                        items(parkingTags) { tag ->
+                        items(tags) { tag ->
                             TagItem(
-                                tagName = tag,
-                                tagIcon = Icons.Filled.AccountBox
+                                tag = tag
                             )
                         }
                     }
@@ -383,6 +391,7 @@ fun ParkingItem(
                     end = 16.dp
                 )
             )
+
         }
     }
 }
@@ -485,35 +494,19 @@ fun ParkingDescription(
 
 @Composable
 fun TagItem(
-    tagName: String,
-    tagIcon: ImageVector
+    tag: Tag
 ){
-    Card(
+    val painter = rememberImagePainter(data = tag.image)
+    Image(
+        painter = painter,
+        contentDescription = null,
         modifier = Modifier
-            .clip(RoundedCornerShape(1000.dp)),
-        colors = CardColors(
-            containerColor = OrangeDark,
-            contentColor = Color.White,
-            disabledContainerColor = Color.Unspecified,
-            disabledContentColor = Color.Unspecified
-        )
-    ) {
-        Row(
-            Modifier.padding(4.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = tagIcon,
-                contentDescription = null,
-                modifier = Modifier
-                    .size(16.dp)
-            )
-            Text(
-                text = tagName
-            )
-        }
-    }
+            .size(56.dp)  // Tamaño de la imagen
+            .padding(8.dp)  // Padding de la imagen
+            .clip(RoundedCornerShape(8.dp))) // Forma de la imagen
+
 }
+
 
 @Composable
 fun ResetSearchButton(parkingViewModel: ParkingViewModel, navController: NavHostController) {
@@ -526,6 +519,57 @@ fun ResetSearchButton(parkingViewModel: ParkingViewModel, navController: NavHost
             painter = painterResource(id = R.drawable.ic_resetsearch),
             contentDescription = null
         )
+    }
+}
+
+@Composable
+fun TagItemExpanded(
+    tag: Tag
+){
+    val painter = rememberImagePainter(data = tag.image)
+    var showDialog by remember { mutableStateOf(false) }
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            text = { Text(text = tag.content) },
+            confirmButton = {
+                Button(onClick = { showDialog = false }) {
+                    Text("OK")
+                }
+            }
+        )
+    }
+
+    Card(
+        modifier = Modifier
+            .clip(RoundedCornerShape(1000.dp))
+            .clickable { showDialog = true },
+        colors = CardColors(
+            containerColor = OrangeDark,
+            contentColor = Color.White,
+            disabledContainerColor = Color.Unspecified,
+            disabledContentColor = Color.Unspecified
+        )
+    ) {
+        Row(
+            Modifier.padding(8.dp),  // Aumenta el padding
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                painter = painter,
+                contentDescription = null,
+                modifier = Modifier
+                    .size(32.dp)  // Aumenta el tamaño de la imagen
+                    .clip(CircleShape)
+                    .padding(4.dp)  // Aumenta el padding
+            )
+            Text(
+                text = tag.title,
+                modifier = Modifier.padding(4.dp),  // Aumenta el padding
+                // Aumenta el tamaño del texto
+            )
+        }
     }
 }
 @Composable
@@ -555,7 +599,7 @@ fun TagFilterButton(parkingViewModel: ParkingViewModel, tagViewModel: TagViewMod
                                         Row(
                                             Modifier
                                                 .clickable {
-                                                    val tagId = tag.id!!
+                                                    val tagId = tag.title!!
                                                     selectedTags =
                                                         if (selectedTags.contains(tagId)) {
                                                             selectedTags - tagId
@@ -567,7 +611,7 @@ fun TagFilterButton(parkingViewModel: ParkingViewModel, tagViewModel: TagViewMod
                                             verticalAlignment = Alignment.CenterVertically
                                         ) {
                                             Checkbox(
-                                                checked = selectedTags.contains(tag.id),
+                                                checked = selectedTags.contains(tag.title),
                                                 onCheckedChange = null // Ignoramos este evento ya que manejamos el clic en el Row
                                             )
                                             Spacer(modifier = Modifier.width(8.dp))

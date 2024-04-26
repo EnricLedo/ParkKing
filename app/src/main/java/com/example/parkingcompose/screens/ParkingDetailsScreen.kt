@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
@@ -31,6 +33,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,6 +49,8 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import com.example.parkingcompose.R
+import com.example.parkingcompose.dao.TagDAO
+import com.example.parkingcompose.model.Tag
 import com.example.parkingcompose.ui.theme.ButtonTextStyle
 import com.example.parkingcompose.ui.theme.OrangeDark
 import com.example.parkingcompose.ui.theme.OrangeLight
@@ -59,13 +66,13 @@ fun ParkingDetailsScreen(
 ) {
     Modifier.background(OrangeLight)
     val parking by parkingDetailsViewModel.parking.collectAsState(null)
-
+    val tagDAO = TagDAO()
     BackHandler {
         // Minimiza la aplicación
         navController.navigate("parkingList")
     }
 
-        LaunchedEffect(key1 = parkingId) {
+    LaunchedEffect(key1 = parkingId) {
         parkingDetailsViewModel.getParkingById(parkingId)
     }
 
@@ -77,7 +84,8 @@ fun ParkingDetailsScreen(
             containerColor = OrangeLight,
             contentColor = Color.White,
             disabledContainerColor = Color.Unspecified,
-            disabledContentColor = Color.Unspecified),
+            disabledContentColor = Color.Unspecified
+        ),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         if (parking != null) {
@@ -132,33 +140,52 @@ fun ParkingDetailsScreen(
                             navController.navigate("mapa/${parking!!.location.latitude}/${parking!!.location.longitude}")
                         }
                         .align(Alignment.CenterHorizontally)
-
-
                 )
+
+                val parkingTags = parking!!.tags
+                var tags by remember { mutableStateOf<List<Tag>>(emptyList()) }
+
+                LaunchedEffect(parkingTags) {
+                    tags = parkingTags.map { tagTitle ->
+                        tagDAO.getTagByTitle(tagTitle)!!
+                    }
+                }
+
+                LazyRow(
+                    Modifier
+                        .padding(2.dp)
+                        .padding(top = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    items(tags) { tag ->
+                        TagItemExpanded(
+                            tag = tag
+                        )
+                    }
+                }
 
                 Card(
                     colors = CardColors(
                         containerColor = OrangeLight,
                         contentColor = OrangeDark,
                         disabledContainerColor = Color.Unspecified,
-                        disabledContentColor = Color.Unspecified),
+                        disabledContentColor = Color.Unspecified
+                    ),
                     modifier = Modifier.padding(6.dp)
                 ) {
-
-                        Text(
-                            text = "·Autor: ${parking!!.createdBy}",
-                            color = OrangeDark,
-                            style = ButtonTextStyle,
-                            modifier = Modifier.padding(bottom = 6.dp)
-                        )
-                        Text(
-                            text = "·Price/Minute: ${parking!!.priceMinute}",
-                            color = OrangeDark,
-                            style = ButtonTextStyle
-                        )
-
-
+                    Text(
+                        text = "·Autor: ${parking!!.createdBy}",
+                        color = OrangeDark,
+                        style = ButtonTextStyle,
+                        modifier = Modifier.padding(bottom = 6.dp)
+                    )
+                    Text(
+                        text = "·Price/Minute: ${parking!!.priceMinute}",
+                        color = OrangeDark,
+                        style = ButtonTextStyle
+                    )
                 }
+
                 Text(
                     text = parking!!.description,
                     style = ButtonTextStyle,

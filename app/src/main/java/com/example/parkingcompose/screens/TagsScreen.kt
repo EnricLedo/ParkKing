@@ -178,7 +178,7 @@ fun TagItem(tag: Tag, tagViewModel: TagViewModel, onEdit: (Tag) -> Unit) {
         DeleteTagDialog(
             onConfirmDelete = {
                 CoroutineScope(Dispatchers.IO).launch {
-                    tagViewModel.deleteTag(tag.id ?: "")
+                    tagViewModel.deleteTag(tag.title ?: "")
                     showDeleteTagDialog = false
                 }
             },

@@ -173,14 +173,14 @@ fun CreateParkingScreen(
 
 @Composable
 fun AddTagSection(viewModel: CreateParkingViewModel) {
-    val tags = viewModel.tags.value  // Asegúrate de que Tag tiene un campo 'id'
+    val tags = viewModel.tags.value
 
     LazyRow(
         modifier = Modifier.padding(8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(tags) { tag ->
-            val isSelected = tag.id in viewModel.selectedTagIds.value
+            val isSelected = tag.title in viewModel.selectedTagIds.value
             Text(
                 text = tag.title,
                 modifier = Modifier
@@ -189,7 +189,7 @@ fun AddTagSection(viewModel: CreateParkingViewModel) {
                         shape = MaterialTheme.shapes.small
                     )
                     .clickable {
-                        tag.id?.let { viewModel.selectTag(it, !isSelected) }
+                        viewModel.selectTag(tag.title, !isSelected)
                     }
                     .padding(horizontal = 16.dp, vertical = 8.dp),
                 color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant

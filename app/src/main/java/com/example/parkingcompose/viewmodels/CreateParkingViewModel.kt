@@ -24,6 +24,7 @@ class CreateParkingViewModel(private val tagViewModel: TagViewModel) : ViewModel
     var description = mutableStateOf("")
     var priceMinute = mutableStateOf("")
     var tags = mutableStateOf(listOf<Tag>())
+    var selectedTags = mutableStateOf(listOf<Tag>())
     var selectedTagIds = mutableStateOf(listOf<String>())
     var latitude = mutableStateOf(0.0)
     var longitude = mutableStateOf(0.0)
@@ -48,6 +49,7 @@ class CreateParkingViewModel(private val tagViewModel: TagViewModel) : ViewModel
             }
         }
     }
+
     fun onNameChange(newValue: String) {
         name.value = newValue
     }
@@ -68,7 +70,11 @@ class CreateParkingViewModel(private val tagViewModel: TagViewModel) : ViewModel
         }
     }
 
-    suspend fun onAddParking(context: Context, selectLocationViewModel: SelectLocationViewModel, userDAO: UserDao) {
+    suspend fun onAddParking(
+        context: Context,
+        selectLocationViewModel: SelectLocationViewModel,
+        userDAO: UserDao
+    ) {
         val imageUrl = StorageUtil.uploadImageToFirebaseStorage(selectedImage.value)
         userDAO.getCurrentUsername { username ->
             if (imageUrl != null) {
@@ -79,7 +85,11 @@ class CreateParkingViewModel(private val tagViewModel: TagViewModel) : ViewModel
                         //Amb aixo canviem la coma per un punt
                         priceMinute.value.toFloat()
                     } else {
-                        Toast.makeText(context, "Please enter a price -> OnAddParking Method", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            context,
+                            "Please enter a price -> OnAddParking Method",
+                            Toast.LENGTH_SHORT
+                        ).show()
                         return@getCurrentUsername
                     }
 
@@ -96,14 +106,26 @@ class CreateParkingViewModel(private val tagViewModel: TagViewModel) : ViewModel
                         createdBy = username
                     )
                     addParking(parking, context)
-                    Toast.makeText(context, "Parking created. It will be published once moderated", Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        context,
+                        "Parking created. It will be published once moderated",
+                        Toast.LENGTH_LONG
+                    ).show()
                     selectLocationViewModel.resetSelectedLocation()
                     resetFields()
                 } else {
-                    Toast.makeText(context, "Please select a location -> OnAddParking Method", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        context,
+                        "Please select a location -> OnAddParking Method",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             } else {
-                Toast.makeText(context, "Failed to upload image -> OnAddParking Method", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    "Failed to upload image -> OnAddParking Method",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
@@ -116,14 +138,16 @@ class CreateParkingViewModel(private val tagViewModel: TagViewModel) : ViewModel
                 Log.d(TAG, "Parking added with ID: ${newParkingRef.id}")
                 viewModelScope.launch {
                     _parkingAddedEvent.emit(Unit) // Emit an update event
-                    _parkingEnabledEvent.emit(Unit) // Emit an update event
+                    updateTagsWithParkingId(newParkingRef.id) // Update tags with the new parking ID
                 }
-                updateTagsWithParkingId(newParkingRef.id) // Consider updating tags before emitting the event if necessary
-
             }
             .addOnFailureListener { e ->
                 Log.w(TAG, "Error adding parking", e)
-                Toast.makeText (localContext, "Error adding parking -> addParking Method", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    localContext,
+                    "Error adding parking -> addParking Method",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
     }
 
@@ -135,21 +159,31 @@ class CreateParkingViewModel(private val tagViewModel: TagViewModel) : ViewModel
         longitude.value = 0.0
         selectedImage.value = null
     }
+
     private fun updateTagsWithParkingId(parkingId: String) {
         val db = FirebaseFirestore.getInstance()
-        selectedTagIds.value.forEach { tagId ->
-            db.collection("tags").document(tagId)
-                .update("parkingIds", FieldValue.arrayUnion(parkingId))
-                .addOnSuccessListener {
-                    Log.d(TAG, "Parking ID added to tag successfully: $parkingId")
+        selectedTagIds.value.forEach { tagTitle ->
+            db.collection("tags")
+                .whereEqualTo("title", tagTitle)
+                .get()
+                .addOnSuccessListener { documents ->
+                    for (document in documents) {
+                        document.reference.update("parkingIds", FieldValue.arrayUnion(parkingId))
+                            .addOnSuccessListener {
+                                Log.d(TAG, "Parking ID added to tag successfully: $parkingId")
+                            }
+                            .addOnFailureListener { e ->
+                                Log.w(TAG, "Error adding parking ID to tag", e)
+                            }
+                    }
                 }
                 .addOnFailureListener { e ->
-                    Log.w(TAG, "Error adding parking ID to tag", e)
+                    Log.w(TAG, "Error finding tag with title: $tagTitle", e)
                 }
         }
     }
-}
 
-fun replaceComaForDot(str: String): String {
-    return str.replace(",", ".")
+    fun replaceComaForDot(str: String): String {
+        return str.replace(",", ".")
+    }
 }
