@@ -1,50 +1,57 @@
 package com.example.parkingcompose.viewmodels
 
 
+import android.content.ContentValues.TAG
 import android.util.Log
-import com.example.parkingcompose.data.Tag
+import androidx.lifecycle.ViewModel
+import com.example.parkingcompose.dao.TagDAO
+import com.example.parkingcompose.model.Tag
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
+import java.io.InputStream
+import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.withContext
+import java.util.UUID
 
-class TagViewModel {
-    private val firestore = FirebaseFirestore.getInstance()
 
-    suspend fun addTag(tag: Tag) {
-        try {
-            firestore.collection("tags").add(tag).await()
-        } catch (e: Exception) {
-            Log.e("FirestoreManager", "Error adding tag", e)
-            // Considera mostrar un mensaje de error al usuario.
-        }
+class TagViewModel : ViewModel() {
+    private val tagDAO = TagDAO()
+    private val _selectedTags = MutableStateFlow<Set<String>>(emptySet())
+    val selectedTags: StateFlow<Set<String>> = _selectedTags
+
+    fun addTag(tag: Tag, onSuccess: () -> Unit, onTagExists: () -> Unit) {
+        tagDAO.addTag(tag, onSuccess, onTagExists)
     }
 
-    suspend fun updateTag(tag: Tag) {
-        val tagRef = tag.id?.let { firestore.collection("tags").document(it) }
-        tagRef?.set(tag)?.await()
+    fun updateTag(tag: Tag, onSuccess: () -> Unit, onTagExists: () -> Unit) {
+        tagDAO.updateTag(tag, onSuccess, onTagExists)
     }
 
     suspend fun deleteTag(tagId: String) {
-        val tagRef = firestore.collection("tags").document(tagId)
-        tagRef.delete().await()
+        tagDAO.deleteTag(tagId)
     }
 
-    fun getTagsFlow(): Flow<List<Tag>> = callbackFlow {
-        val tagsRef = firestore.collection("tags").orderBy("title")
+    fun getTagsFlow(): Flow<List<Tag>> {
+        return tagDAO.getTagsFlow()
+    }
 
-        val subscription = tagsRef.addSnapshotListener { snapshot, _ ->
-            snapshot?.let { querySnapshot ->
-                val tags = mutableListOf<Tag>()
-                for (document in querySnapshot.documents) {
-                    val tag = document.toObject(Tag::class.java)
-                    tag?.id = document.id
-                    tag?.let { tags.add(it) }
-                }
-                trySend(tags).isSuccess
-            }
-        }
-        awaitClose { subscription.remove() }
+    fun uploadImageToFirebaseStorage(inputStream: InputStream, onSuccess: (String) -> Unit, onFailure: () -> Unit) {
+        tagDAO.uploadImageToFirebaseStorage(inputStream, onSuccess, onFailure)
+    }
+
+    suspend fun getTagsById(tagId: String): Tag {
+        return tagDAO.getTagsById(tagId)
+    }
+
+    suspend fun getTag(title: String): Tag? {
+        return tagDAO.getTag(title)
     }
 }
+

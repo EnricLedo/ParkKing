@@ -15,12 +15,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.parkingcompose.R
 import com.example.parkingcompose.util.GoogleAuthUiClient
 import com.example.parkingcompose.viewmodels.RegisterViewModel
 
@@ -35,7 +37,7 @@ fun RegisterScreen(viewModel: RegisterViewModel, navController: NavHostControlle
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Registrarse",
+            text = stringResource(id = R.string.register),
             fontSize = 28.sp,
             color = Color.Black,
             textAlign = TextAlign.Center,
@@ -47,7 +49,7 @@ fun RegisterScreen(viewModel: RegisterViewModel, navController: NavHostControlle
         OutlinedTextField(
             value = viewModel.email.value,
             onValueChange = { viewModel.onEmailChange(it) },
-            label = { Text("Email") },
+            label = { Text(stringResource(id = R.string.email)) },
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -56,7 +58,7 @@ fun RegisterScreen(viewModel: RegisterViewModel, navController: NavHostControlle
         OutlinedTextField(
             value = viewModel.password.value,
             onValueChange = { viewModel.onPasswordChange(it) },
-            label = { Text("Password") },
+            label = { Text(stringResource(id = R.string.password)) },
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             modifier = Modifier.fillMaxWidth()
@@ -67,7 +69,7 @@ fun RegisterScreen(viewModel: RegisterViewModel, navController: NavHostControlle
         OutlinedTextField(
             value = viewModel.repeatPassword.value,
             onValueChange = { viewModel.onRepeatPasswordChange(it) },
-            label = { Text("Repeat Password") },
+            label = { Text(stringResource(id = R.string.repeat_password)) },
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             modifier = Modifier.fillMaxWidth()
@@ -76,11 +78,11 @@ fun RegisterScreen(viewModel: RegisterViewModel, navController: NavHostControlle
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = { viewModel.registerUser(googleAuthUiClient)
+            onClick = { viewModel.registerUser()
                 navController.navigate("mapa")},
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Register")
+            Text(stringResource(id = R.string.register))
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -89,7 +91,7 @@ fun RegisterScreen(viewModel: RegisterViewModel, navController: NavHostControlle
             onClick = { navController.navigate("sign_in")},
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Ya tengo cuenta")
+            Text(stringResource(id = R.string.already_have_account))
         }
     }
 }

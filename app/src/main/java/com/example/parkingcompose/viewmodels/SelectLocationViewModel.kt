@@ -17,4 +17,10 @@ class SelectLocationViewModel : ViewModel() {
             _selectedLocation.emit(location)
         }
     }
+    fun resetSelectedLocation() {
+        viewModelScope.launch {
+            _selectedLocation.emit(null)
+        }
+    }
+
 }

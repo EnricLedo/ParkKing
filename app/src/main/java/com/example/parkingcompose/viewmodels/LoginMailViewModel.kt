@@ -1,13 +1,12 @@
 package com.example.parkingcompose.viewmodels
 
-import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import com.example.parkingcompose.MainActivity
-import com.example.parkingcompose.data.SignInResult
-import com.example.parkingcompose.data.LoginState
+import com.example.parkingcompose.model.SignInResult
+import com.example.parkingcompose.model.LoginState
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,8 +29,9 @@ class LoginMailViewModel: ViewModel() {
     }
 
     fun login(context: Context, email: String, password: String) {
+        val trimmedEmail = email.trimEnd()
         val auth = Firebase.auth
-        auth.signInWithEmailAndPassword(email, password)
+        auth.signInWithEmailAndPassword(trimmedEmail, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     // Inicio de sesión exitoso, puedes iniciar tu actividad aquí si lo necesitas
@@ -44,7 +44,6 @@ class LoginMailViewModel: ViewModel() {
                 }
             }
     }
-
 
     fun onSignInResult(result: SignInResult) {
         _signInState.update { it.copy(

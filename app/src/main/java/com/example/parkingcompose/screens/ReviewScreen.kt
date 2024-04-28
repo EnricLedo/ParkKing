@@ -1,8 +1,9 @@
 package com.example.parkingcompose.screens
 
-import ReviewViewModel
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,16 +11,26 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.Surface
+import androidx.compose.material.TextButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
-import androidx.compose.material3.Divider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -33,9 +44,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
-import com.example.parkingcompose.data.Review
+import com.example.parkingcompose.R
+import com.example.parkingcompose.model.Review
+import com.example.parkingcompose.ui.theme.OrangeLight
+import com.example.parkingcompose.viewmodels.ReviewViewModel
 import com.google.firebase.auth.FirebaseAuth
 import java.util.Date
 
@@ -75,14 +94,31 @@ fun RatingBar(rating: Float, onRatingChanged: (Float) -> Unit) {
 
 @Composable
 fun ListReviewScreen(
-    viewModel: ReviewViewModel
+    parkingId: String,
+    viewModel: ReviewViewModel,
+    navController: NavController
 ) {
+
+    BackHandler {
+        // Minimiza la aplicación
+        navController.navigate("parkingDetailsScreen/$parkingId")
+    }
     // Cargar las reseñas cuando la pantalla sea visible
     LaunchedEffect(Unit) {
         viewModel.loadReviews()
     }
-
+    // Campo de entrada para la puntuación
+    var ratingInput by remember { mutableStateOf("") }
     val reviews by viewModel.reviews.collectAsState()
+
+    var sortOrder by remember { mutableStateOf(false) }
+    fun sortReviews() {
+        reviews?.let { reviewsList ->
+            viewModel.setReviews(if (sortOrder) reviewsList.sortedByDescending { it.review_rating } else reviewsList.sortedBy { it.review_rating })
+        }
+        sortOrder = !sortOrder // Cambiar el orden para el próximo clic
+    }
+
 
     Column(
         modifier = Modifier
@@ -91,36 +127,142 @@ fun ListReviewScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // Verificar si la lista de reseñas no es nula
-        reviews?.let { reviewsList ->
-            LazyColumn(
-                modifier = Modifier.fillMaxWidth(),
-                contentPadding = PaddingValues(vertical = 16.dp)
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            OutlinedTextField(
+                value = ratingInput,
+                onValueChange = { ratingInput = it },
+                label = { Text("Introduce la puntuación a buscar") },
+                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
+            )
+            Button(
+                onClick = { ratingInput.toFloatOrNull()?.let { viewModel.searchReviewsByRating(it) } },
+                modifier = Modifier.padding(vertical = 8.dp)
             ) {
-                items(reviewsList) { review ->
-                    ReviewItem(review)
-                    Divider()
+                Text("Buscar por puntuación")
+            }
+            Button(
+                onClick = { sortReviews() },
+                modifier = Modifier.padding(bottom = 16.dp)
+            ) {
+                Text(if (sortOrder) "Ordenar de mayor a menor" else "Ordenar de menor a mayor")
+            }
+
+            reviews?.let { reviewsList ->
+                // Filtrar las reseñas que coinciden con el parkingId
+                val filteredReviews = reviewsList.filter { it.parking_id == parkingId }
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentPadding = PaddingValues(vertical = 16.dp)
+                ) {
+                    filteredReviews.groupBy { it.user_email }.forEach { (user, userReviews) ->
+                        // Mostrar el nombre del usuario como encabezado
+                        item {
+                            Text(
+                                text = "Reseñas:",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp,
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            )
+                        }
+                        items(userReviews) { review ->
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp)
+                                    .border(1.dp, Color.Black)
+                                    .background(OrangeLight)
+                            ) {
+                                ReviewItem(review, viewModel = viewModel)
+                            }
+                        }
+
+                    }
                 }
+            }
+        }
+
+    }
+}
+
+
+@Composable
+fun ReviewItem(
+    review: Review,
+    viewModel: ReviewViewModel // ViewModel
+) {
+    var showUpdateDialog by remember { mutableStateOf(false) }
+
+    Column(
+        modifier = Modifier.padding(16.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically // Alinea los textos verticalmente al centro
+        ) {
+            Text(text = "Title: ", fontWeight = FontWeight.Bold, color = Color.Black)
+            Text(text = review.title ?: "", color = Color.Black)
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(text = "Rating : ", fontWeight = FontWeight.Bold, color = Color.Black)
+            Text(text = "${review.review_rating}", color = Color.Black)
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(text = "Comment: ", fontWeight = FontWeight.Bold, color = Color.Black)
+            Text(text = review.comment ?: "", color = Color.Black)
+        }
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically // Alinea los botones verticalmente al centro
+        ) {
+            // Botón de eliminación
+            IconButton(
+                onClick = { review.id?.let { viewModel.deleteReview(it) } },
+                modifier = Modifier.padding(end = 8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = stringResource(id = R.string.delet_con)
+                )
+            }
+
+            // Botón de actualización
+            IconButton(
+                onClick = { showUpdateDialog = true },
+                modifier = Modifier.padding(end = 8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = stringResource(id = R.string.edit_con)
+                )
+            }
+
+            // Mostrar el diálogo de actualización si showUpdateDialog es verdadero
+            if (showUpdateDialog) {
+                UpdateReviewDialog(
+                    review = review,
+                    onUpdateReview = { updatedReview ->
+                        viewModel.updateReview(updatedReview)
+                    },
+                    onDismiss = {
+                        showUpdateDialog = false
+                    }
+                )
             }
         }
     }
 }
-
-@Composable
-fun ReviewItem(review: Review) {
-    Column(
-        modifier = Modifier.padding(16.dp)
-    ) {
-        Text(text = review.title)
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(text = "Rating: ${review.review_rating}")
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(text = review.comment)
-    }
-}
-
 @Composable
 fun CreateReviewScreen(
+    parkingId: String, // Recuperar el ID del estacionamiento de la ruta
     navController: NavController,
     viewModel: ReviewViewModel
 ) {
@@ -129,7 +271,10 @@ fun CreateReviewScreen(
     var comment by remember { mutableStateOf("") }
     var title by remember { mutableStateOf("") }
     var userEmail by remember { mutableStateOf("") }
-    var parkingId by remember { mutableStateOf("") }
+
+    val reviewSubmittedText = stringResource(id = R.string.review_submitted)
+    val errorSendingReviewText = stringResource(id = R.string.error_sending_review)
+
 
     Column(
         modifier = Modifier
@@ -138,41 +283,28 @@ fun CreateReviewScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(text = "Deja tu reseña")
-        Spacer(modifier = Modifier.height(16.dp))
-        TextField(
-            value = title,
-            onValueChange = { newTitle -> title = newTitle },
-            label = { Text("Título") },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(16.dp))
+        Text(text = stringResource(id = R.string.leave_your_review))
         RatingBar(
             rating = rating,
             onRatingChanged = { newRating -> rating = newRating }
         )
         Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(16.dp))
+        TextField(
+            value = title,
+            onValueChange = { newTitle -> title = newTitle },
+            label = { Text(stringResource(id = R.string.title)) },
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(16.dp))
         TextField(
             value = comment,
             onValueChange = { newComment -> comment = newComment },
-            label = { Text("Comentario") },
+            label = { Text(stringResource(id = R.string.comment)) },
             maxLines = 3,
             modifier = Modifier.fillMaxWidth()
         )
-        Spacer(modifier = Modifier.height(16.dp))
-        TextField(
-            value = userEmail,
-            onValueChange = { newUserEmail -> userEmail = newUserEmail },
-            label = { Text("Correo electrónico del usuario") },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        TextField(
-            value = parkingId,
-            onValueChange = { newParkingId -> parkingId = newParkingId },
-            label = { Text("ID del estacionamiento") },
-            modifier = Modifier.fillMaxWidth()
-        )
+
         Spacer(modifier = Modifier.height(16.dp))
         Button(
             onClick = {
@@ -182,27 +314,92 @@ fun CreateReviewScreen(
                     title = title,
                     user_email = FirebaseAuth.getInstance().currentUser?.email ?: "",
                     date = Date(),
-                    parking_id = parkingId
+                    parking_id = parkingId // Usar el ID del estacionamiento para el parking_id de la reseña
                 )
                 try {
                     viewModel.addReview(review)
-                    Toast.makeText(context, "Reseña enviada", Toast.LENGTH_SHORT).show()
-                    navController.popBackStack()
+                    Toast.makeText(context, reviewSubmittedText, Toast.LENGTH_SHORT).show()
+                    navController.navigate("listReviews/$parkingId?rating=${review.review_rating}")
                 } catch (e: Exception) {
                     Toast.makeText(
                         context,
-                        "Error al enviar la reseña: ${e.message}",
+                        "$errorSendingReviewText ${e.message}",
                         Toast.LENGTH_SHORT
                     ).show()
                 }
             },
             modifier = Modifier.align(Alignment.End)
         ) {
-            Text("Enviar")
+            Text(stringResource(id = R.string.send))
         }
     }
 }
 
+@Composable
+fun UpdateReviewDialog(
+    review: Review,
+    onUpdateReview: (Review) -> Unit,
+    onDismiss: () -> Unit
+) {
+    // Estado para almacenar el título y el comentario actualizados
+    var updatedTitle by remember { mutableStateOf(review.title ?: "") }
+    var updatedComment by remember { mutableStateOf(review.comment ?: "") }
 
-
+    // Mostrar el diálogo personalizado
+    Dialog(
+        onDismissRequest = onDismiss
+    ) {
+        Surface(
+            modifier = Modifier.padding(16.dp),
+            shape = MaterialTheme.shapes.medium,
+            elevation = 8.dp
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    text = "Actualizar revisión",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                OutlinedTextField(
+                    value = updatedTitle,
+                    onValueChange = { updatedTitle = it },
+                    label = { Text("Título") }
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                OutlinedTextField(
+                    value = updatedComment,
+                    onValueChange = { updatedComment = it },
+                    label = { Text("Comentario") }
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    TextButton(onClick = onDismiss) {
+                        Text("Cancelar")
+                    }
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Button(
+                        onClick = {
+                            // Crear una revisión actualizada con los datos ingresados
+                            val updatedReview = review.copy(title = updatedTitle, comment = updatedComment)
+                            // Llamar a la función de actualización
+                            onUpdateReview(updatedReview)
+                            // Cerrar el diálogo
+                            onDismiss()
+                        }
+                    ) {
+                        Text("Actualizar")
+                    }
+                }
+            }
+        }
+    }
+}
 

@@ -1,5 +1,7 @@
 package com.example.parkingcompose.screens
 
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -16,18 +18,20 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.parkingcompose.data.LoginState
+import com.example.parkingcompose.model.LoginState
 import com.example.parkingcompose.ui.theme.ButtonTextStyle
 import com.example.parkingcompose.util.GoogleAuthUiClient
 import com.example.parkingcompose.viewmodels.LoginMailViewModel
 import com.example.parkingcompose.viewmodels.RegisterViewModel
+import com.example.parkingcompose.R
 
 
 @Composable
@@ -41,16 +45,19 @@ fun LoginScreen(
     onRegister: () -> Unit,
     onSignInClick: () -> Unit
 )  {
+    val activity = LocalContext.current as ComponentActivity
     val loginState by loginViewModel.loginState.collectAsState()
-
+    BackHandler {
+        // Minimiza la aplicación
+        activity.moveTaskToBack(true)
+    }
     Column(
         modifier = Modifier.fillMaxSize().padding(14.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
-
     ) {
         Text(
-            text = "Iniciar sesión",
+            text = stringResource(id = R.string.login_title),
             fontSize = 28.sp,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth()
@@ -61,7 +68,7 @@ fun LoginScreen(
         OutlinedTextField(
             value = loginState.email,
             onValueChange = { loginViewModel.onEmailChange(it) },
-            label = { Text("Email") },
+            label = { Text(stringResource(id = R.string.email)) },
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -70,7 +77,7 @@ fun LoginScreen(
         OutlinedTextField(
             value = loginState.password,
             onValueChange = { loginViewModel.onPasswordChange(it) },
-            label = { Text("Password") },
+            label = { Text(stringResource(id = R.string.password)) },
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             modifier = Modifier.fillMaxWidth()
@@ -78,30 +85,19 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-
-            Button(
-                onClick = { onLogin(loginState.email, loginState.password) },
-                modifier = Modifier.fillMaxWidth().padding(0.dp, 0.dp, 0.dp, 8.dp)
-            ) {
-                Text(
-                    "INICIAR SESIÓN",
-                    style = ButtonTextStyle
-                )
-            }
-
         Button(
-            onClick = {
-                onSignInClick()
-
-            },
-            modifier = Modifier.fillMaxWidth()
+            onClick = { onLogin(loginState.email, loginState.password) },
+            modifier = Modifier.fillMaxWidth().padding(0.dp, 0.dp, 0.dp, 8.dp)
         ) {
-            Text(
-                "GOOGLE SIGN-IN",
-                style = ButtonTextStyle
-            )
+            Text(stringResource(id = R.string.login_button))
         }
 
+        Button(
+            onClick = { onSignInClick() },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(stringResource(id = R.string.google_sign_in))
+        }
 
         Spacer(modifier = Modifier.height(65.dp))
 
@@ -109,23 +105,15 @@ fun LoginScreen(
             onClick = { onRegister() },
             modifier = Modifier.fillMaxWidth(0.7F).padding(0.dp, 0.dp, 0.dp, 8.dp)
         ) {
-            Text(
-                text = "REGISTRARSE",
-                style = ButtonTextStyle
-            )
-
+            Text(stringResource(id = R.string.register))
         }
+
         Button(
             onClick = { navHostController.navigate("forgotpassword") },
             modifier = Modifier.fillMaxWidth(0.7F)
         ) {
-            Text(
-                "CONTRASEÑA OLVIDADA",
-                style = ButtonTextStyle
-            )
+            Text(stringResource(id = R.string.forgotpassword))
         }
-
-
-
     }
 }
+
