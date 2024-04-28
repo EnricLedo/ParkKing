@@ -1,8 +1,8 @@
 package com.example.parkingcompose.viewmodels
 
 import androidx.lifecycle.ViewModel
-import com.example.parkingcompose.model.SignInResult
-import com.example.parkingcompose.model.LoginState
+import com.example.parkingcompose.data.SignInResult
+import com.example.parkingcompose.data.LoginState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update

@@ -1,4 +1,4 @@
-package com.example.parkingcompose.model
+package com.example.parkingcompose.data
 
 data class Tag (
     val title: String = "",

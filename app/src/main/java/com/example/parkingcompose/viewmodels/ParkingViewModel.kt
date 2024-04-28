@@ -3,9 +3,10 @@ package com.example.parkingcompose.viewmodels
 import android.content.ContentValues.TAG
 import android.location.Location
 import android.util.Log
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.parkingcompose.model.Parking
+import com.example.parkingcompose.data.Parking
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
