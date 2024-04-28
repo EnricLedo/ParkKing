@@ -230,7 +230,7 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("editparking/{parkingId}") { backStackEntry ->
                             val parkingId = backStackEntry.arguments?.getString("parkingId") ?: ""
-                            val editParkingViewModelFactory = EditParkingViewModelFactory(parkingDAO, parkingId)
+                            val editParkingViewModelFactory = EditParkingViewModelFactory(parkingDAO, parkingId, tagViewModel)
                             val editParkingViewModel: EditParkingViewModel = viewModel(factory = editParkingViewModelFactory)
                             LaunchedEffect(parkingId) {
                                 parkingDAO.getParkingById(parkingId)
@@ -240,6 +240,7 @@ class MainActivity : ComponentActivity() {
                                 parkingDAO,
                                 parkingId,
                                 selectLocationScreen,
+                                tagViewModel,
                                 userDao
                             )
                         }

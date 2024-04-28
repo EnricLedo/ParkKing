@@ -43,6 +43,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.parkingcompose.dao.ParkingDAO
 import com.example.parkingcompose.model.EditParkingViewModelFactory
+import com.example.parkingcompose.viewmodels.CreateParkingViewModel
+import com.example.parkingcompose.viewmodels.TagViewModel
 
 @Composable
 fun EditParkingScreen(
@@ -50,9 +52,10 @@ fun EditParkingScreen(
     parkingDAO: ParkingDAO,
     parkingId: String,
     selectLocationViewModel: SelectLocationViewModel,
+    tagViewModel: TagViewModel,
     userDao: UserDao
 ) {
-    val editParkingViewModelFactory = EditParkingViewModelFactory(parkingDAO, parkingId)
+    val editParkingViewModelFactory = EditParkingViewModelFactory(parkingDAO, parkingId, tagViewModel)
     val editParkingViewModel: EditParkingViewModel = viewModel(factory = editParkingViewModelFactory)
     val parking = editParkingViewModel.parking.value
 
@@ -110,45 +113,33 @@ fun EditParkingScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Button(onClick = { navController.navigate("selectLocation") }) {
-                    Text("Select Location")
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Button(onClick = { photoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) }) {
-                    Text("Select Image")
-                }
 
                 editParkingViewModel.selectedImage.value?.let {
                     AsyncImage(
                         model = it,
                         contentDescription = null,
-                        modifier = Modifier.padding(10.dp).height(300.dp)
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .height(300.dp)
                     )
                 }
+                Spacer(modifier = Modifier.height(16.dp))
+
+                AddTagSection(parking.tags, editParkingViewModel)
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Button(
                     onClick = {
-                        if (editParkingViewModel.selectedImage.value != null) {
-                            CoroutineScope(Dispatchers.Main).launch {
+                        CoroutineScope(Dispatchers.Main).launch {
                                 // Actualizar el objeto Parking con los nuevos valores antes de llamar a updateParking
                                 parking.name = name
                                 parking.description = description
                                 parking.priceMinute = priceMinute.toFloat()
+                                parking.tags = editParkingViewModel.selectedTagIds.value
                                 editParkingViewModel.updateParking(parking)
                             }
-                        } else {
-                            Toast.makeText(
-                                context,
-                                "Please select an image or Location",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
+
                         navController.navigate("parkingList")
                     },
                     modifier = Modifier.fillMaxWidth()
@@ -159,5 +150,34 @@ fun EditParkingScreen(
         }
     } else {
         Text("Loading...")
+    }
+}
+@Composable
+fun AddTagSection(previousTags: List<String>,viewModel: EditParkingViewModel) {
+    //Le pasamos el previousTags para que las etiquetas aparezcan seleccionadas
+    viewModel.selectedTagIds = remember { mutableStateOf(previousTags) }
+
+    val tags = viewModel.tags.value
+
+    LazyRow(
+        modifier = Modifier.padding(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(tags) { tag ->
+            val isSelected = tag.title in viewModel.selectedTagIds.value
+            Text(
+                text = tag.title,
+                modifier = Modifier
+                    .background(
+                        color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                        shape = MaterialTheme.shapes.small
+                    )
+                    .clickable {
+                        viewModel.selectTag(tag.title, !isSelected)
+                    }
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
     }
 }
