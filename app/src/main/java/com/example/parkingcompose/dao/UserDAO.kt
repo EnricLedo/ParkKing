@@ -77,24 +77,24 @@ class UserDao() {
     }
 
     suspend fun updateUsernameInDb(userId: String?, newUsername: String): Boolean {
-    val db = FirebaseFirestore.getInstance()
-    var isUpdated = false
+        val db = FirebaseFirestore.getInstance()
+        var isUpdated = false
 
-    try {
-        val documents = db.collection("users")
-            .whereEqualTo("user_id", userId)
-            .get()
-            .await()
+        try {
+            val documents = db.collection("users")
+                .whereEqualTo("user_id", userId)
+                .get()
+                .await()
 
-        for (document in documents) {
-            document.reference.update("username", newUsername).await()
+            for (document in documents) {
+                document.reference.update("username", newUsername).await()
+            }
+            isUpdated = true
+        } catch (e: Exception) {
+            isUpdated = false
         }
-        isUpdated = true
-    } catch (e: Exception) {
-        isUpdated = false
+        return isUpdated
     }
-    return isUpdated
-}
 
     fun getCurrentUsername(onSuccess: (String) -> Unit) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid
@@ -127,4 +127,5 @@ class UserDao() {
         return isAvailable
     }
 }
+
 

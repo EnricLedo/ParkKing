@@ -103,7 +103,7 @@ fun ProfileScreen(
                     fontSize = 36.sp,
                     fontWeight = FontWeight.SemiBold
                 )
-                    Spacer(modifier = Modifier.height(26.dp))
+                Spacer(modifier = Modifier.height(26.dp))
                 Button(
                     onClick = { navController.navigate("tagsscreen") },
                     modifier = Modifier

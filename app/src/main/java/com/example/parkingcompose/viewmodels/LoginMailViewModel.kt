@@ -1,13 +1,12 @@
 package com.example.parkingcompose.viewmodels
 
-import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import com.example.parkingcompose.MainActivity
-import com.example.parkingcompose.data.SignInResult
-import com.example.parkingcompose.data.LoginState
+import com.example.parkingcompose.model.SignInResult
+import com.example.parkingcompose.model.LoginState
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.flow.MutableStateFlow

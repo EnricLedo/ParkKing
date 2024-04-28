@@ -154,12 +154,12 @@ fun ParkingListScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
 
-                ) {
+            ) {
                 YourComposableFunction(parkingViewModel)
                 RatingFilter(parkingViewModel)
                 TagFilterButton(parkingViewModel, tagViewModel)
                 ResetSearchButton(parkingViewModel, navController)
-                }
+            }
 
             if (errorState.value != null) {
                 Text("Error: ${errorState.value}")
@@ -596,27 +596,27 @@ fun TagFilterButton(parkingViewModel: ParkingViewModel, tagViewModel: TagViewMod
                         items(tagsState.value.chunked(3)) { rowTags -> // Ajusta el valor en chunked() para cambiar el número de columnas
                             Row(Modifier.padding(8.dp)) {
                                 rowTags.forEach { tag ->
-                                        Row(
-                                            Modifier
-                                                .clickable {
-                                                    val tagId = tag.title!!
-                                                    selectedTags =
-                                                        if (selectedTags.contains(tagId)) {
-                                                            selectedTags - tagId
-                                                        } else {
-                                                            selectedTags + tagId
-                                                        }
-                                                }
-                                                .padding(8.dp),
-                                            verticalAlignment = Alignment.CenterVertically
-                                        ) {
-                                            Checkbox(
-                                                checked = selectedTags.contains(tag.title),
-                                                onCheckedChange = null // Ignoramos este evento ya que manejamos el clic en el Row
-                                            )
-                                            Spacer(modifier = Modifier.width(8.dp))
-                                            Text(tag.title, color = Color.Black)
-                                        }
+                                    Row(
+                                        Modifier
+                                            .clickable {
+                                                val tagId = tag.title!!
+                                                selectedTags =
+                                                    if (selectedTags.contains(tagId)) {
+                                                        selectedTags - tagId
+                                                    } else {
+                                                        selectedTags + tagId
+                                                    }
+                                            }
+                                            .padding(8.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Checkbox(
+                                            checked = selectedTags.contains(tag.title),
+                                            onCheckedChange = null // Ignoramos este evento ya que manejamos el clic en el Row
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text(tag.title, color = Color.Black)
+                                    }
 
                                 }
                             }

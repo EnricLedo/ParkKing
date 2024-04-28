@@ -54,3 +54,4 @@ class TagViewModel : ViewModel() {
         return tagDAO.getTag(title)
     }
 }
+

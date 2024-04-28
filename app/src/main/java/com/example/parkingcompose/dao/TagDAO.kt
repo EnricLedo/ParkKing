@@ -43,29 +43,29 @@ class TagDAO {
     }
 
     fun updateTag(tag: Tag, onSuccess: () -> Unit, onFailure: () -> Unit) {
-    // Comprueba si el nombre del tag está disponible
-    firestore.collection("tags")
-        .whereEqualTo("title", tag.title)
-        .get()
-        .addOnSuccessListener { documents ->
-            if (documents.isEmpty) {
-                // Si el nombre del tag está disponible, actualiza el tag
-                firestore.collection("tags").document(tag.title).set(tag)
-                    .addOnSuccessListener {
-                        onSuccess()
-                    }
-                    .addOnFailureListener {
-                        onFailure()
-                    }
-            } else {
-                // Si el nombre del tag no está disponible, llama a la función de error
+        // Comprueba si el nombre del tag está disponible
+        firestore.collection("tags")
+            .whereEqualTo("title", tag.title)
+            .get()
+            .addOnSuccessListener { documents ->
+                if (documents.isEmpty) {
+                    // Si el nombre del tag está disponible, actualiza el tag
+                    firestore.collection("tags").document(tag.title).set(tag)
+                        .addOnSuccessListener {
+                            onSuccess()
+                        }
+                        .addOnFailureListener {
+                            onFailure()
+                        }
+                } else {
+                    // Si el nombre del tag no está disponible, llama a la función de error
+                    onFailure()
+                }
+            }
+            .addOnFailureListener {
                 onFailure()
             }
-        }
-        .addOnFailureListener {
-            onFailure()
-        }
-}
+    }
 
 
 
