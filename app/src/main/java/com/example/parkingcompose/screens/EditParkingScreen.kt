@@ -31,6 +31,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.parkingcompose.R
@@ -43,6 +44,9 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.parkingcompose.dao.ParkingDAO
 import com.example.parkingcompose.model.EditParkingViewModelFactory
+import com.example.parkingcompose.util.StorageUtil
+import com.example.parkingcompose.viewmodels.CreateParkingViewModel
+import com.example.parkingcompose.viewmodels.TagViewModel
 
 @Composable
 fun EditParkingScreen(
@@ -50,25 +54,36 @@ fun EditParkingScreen(
     parkingDAO: ParkingDAO,
     parkingId: String,
     selectLocationViewModel: SelectLocationViewModel,
+    tagViewModel: TagViewModel,
     userDao: UserDao
 ) {
-    val editParkingViewModelFactory = EditParkingViewModelFactory(parkingDAO, parkingId)
+    val editParkingViewModelFactory = EditParkingViewModelFactory(parkingDAO, parkingId, tagViewModel)
     val editParkingViewModel: EditParkingViewModel = viewModel(factory = editParkingViewModelFactory)
     val parking = editParkingViewModel.parking.value
 
     val context = LocalContext.current
     val selectedLocation by selectLocationViewModel.selectedLocation.collectAsState()
 
-    val photoPickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickVisualMedia(),
-        onResult = { uri -> editParkingViewModel.selectedImage.value = uri }
-    )
+    // Recursos de strings localizados
+    val strEditParking = stringResource(id = R.string.edit_parking)
+    val strParkingName = stringResource(id = R.string.parking_name)
+    val strParkingDescription = stringResource(id = R.string.parking_description)
+    val strPriceMinute = stringResource(id = R.string.price_minute)
+    val strSelectLocation = stringResource(id = R.string.select_location)
+    val strSelectImage = stringResource(id = R.string.select_image)
 
     if (parking != null) {
         // Mover la inicialización de los estados mutables aquí
         var name by remember { mutableStateOf(parking.name ?: "") }
         var description by remember { mutableStateOf(parking.description ?: "") }
         var priceMinute by remember { mutableStateOf(parking.priceMinute.toString() ?: "") }
+        var image by remember { mutableStateOf(parking.image ?: "") }
+
+        var imageMayHaveChanged = false
+        val photoPickerLauncher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.PickVisualMedia(),
+            onResult = { uri -> image = uri?.toString() ?: "" }
+        )
 
         LazyColumn(
             modifier = Modifier
@@ -78,7 +93,7 @@ fun EditParkingScreen(
         ) {
             item {
                 Text(
-                    text = "Edit Parking",
+                    text = strEditParking,
                     fontSize = 28.sp,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -88,7 +103,7 @@ fun EditParkingScreen(
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
-                    label = { Text("Parking Name") },
+                    label = { Text(strParkingName) },
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -97,7 +112,7 @@ fun EditParkingScreen(
                 OutlinedTextField(
                     value = description,
                     onValueChange = { description = it },
-                    label = { Text("Parking Description") },
+                    label = { Text(strParkingDescription) },
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -105,50 +120,52 @@ fun EditParkingScreen(
 
                 OutlinedTextField(
                     value = priceMinute,
-                    onValueChange = { priceMinute = it },
-                    label = { Text("Price per Minute") },
-                    modifier = Modifier.fillMaxWidth()
+                    onValueChange = { newValue ->
+                        // Ensure only numeric input
+                        val filteredValue = newValue.filter { it.isDigit() || it == '.' || it == ',' }
+                            .replace(',', '.') // Replace comma with period
+                        priceMinute = filteredValue
+                    },
+                    label = { Text(strPriceMinute) },
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                )
+
+                AsyncImage(
+                    model = image,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(10.dp)
+                        .height(300.dp)
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
-
-                Button(onClick = { navController.navigate("selectLocation") }) {
-                    Text("Select Location")
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
                 Button(onClick = { photoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) }) {
-                    Text("Select Image")
+                    imageMayHaveChanged = true
+                    Text(strSelectImage)
                 }
-
-                editParkingViewModel.selectedImage.value?.let {
-                    AsyncImage(
-                        model = it,
-                        contentDescription = null,
-                        modifier = Modifier.padding(10.dp).height(300.dp)
-                    )
-                }
+                Spacer(modifier = Modifier.height(16.dp))
+                AddTagSection(parking.tags, editParkingViewModel)
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Button(
                     onClick = {
-                        if (editParkingViewModel.selectedImage.value != null) {
-                            CoroutineScope(Dispatchers.Main).launch {
-                                // Actualizar el objeto Parking con los nuevos valores antes de llamar a updateParking
-                                parking.name = name
-                                parking.description = description
-                                parking.priceMinute = priceMinute.toFloat()
-                                editParkingViewModel.updateParking(parking)
+                        CoroutineScope(Dispatchers.Main).launch {
+                            // Actualizar el objeto Parking con los nuevos valores antes de llamar a updateParking
+                            parking.name = name
+                            parking.description = description
+                            parking.priceMinute = priceMinute.toFloat()
+                            parking.tags = editParkingViewModel.selectedTagIds.value
+
+                            if (imageMayHaveChanged) {
+                                val imageUrl = StorageUtil.uploadImageToFirebaseStorage(image.toUri())
+                                parking.image = imageUrl ?: parking.image
                             }
-                        } else {
-                            Toast.makeText(
-                                context,
-                                "Please select an image or Location",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
+
+                            editParkingViewModel.updateParking(parking)
+                            }
+
                         navController.navigate("parkingList")
                     },
                     modifier = Modifier.fillMaxWidth()
@@ -159,5 +176,34 @@ fun EditParkingScreen(
         }
     } else {
         Text("Loading...")
+    }
+}
+@Composable
+fun AddTagSection(previousTags: List<String>,viewModel: EditParkingViewModel) {
+    //Le pasamos el previousTags para que las etiquetas aparezcan seleccionadas
+    viewModel.selectedTagIds = remember { mutableStateOf(previousTags) }
+
+    val tags = viewModel.tags.value
+
+    LazyRow(
+        modifier = Modifier.padding(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(tags) { tag ->
+            val isSelected = tag.title in viewModel.selectedTagIds.value
+            Text(
+                text = tag.title,
+                modifier = Modifier
+                    .background(
+                        color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                        shape = MaterialTheme.shapes.small
+                    )
+                    .clickable {
+                        viewModel.selectTag(tag.title, !isSelected)
+                    }
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
     }
 }
