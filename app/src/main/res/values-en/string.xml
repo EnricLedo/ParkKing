@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">ParkingCompose</string>
+    <string name="app_name">ParkKing</string>
     <string name="default_web_client_id">1:84528945230:android:c7feae14d71ddea6da8b1f</string>
     <string name="web_client_id">84528945230-qvi9srll4ispag2f1dck5otn0t32865h.apps.googleusercontent.com</string>
     <string name="create_parking">Create Parking</string>
