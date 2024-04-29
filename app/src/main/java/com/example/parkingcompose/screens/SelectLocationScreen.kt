@@ -94,7 +94,7 @@ fun SelectLocationScreen(
             onClick = {
                 if (selectedLatLng != null) {
                     selectLocationViewModel.updateSelectedLocation(selectedLatLng!!)
-                    navController.navigate("crearparking")
+                    navController.popBackStack()
                 }
             },
             modifier = Modifier

@@ -15,6 +15,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -36,6 +37,8 @@ import com.google.android.gms.maps.model.LatLng
 import com.example.parkingcompose.navegacion.BottomNavigationBar
 import com.example.parkingcompose.viewmodels.CreateParkingViewModel
 import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.parkingcompose.viewmodels.ModerateViewModel
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -44,9 +47,26 @@ fun MapScreen(
     createParkingViewModel: CreateParkingViewModel,
     mapViewModel: MapViewModel,
     navController: NavHostController,
+    moderateViewModel: ModerateViewModel,
     latitude: Double = 0.0, // Nuevo parámetro
     longitude: Double = 0.0 // Nuevo parámetro
 ) {
+
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    LaunchedEffect(currentRoute) {
+        if (currentRoute == "mapa") {
+            // Actualiza la lista de parkings
+            mapViewModel.getParkingList()
+        }
+    }
+    val parkingEnabledEvent by moderateViewModel.parkingEnabledEvent.collectAsState(initial = false) // Nuevo estado
+
+    LaunchedEffect(parkingEnabledEvent) {
+        // Actualiza la lista de parkings
+        mapViewModel.getParkingList()
+    }
     val context = LocalContext.current
     val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
         permissions.entries.forEach {
@@ -61,13 +81,11 @@ fun MapScreen(
 
     LaunchedEffect(Unit) {
         mapViewModel.requestPermissions(context, permissionLauncher)
+        mapViewModel.getParkingList()
     }
 
-
-
     val cameraPositionState = rememberCameraPositionState()
-    val parkingListState = mapViewModel.parkingList.collectAsState()
-    val parkingList = parkingListState.value
+    val parkingList by mapViewModel.parkingList.collectAsState()
     val parkingAddedEvent by createParkingViewModel.parkingAddedEvent.collectAsState(initial = Unit)
 
     LaunchedEffect(parkingAddedEvent) {
@@ -101,6 +119,13 @@ fun MapScreen(
                     cameraPositionState = cameraPositionState,
                     // Resto de las propiedades del mapa
                 ) {
+                    DisposableEffect(navBackStackEntry) {
+                        // Actualiza la lista de parkings
+                        mapViewModel.getParkingList()
+
+                        onDispose { }
+                    }
+
                     parkingList.forEach { parking ->
                         val markerState = mapViewModel.rememberCustomMarkerState("${parking.location.latitude},${parking.location.longitude}")
                         Marker(
