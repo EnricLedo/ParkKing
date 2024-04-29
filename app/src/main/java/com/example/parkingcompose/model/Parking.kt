@@ -13,7 +13,7 @@ data class Parking(
     val location: Location = Location(),
     var name: String = "",
     var description: String = "",
-    val image: String = "", // URL del Storage
+    var image: String = "", // URL del Storage
     val parkingRating: Double = 0.0,
     val reviewList: List<Review> = emptyList(),
     var priceMinute: Float = 0.0f,
