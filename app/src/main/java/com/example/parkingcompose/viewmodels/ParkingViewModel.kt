@@ -37,7 +37,7 @@ class ParkingViewModel : ViewModel() {
         parkings.filter { parking ->
             (selectedTags.isEmpty() || parking.tags.intersect(selectedTags).isNotEmpty()) &&
                     (query.isBlank() || parking.name.contains(query, ignoreCase = true)) &&
-                    (selectedRating == null || parking.parkingRating.toInt() == selectedRating) &&
+                    (selectedRating == null || parking.parkingRating.toInt() >= selectedRating) && // Cambio aquí
                     (selectedDistance == null || distanceBetween(userLocation.value, parking.location) <= selectedDistance)
         }
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
@@ -74,6 +74,7 @@ class ParkingViewModel : ViewModel() {
         _selectedRating.value = null
         _selectedTags.value = emptySet()
         _searchQuery.value = ""
+        _selectedDistance.value = null
 
         // Luego obtén la lista de parkings de nuevo
         getParkingList()

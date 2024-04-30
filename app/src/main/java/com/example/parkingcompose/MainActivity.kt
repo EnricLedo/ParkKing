@@ -208,7 +208,7 @@ class MainActivity : ComponentActivity() {
                                 },
                                 navController = navController,
                                 username = username,
-                                userIsAdmin = userIsAdmin,
+                                userDao = userDao
                             )
                         }
 

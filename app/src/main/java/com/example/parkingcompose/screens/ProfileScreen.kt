@@ -13,8 +13,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,8 +46,16 @@ fun ProfileScreen(
     onSignOut: () -> Unit,
     navController: NavHostController,
     username: String,
-    userIsAdmin: Boolean
+    userDao: UserDao
 ) {
+    var userIsAdmin by remember { mutableStateOf(false) }
+
+    LaunchedEffect(key1 = Unit) {
+        userDao.userIsAdmin {
+            userIsAdmin = it
+        }
+    }
+
     DaleComposeTheme {
         Scaffold(
             bottomBar = { BottomNavigationBar(navController) }
