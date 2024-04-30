@@ -94,20 +94,20 @@ fun ParkingListScreen(
     navController: NavHostController,
     locationRepository: LocationRepository // Este valor debería ser obtenido dinámicamente
 ){
-
     LaunchedEffect(Unit) {
         val userLocation = locationRepository.getCurrentLocation()
         userLocation?.let {
             parkingViewModel.setUserLocation(it.latitude, it.longitude)
         }
     }
-    val parkingListState = parkingViewModel.filteredParkings.collectAsState()
     val errorState = parkingViewModel.error.collectAsState()
     var showFilteredParkings by remember { mutableStateOf(false) }
     var selectedTags by remember { mutableStateOf(setOf<String>()) }
     var minDistance by remember { mutableStateOf(1f) } // Kilómetros
     var maxDistance by remember { mutableStateOf(5f) } // Kilómetros
-
+    var showSliderDialog by remember { mutableStateOf(false) }
+    val selectedDistance by parkingViewModel.selectedDistance.collectAsState()
+    val parkingListState = parkingViewModel.parkingList.collectAsState()
 
     LaunchedEffect(key1 = Unit) {
         parkingViewModel.getParkingList()
@@ -150,17 +150,50 @@ fun ParkingListScreen(
         floatingActionButtonPosition = FabPosition.Center
     )  {
         Column {
-            ParkingSearchBar(onQueryChanged = parkingViewModel::updateSearchQuery)
+            Row(){
+                Button(onClick = { showSliderDialog = true }) {
+                    Text("Filtrar por distancia")
+                }
+                ParkingSearchBar(onQueryChanged = parkingViewModel::updateSearchQuery)
+            }
+
             Row(
                 modifier = Modifier.fillMaxWidth().padding(8.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
-
             ) {
                 YourComposableFunction(parkingViewModel)
                 RatingFilter(parkingViewModel)
                 TagFilterButton(parkingViewModel, tagViewModel)
                 ResetSearchButton(parkingViewModel, navController)
+            }
+
+            if (showSliderDialog) {
+                var sliderValue by remember { mutableStateOf(selectedDistance ?: 0f) }
+                AlertDialog(
+                    onDismissRequest = { showSliderDialog = false },
+                    title = { Text("Seleccione la distancia máxima") },
+                    text = {
+                        Column {
+                            Text("Distancia: ${"%.3f".format(sliderValue)} km")
+                            Slider(
+                                value = sliderValue,
+                                onValueChange = { sliderValue = it },
+                                valueRange = 0f..50f,
+                                steps = 500 // Para tener una precisión de hasta 3 decimales
+                            )
+                        }
+                    },
+                    confirmButton = {
+                        Button(onClick = {
+                            parkingViewModel.setSelectedDistance(sliderValue)
+                            parkingViewModel.filterParkingsByDistance()
+                            showSliderDialog = false
+                        }) {
+                            Text("Aplicar")
+                        }
+                    }
+                )
             }
 
             if (errorState.value != null) {
@@ -170,7 +203,7 @@ fun ParkingListScreen(
             LazyColumn(
                 modifier = Modifier.padding(bottom = 70.dp)
             ) {
-                items(parkingList) { parking ->
+                items(parkingListState.value) { parking ->
                     if(parking.checked){
                         ParkingItem(
                             parking = parking,
@@ -179,10 +212,10 @@ fun ParkingListScreen(
                         )
                     }
                 }
+                }
             }
         }
     }
-}
 
 @Composable
 fun YourComposableFunction(parkingViewModel: ParkingViewModel = viewModel()) {
