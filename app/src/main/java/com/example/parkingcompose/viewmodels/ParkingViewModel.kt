@@ -2,6 +2,7 @@ package com.example.parkingcompose.viewmodels
 
 import android.content.ContentValues.TAG
 import android.location.Location
+import android.location.Location.distanceBetween
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,10 +17,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 class ParkingViewModel : ViewModel() {
-    private val _selectedDistance = MutableStateFlow<Float?>(null)
-    val selectedDistance: StateFlow<Float?> = _selectedDistance
     private val db = FirebaseFirestore.getInstance()
     private val _parkingList = MutableStateFlow<List<Parking>>(emptyList())
+    val parkingList: StateFlow<List<Parking>> = _parkingList
     private val _selectedTags = MutableStateFlow<Set<String>>(setOf())
     private val _searchQuery = MutableStateFlow("")
     private val _error = MutableStateFlow<String?>(null)
@@ -27,32 +27,25 @@ class ParkingViewModel : ViewModel() {
     private val userLocation = MutableStateFlow(com.example.parkingcompose.model.Location(0.0, 0.0)) // MutableStateFlow to track user location
     private val _filteredParkings = MutableStateFlow<List<Parking>>(emptyList())
     private val _selectedRating = MutableStateFlow<Int?>(null)
+    private val _selectedDistance = MutableStateFlow<Float?>(null)
+    val selectedDistance: StateFlow<Float?> = _selectedDistance
+
     val selectedRating: StateFlow<Int?> = _selectedRating
-    private val _orderedParkings = MutableStateFlow<List<Parking>>(emptyList())
-    val orderedParkings: StateFlow<List<Parking>> = _orderedParkings
-    val parkingList: StateFlow<List<Parking>> = combine(
+    val filteredParkings: StateFlow<List<Parking>> = combine(
         _parkingList, _selectedTags, _searchQuery, _selectedRating, _selectedDistance
     ) { parkings, selectedTags, query, selectedRating, selectedDistance ->
         parkings.filter { parking ->
             (selectedTags.isEmpty() || parking.tags.intersect(selectedTags).isNotEmpty()) &&
                     (query.isBlank() || parking.name.contains(query, ignoreCase = true)) &&
-                    (selectedRating == null || parking.parkingRating.toInt() >= selectedRating) &&
+                    (selectedRating == null || parking.parkingRating.toInt() == selectedRating) &&
                     (selectedDistance == null || distanceBetween(userLocation.value, parking.location) <= selectedDistance)
-        }.let { filteredParkings ->
-            // Ordenar por distancia aquí
-            if (userLocation.value != null) {
-                filteredParkings.sortedBy { parking ->
-                    val dist = FloatArray(1)
-                    Location.distanceBetween(userLocation.value.latitude, userLocation.value.longitude, parking.location.latitude, parking.location.longitude, dist)
-                    dist[0]
-                }
-            } else {
-                filteredParkings
-            }
         }
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
-    // ...
+
+    fun setSelectedDistance(distance: Float?) {
+        _selectedDistance.value = distance
+    }
 
     private fun distanceBetween(userLocation: com.example.parkingcompose.model.Location, parkingLocation: com.example.parkingcompose.model.Location): Float {
         val results = FloatArray(1)
@@ -60,16 +53,10 @@ class ParkingViewModel : ViewModel() {
         return results[0] / 1000
     }
 
-
-
-
-
     init {
         getParkingList()
     }
-    fun setSelectedDistance(distance: Float?) {
-        _selectedDistance.value = distance
-    }
+
     fun setSelectedRating(rating: Int?) {
         _selectedRating.value = rating
     }
@@ -87,7 +74,6 @@ class ParkingViewModel : ViewModel() {
         _selectedRating.value = null
         _selectedTags.value = emptySet()
         _searchQuery.value = ""
-        _selectedDistance.value = null
 
         // Luego obtén la lista de parkings de nuevo
         getParkingList()
@@ -109,20 +95,18 @@ class ParkingViewModel : ViewModel() {
 
 
     fun getParkingList() {
-    viewModelScope.launch {
-        try {
-            val querySnapshot = db.collection("parkings").get().await()
-            val list = querySnapshot.documents.mapNotNull { document ->
-                document.toObject(Parking::class.java)
+        viewModelScope.launch {
+            try {
+                val querySnapshot = db.collection("parkings").get().await()
+                val list = querySnapshot.documents.mapNotNull { document ->
+                    document.toObject(Parking::class.java)
+                }
+                _parkingList.value = list
+            } catch (e: Exception) {
+                _error.value = "Error al cargar la lista de parkings: ${e.message}"
             }
-            _parkingList.value = list
-            _filteredParkings.value = list
-            _orderedParkings.value = list
-        } catch (e: Exception) {
-            _error.value = "Error al cargar la lista de parkings: ${e.message}"
         }
     }
-}
     suspend fun getParkingById(id: String): Parking? {
         return try {
             val querySnapshot = db.collection("parkings").whereEqualTo("id", id).get().await()
@@ -160,37 +144,33 @@ class ParkingViewModel : ViewModel() {
 
     fun orderParkingsByDistance(ascending: Boolean = true) {
         viewModelScope.launch {
-            _orderedParkings.value = if (ascending) {
-                _filteredParkings.value.sortedBy { parking ->
-                    val dist = FloatArray(1)
-                    Location.distanceBetween(userLocation.value.latitude, userLocation.value.longitude, parking.location.latitude, parking.location.longitude, dist)
-                    dist[0]
-                }
-            } else {
-                _filteredParkings.value.sortedByDescending { parking ->
-                    val dist = FloatArray(1)
-                    Location.distanceBetween(userLocation.value.latitude, userLocation.value.longitude, parking.location.latitude, parking.location.longitude, dist)
-                    dist[0]
-                }
+            val allParkings = db.collection("parkings").get().await().toObjects(Parking::class.java)
+            _parkingList.value = allParkings.sortedBy { parking ->
+                val dist = FloatArray(1)
+                android.location.Location.distanceBetween(userLocation.value.latitude, userLocation.value.longitude, parking.location.latitude, parking.location.longitude, dist)
+                dist[0]
+            }
+            if (!ascending) {
+                _parkingList.value = _parkingList.value.reversed()
             }
         }
     }
 
     fun filterParkingsByDistance() {
-    val userLat = userLocation.value.latitude
-    val userLng = userLocation.value.longitude
-    val maxDistance = _selectedDistance.value
+        val userLat = userLocation.value.latitude
+        val userLng = userLocation.value.longitude
+        val maxDistance = _selectedDistance.value
 
-    viewModelScope.launch {
-        val allParkings = db.collection("parkings").get().await().toObjects(Parking::class.java)
-        if (maxDistance != null) {
-            _filteredParkings.value = allParkings.filter { parking ->
-                val dist = FloatArray(1)
-                Location.distanceBetween(userLat, userLng, parking.location.latitude, parking.location.longitude, dist)
-                dist[0] / 1000 <= maxDistance
+        viewModelScope.launch {
+            val allParkings = db.collection("parkings").get().await().toObjects(Parking::class.java)
+            if (maxDistance != null) {
+                _parkingList.value = allParkings.filter { parking ->
+                    val dist = FloatArray(1)
+                    Location.distanceBetween(userLat, userLng, parking.location.latitude, parking.location.longitude, dist)
+                    dist[0] / 1000 <= maxDistance
+                }
             }
-            _orderedParkings.value = _filteredParkings.value
         }
     }
-}
+
 }

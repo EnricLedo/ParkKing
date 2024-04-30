@@ -107,7 +107,7 @@ fun ParkingListScreen(
     var maxDistance by remember { mutableStateOf(5f) } // Kilómetros
     var showSliderDialog by remember { mutableStateOf(false) }
     val selectedDistance by parkingViewModel.selectedDistance.collectAsState()
-    val parkingListState = parkingViewModel.parkingList.collectAsState()
+    val parkingListState = parkingViewModel.filteredParkings.collectAsState()
 
     LaunchedEffect(key1 = Unit) {
         parkingViewModel.getParkingList()
@@ -212,10 +212,10 @@ fun ParkingListScreen(
                         )
                     }
                 }
-                }
             }
         }
     }
+}
 
 @Composable
 fun YourComposableFunction(parkingViewModel: ParkingViewModel = viewModel()) {
@@ -326,21 +326,21 @@ fun ParkingSearchBar(onQueryChanged: (String) -> Unit) {
     var text by remember { mutableStateOf("") }
 
     OutlinedTextField(
-    value = text,
-    onValueChange = {
-        text = it
-        onQueryChanged(it)
-    },
-    label = { Text(stringResource(id = R.string.search_parkings)) },
-    modifier = Modifier
-        .fillMaxWidth()
-        .padding(16.dp),
-    colors = TextFieldDefaults.outlinedTextFieldColors(
-        focusedBorderColor = MaterialTheme.colorScheme.primary,
-        unfocusedBorderColor = MaterialTheme.colorScheme.primary,
-        cursorColor = MaterialTheme.colorScheme.primary
+        value = text,
+        onValueChange = {
+            text = it
+            onQueryChanged(it)
+        },
+        label = { Text(stringResource(id = R.string.search_parkings)) },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = MaterialTheme.colorScheme.primary,
+            cursorColor = MaterialTheme.colorScheme.primary
+        )
     )
-)
 }
 @Composable
 fun ParkingItem(
@@ -678,3 +678,4 @@ fun TagFilterButton(parkingViewModel: ParkingViewModel, tagViewModel: TagViewMod
         }
     }
 }
+
