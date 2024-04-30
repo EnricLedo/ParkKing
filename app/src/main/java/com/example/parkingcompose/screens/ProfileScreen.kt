@@ -43,16 +43,9 @@ fun ProfileScreen(
     userData: UserData?,
     onSignOut: () -> Unit,
     navController: NavHostController,
-    userDao: UserDao,
-    languageViewModel: LanguageViewModel,
+    username: String,
+    userIsAdmin: Boolean
 ) {
-    val username = remember { mutableStateOf("") }
-
-    LaunchedEffect(key1 = true) {
-        userDao.getCurrentUsername { usernameFromDb ->
-            username.value = usernameFromDb
-        }
-    }
     DaleComposeTheme {
         Scaffold(
             bottomBar = { BottomNavigationBar(navController) }
@@ -98,27 +91,30 @@ fun ProfileScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = username.value,
+                    text = username,
                     textAlign = TextAlign.Center,
                     fontSize = 36.sp,
                     fontWeight = FontWeight.SemiBold
                 )
                 Spacer(modifier = Modifier.height(26.dp))
-                Button(
-                    onClick = { navController.navigate("tagsscreen") },
-                    modifier = Modifier
-                        .padding(8.dp)
-                ) {
-                    Text(stringResource(id = R.string.manage_tags), style = ButtonTextStyle)
+                if(userIsAdmin) {
+                    Button(
+                        onClick = { navController.navigate("tagsscreen") },
+                        modifier = Modifier
+                            .padding(8.dp)
+                    ) {
+                        Text(stringResource(id = R.string.manage_tags), style = ButtonTextStyle)
+                    }
+                    Spacer(modifier = Modifier.height(36.dp))
+
+                    Button(onClick = { navController.navigate("moderate") }) {
+                        Text(
+                            text = stringResource(id = R.string.moderate_parkings),
+                            style = ButtonTextStyle
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(36.dp))
                 }
-                Spacer(modifier = Modifier.height(36.dp))
-
-                Button(onClick = { navController.navigate("moderate") }){
-                    Text(text = stringResource(id = R.string.moderate_parkings), style = ButtonTextStyle)
-                }
-
-                Spacer(modifier = Modifier.height(36.dp))
-
                 Button(onClick = { navController.navigate("updateusername") }){
                     Text(text = stringResource(id = R.string.change_username), style = ButtonTextStyle)
                 }

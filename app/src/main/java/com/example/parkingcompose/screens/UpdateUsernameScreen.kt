@@ -10,11 +10,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
+import com.example.parkingcompose.R
 import com.example.parkingcompose.dao.ParkingDAO
 import com.example.parkingcompose.ui.theme.ButtonTextStyle
 import com.example.parkingcompose.ui.theme.Orange
@@ -34,7 +36,7 @@ fun UpdateUsernameScreen(viewModel: UpdateUsernameViewModel, parkingDAO: Parking
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Your current username is",
+            text = stringResource(R.string.your_current_username_is),
             fontSize = 28.sp,
             color = Color.White,
             textAlign = TextAlign.Center,
@@ -45,11 +47,13 @@ fun UpdateUsernameScreen(viewModel: UpdateUsernameViewModel, parkingDAO: Parking
             fontSize = 28.sp,
             color = Orange,
             textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth().padding(0.dp, 0.dp, 0.dp, 16.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(0.dp, 0.dp, 0.dp, 16.dp)
         )
         Text(
 
-            text = "Enter your new username: ",
+            text = stringResource(R.string.enter_your_new_username),
             fontSize = 28.sp,
             color = Color.White,
             textAlign = TextAlign.Center,
@@ -61,29 +65,33 @@ fun UpdateUsernameScreen(viewModel: UpdateUsernameViewModel, parkingDAO: Parking
         OutlinedTextField(
             value = viewModel.username.value,
             onValueChange = { viewModel.username.value = it },
-            label = { Text("Username", color = OrangeDark) }, // Cambia la etiqueta a "Nombre de usuario"
-            modifier = Modifier.fillMaxWidth().padding(0.dp, 6.dp, 0.dp, 36.dp)
+            label = { Text(R.string.username.toString(), color = OrangeDark) }, // Cambia la etiqueta a "Nombre de usuario"
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(0.dp, 6.dp, 0.dp, 36.dp)
 
         )
 
         Button(
-    onClick = {
-        viewModel.viewModelScope.launch {
+            onClick = {
+            viewModel.viewModelScope.launch {
             val oldUsername = viewModel.currentUsername.value
             val newUsername = viewModel.username.value.text // Obtén el nuevo nombre de usuario antes de llamar a updateUsername()
             val isUpdated = viewModel.updateUsername()
             if (isUpdated) {
                 parkingDAO.updateCreatedBy(oldUsername, newUsername)
-                Toast.makeText(context, "Nombre de usuario cambiado", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context,
+                    context.getString(R.string.nombre_de_usuario_cambiado), Toast.LENGTH_SHORT).show()
                 navController.navigate("profile")
             } else {
-                Toast.makeText(context, "El nombre de usuario ya está en uso", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context,
+                    context.getString(R.string.el_nombre_de_usuario_ya_est_en_uso), Toast.LENGTH_SHORT).show()
             }
         }
     },
     modifier = Modifier.fillMaxWidth()
 ) {
-    Text("SAVE", style = ButtonTextStyle)
+    Text(R.string.save.toString(), style = ButtonTextStyle)
 }
     }
 }

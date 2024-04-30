@@ -213,24 +213,6 @@ fun ParkingModerateItem(
     }
 }
 
-@Composable
-fun ParkingModerateInformation(
-    parkingId: String,
-    parkingName: String,
-    modifier: Modifier = Modifier,
-) {
-    Column(modifier = modifier) {
-        Text( text = parkingId)
-        Text(
-            text = parkingName,
-            style = ButtonTextStyle,
-            fontSize = 40.sp,
-            modifier = Modifier
-                .padding(top = 8.dp)
-
-        )
-    }
-}
 
 @Composable
 fun ModerateParkingImage(

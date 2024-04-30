@@ -30,7 +30,7 @@
     <string name="sort_by_distance_descending">Ordena per distància descendent</string>
     <string name="order_by_creation_date">Ordena per data de creació</string>
     <string name="add_new_parking">Afegeix nou aparcament</string>
-    <string name="manage_tags">Gestiona etiquetes</string>
+    <string name="manage_tags">GESTIONA ETIQUETES</string>
     <string name="error">Error:</string>
     <string name="description">Descripció</string>
     <string name="logout">TANCA SESSIÓ</string>
@@ -71,9 +71,16 @@
     <string name="Contenido_de_Tag">Contingut de Tag</string>
     <string name="edit_con">Edita Icon</string>
     <string name="delet_con">Esborrar Icon</string>
-    <string name="current_username">El teu nom d\'usuari actual és</string>
     <string name="enter_new_username">Introdueix el teu nou nom d\'usuari:</string>
     <string name="username">Nom d\'usuari</string>
     <string name="save">DESA</string>
     <string name="edit_parking">Editar aparcament</string>
+    <string name="edit_parking_capital_letters">EDITAR APARCAMENT</string>
+    <string name="new_review_capital_letters">NOVA RESSENYA</string>
+    <string name="reviews_capital_letters">RESSENYES</string>
+    <string name="your_current_username_is">El teu nom d\'usuari és: </string>
+    <string name="enter_your_new_username">"Introdueix el teu nou usuari: "</string>
+    <string name="nombre_de_usuario_cambiado">Nom d\'usuari canviat</string>
+    <string name="el_nombre_de_usuario_ya_est_en_uso">El nom d\'usuari ja està en ús</string>
+    <string name="delete_parking">ELIMINAR APARCAMENT</string>
 </resources>
