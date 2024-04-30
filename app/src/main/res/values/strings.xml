@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ParkingCompose</string>
+    <string name="app_name">ParkKing</string>
     <string name="default_web_client_id">1:84528945230:android:c7feae14d71ddea6da8b1f</string>
     <string name="web_client_id">84528945230-qvi9srll4ispag2f1dck5otn0t32865h.apps.googleusercontent.com</string>
     <string name="create_parking">Crear Parking</string>
@@ -70,9 +70,16 @@
     <string name="Contenido_de_Tag">Contenido de Tag</string>
     <string name="edit_con">Editar Icon</string>
     <string name="delet_con">Borrar Icon</string>
-    <string name="current_username">Tu nombre de usuario actual es</string>
     <string name="enter_new_username">Ingresa tu nuevo nombre de usuario:</string>
     <string name="username">Nombre de usuario</string>
     <string name="save">GUARDAR</string>
     <string name="edit_parking">Editar parking</string>
+    <string name="edit_parking_capital_letters">EDITAR PARKING</string>
+    <string name="new_review_capital_letters">NUEVA RESEÑA</string>
+    <string name="reviews_capital_letters">RESEÑAS</string>
+    <string name="your_current_username_is">Tu nombre de usuario es: </string>
+    <string name="enter_your_new_username">"Introduce tu nuevo usuario: "</string>
+    <string name="nombre_de_usuario_cambiado">Nombre de usuario cambiado</string>
+    <string name="el_nombre_de_usuario_ya_est_en_uso">El nombre de usuario ya está en uso</string>
+    <string name="delete_parking">ELIMINAR PARKING</string>
 </resources>

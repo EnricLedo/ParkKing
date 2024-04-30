@@ -143,7 +143,7 @@ fun ParkingListScreen(
                     .border(2.dp, Color.Black, CircleShape)
                     .clip(CircleShape)  // Añade esta línea
             ) {
-                Icon(Icons.Filled.Add, contentDescription = "Add")
+                Icon(Icons.Filled.Add, contentDescription = R.string.add.toString())
             }
         },
         floatingActionButtonPosition = FabPosition.Center

@@ -1,6 +1,7 @@
 package com.example.parkingcompose.dao
 
 import android.util.Log
+import androidx.compose.runtime.Composable
 import com.example.parkingcompose.model.Rol
 import com.example.parkingcompose.model.User
 import com.example.parkingcompose.util.GoogleAuthUiClient
@@ -111,6 +112,22 @@ class UserDao() {
             }
     }
 
+    fun userIsAdmin(onSuccess: (Boolean) -> Unit) {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        db.collection("users")
+            .whereEqualTo("user_id", userId)
+            .get()
+            .addOnSuccessListener { documents ->
+                for (document in documents) {
+                    val rol = document.getString("rol")
+                    if (rol == "Admin") {
+                        onSuccess(true)
+                    } else {
+                        onSuccess(false)
+                    }
+                }
+            }
+    }
 
 
     suspend fun checkUsernameAvailable(username: String): Boolean {

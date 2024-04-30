@@ -15,6 +15,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -103,11 +106,21 @@ class MainActivity : ComponentActivity() {
         val viewModel = ViewModelProvider(this, factory).get(CreateParkingViewModel::class.java)
         val languageViewModel : LanguageViewModel by viewModels()
 
+
         setContent {
             DaleComposeTheme{
                 Surface(
                     modifier = Modifier.fillMaxSize()
                 ) {
+                    var userIsAdmin by remember { mutableStateOf(false) }
+                    userDao.userIsAdmin {
+                        userIsAdmin = it
+                    }
+                    var username by remember { mutableStateOf("") }
+
+                    userDao.getCurrentUsername { receivedUsername ->
+                        username = receivedUsername
+                    }
                     val navController = rememberNavController()
                     NavHost(navController = navController, startDestination = "sign_in") {
                         composable("sign_in") {
@@ -194,8 +207,8 @@ class MainActivity : ComponentActivity() {
                                     }
                                 },
                                 navController = navController,
-                                userDao = userDao,
-                                languageViewModel
+                                username = username,
+                                userIsAdmin = userIsAdmin,
                             )
                         }
 
@@ -230,8 +243,6 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("editparking/{parkingId}") { backStackEntry ->
                             val parkingId = backStackEntry.arguments?.getString("parkingId") ?: ""
-                            val editParkingViewModelFactory = EditParkingViewModelFactory(parkingDAO, parkingId, tagViewModel)
-                            val editParkingViewModel: EditParkingViewModel = viewModel(factory = editParkingViewModelFactory)
                             LaunchedEffect(parkingId) {
                                 parkingDAO.getParkingById(parkingId)
                             }
@@ -253,12 +264,16 @@ class MainActivity : ComponentActivity() {
                         composable("parkingDetailsScreen/{parkingId}") { backStackEntry ->
                             val parkingId = backStackEntry.arguments?.getString("parkingId") ?: ""
                             val parkingDetailsViewModel = viewModel<ParkingDetailsViewModel>(factory = parkingDetailsViewModelFactory)
+
                             ParkingDetailsScreen(
                                 parkingId = parkingId,
                                 navController = navController,
-                                parkingDetailsViewModel = parkingDetailsViewModel
+                                parkingDetailsViewModel = parkingDetailsViewModel,
+                                username = username,
+                                userIsAdmin = userIsAdmin
                             )
                         }
+
                         composable("selectLocation") { backStackEntry ->
                             SelectLocationScreen(selectLocationScreen, navController)
                         }
@@ -278,7 +293,7 @@ class MainActivity : ComponentActivity() {
                             ListReviewScreen(parkingId = parkingId, viewModel = reviewViewModel, navController = navController)
                         }
                         composable("tagsscreen"){
-                            TagsScreen(tagViewModel,navController)
+                            TagsScreen(tagViewModel)
                         }
 
                     }

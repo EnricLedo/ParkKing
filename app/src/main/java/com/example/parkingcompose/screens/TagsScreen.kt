@@ -80,7 +80,7 @@ class MyApplication : Application() {
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun TagsScreen(tagViewModel: TagViewModel, navController: NavController) {
+fun TagsScreen(tagViewModel: TagViewModel) {
     var showAddTagDialog by remember { mutableStateOf(false) }
     val tags by tagViewModel.getTagsFlow().collectAsState(initial = emptyList())
     val scope = rememberCoroutineScope()

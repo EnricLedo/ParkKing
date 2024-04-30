@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -40,6 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -50,6 +52,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import com.example.parkingcompose.R
 import com.example.parkingcompose.dao.TagDAO
+import com.example.parkingcompose.dao.UserDao
 import com.example.parkingcompose.model.Tag
 import com.example.parkingcompose.ui.theme.ButtonTextStyle
 import com.example.parkingcompose.ui.theme.OrangeDark
@@ -62,8 +65,11 @@ import okhttp3.internal.userAgent
 fun ParkingDetailsScreen(
     parkingId: String,
     navController: NavHostController,
-    parkingDetailsViewModel: ParkingDetailsViewModel = viewModel()
+    parkingDetailsViewModel: ParkingDetailsViewModel = viewModel(),
+    username: String,
+    userIsAdmin: Boolean
 ) {
+
     Modifier.background(OrangeLight)
     val parking by parkingDetailsViewModel.parking.collectAsState(null)
     val tagDAO = TagDAO()
@@ -132,7 +138,7 @@ fun ParkingDetailsScreen(
                 }
                 Image(
                     painter = rememberAsyncImagePainter(parking!!.image),
-                    contentDescription = "Parking Image",
+                    contentDescription = R.string.parking_image.toString(),
                     modifier = Modifier
                         .height(200.dp)
                         .clip(RoundedCornerShape(8.dp))
@@ -208,7 +214,7 @@ fun ParkingDetailsScreen(
                         )
                     ) {
                         Text(
-                            "REVIEWS",
+                            stringResource(R.string.reviews_capital_letters),
                             color = Color.White,
                             style = ButtonTextStyle
                         )
@@ -227,32 +233,51 @@ fun ParkingDetailsScreen(
                         )
                     ) {
                         Text(
-                            "NEW REVIEW",
+                            stringResource(R.string.new_review_capital_letters),
                             color = Color.White,
                             style = ButtonTextStyle
                         )
                     }
                 }
-                Button(
-                    onClick = { navController.navigate(
-                        "editparking/${parking!!.id}"
-                    ) },
-                    modifier = Modifier
-                        .fillMaxWidth(0.7F)
-                        .align(Alignment.CenterHorizontally)
-                        .padding(4.dp),
-                    colors = ButtonColors(
-                        containerColor = OrangeDark,
-                        contentColor = Color.Unspecified,
-                        disabledContainerColor = Color.Unspecified,
-                        disabledContentColor = Color.Unspecified
-                    )
-                ) {
-                    Text(
-                        "EDIT PARKING",
-                        color = Color.White,
-                        style = ButtonTextStyle
-                    )
+                if(username == parking!!.createdBy || userIsAdmin) {
+                    Button(
+                        onClick = { navController.navigate("updateParking/${parking!!.id}") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(4.dp),
+                        colors = ButtonColors(
+                            containerColor = OrangeDark,
+                            contentColor = Color.Unspecified,
+                            disabledContainerColor = Color.Unspecified,
+                            disabledContentColor = Color.Unspecified
+                        )
+                    ) {
+                        Text(
+                            stringResource(R.string.edit_parking_capital_letters),
+                            color = Color.White,
+                            style = ButtonTextStyle
+                        )
+                    }
+                    Button(
+                        onClick = {  },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(4.dp),
+                        /*horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically,*/
+                        colors = ButtonColors(
+                            containerColor = OrangeDark,
+                            contentColor = Color.Unspecified,
+                            disabledContainerColor = Color.Unspecified,
+                            disabledContentColor = Color.Unspecified
+                        )
+                    ) {
+                        Text(
+                            stringResource(R.string.delete_parking),
+                            color = Color.White,
+                            style = ButtonTextStyle
+                        )
+                    }
                 }
             }
         }
