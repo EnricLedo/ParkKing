@@ -227,7 +227,8 @@ class MainActivity : ComponentActivity() {
                                 createParkingViewModel,
                                 moderateViewModel,
                                 tagViewModel,
-                                navController
+                                navController,
+                                locationRepository
                             )
                         }
                         composable("register") {

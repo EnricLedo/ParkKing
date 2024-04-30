@@ -78,6 +78,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.window.Dialog
 import coil.compose.rememberImagePainter
 import com.example.parkingcompose.dao.TagDAO
+import com.example.parkingcompose.model.LocationRepository
 import com.example.parkingcompose.model.Tag
 import com.example.parkingcompose.ui.theme.Blue600
 import com.example.parkingcompose.ui.theme.BlueGreyLight
@@ -90,8 +91,16 @@ fun ParkingListScreen(
     createParkingViewModel: CreateParkingViewModel = viewModel(),
     moderateViewModel: ModerateViewModel = viewModel(),
     tagViewModel: TagViewModel = viewModel(),
-    navController: NavHostController, userLocation: LatLng = LatLng(0.0, 0.0) // Este valor debería ser obtenido dinámicamente
+    navController: NavHostController,
+    locationRepository: LocationRepository // Este valor debería ser obtenido dinámicamente
 ){
+
+    LaunchedEffect(Unit) {
+        val userLocation = locationRepository.getCurrentLocation()
+        userLocation?.let {
+            parkingViewModel.setUserLocation(it.latitude, it.longitude)
+        }
+    }
     val parkingListState = parkingViewModel.filteredParkings.collectAsState()
     val errorState = parkingViewModel.error.collectAsState()
     var showFilteredParkings by remember { mutableStateOf(false) }
@@ -99,15 +108,7 @@ fun ParkingListScreen(
     var minDistance by remember { mutableStateOf(1f) } // Kilómetros
     var maxDistance by remember { mutableStateOf(5f) } // Kilómetros
 
-    LaunchedEffect(minDistance, maxDistance) {
-        parkingViewModel.filterParkings(
-            userLat = userLocation.latitude,
-            userLng = userLocation.longitude,
-            minDist = minDistance * 1000,  // Convertir km a metros
-            maxDist = maxDistance * 1000   // Convertir km a metros
-        )
-        showFilteredParkings = true
-    }
+
     LaunchedEffect(key1 = Unit) {
         parkingViewModel.getParkingList()
     }

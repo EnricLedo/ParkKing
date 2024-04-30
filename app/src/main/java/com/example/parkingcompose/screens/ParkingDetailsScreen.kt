@@ -241,7 +241,7 @@ fun ParkingDetailsScreen(
                 }
                 if(username == parking!!.createdBy || userIsAdmin) {
                     Button(
-                        onClick = { navController.navigate("updateParking/${parking!!.id}") },
+                        onClick = { navController.navigate("editparking/${parking!!.id}") },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(4.dp),

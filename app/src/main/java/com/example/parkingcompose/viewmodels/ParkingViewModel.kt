@@ -131,17 +131,20 @@ class ParkingViewModel : ViewModel() {
     }
 
     fun orderParkingsByDistance(ascending: Boolean = true) {
-        viewModelScope.launch {
-            val allParkings = db.collection("parkings").get().await().toObjects(Parking::class.java)
-            _parkingList.value = allParkings.sortedBy { parking ->
-                val dist = FloatArray(1)
-                android.location.Location.distanceBetween(userLocation.value.latitude, userLocation.value.longitude, parking.location.latitude, parking.location.longitude, dist)
-                dist[0]
-            }
-            if (!ascending) {
-                _parkingList.value = _parkingList.value.reversed()
-            }
+    viewModelScope.launch {
+        val allParkings = db.collection("parkings").get().await().toObjects(Parking::class.java)
+        _parkingList.value = allParkings.sortedBy { parking ->
+            val dist = FloatArray(1)
+            Location.distanceBetween(userLocation.value.latitude, userLocation.value.longitude, parking.location.latitude, parking.location.longitude, dist)
+            dist[0]
         }
+        if (!ascending) {
+            _parkingList.value = _parkingList.value.reversed()
+        }
+
+        // Log current user location
+        Log.d(TAG, "Current user location: Latitude = ${userLocation.value.latitude}, Longitude = ${userLocation.value.longitude}")
     }
+}
 
 }
