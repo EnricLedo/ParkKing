@@ -101,10 +101,7 @@ fun ParkingListScreen(
         }
     }
     val errorState = parkingViewModel.error.collectAsState()
-    var showFilteredParkings by remember { mutableStateOf(false) }
     var selectedTags by remember { mutableStateOf(setOf<String>()) }
-    var minDistance by remember { mutableStateOf(1f) } // Kilómetros
-    var maxDistance by remember { mutableStateOf(5f) } // Kilómetros
     var showSliderDialog by remember { mutableStateOf(false) }
     val selectedDistance by parkingViewModel.selectedDistance.collectAsState()
     val parkingListState = parkingViewModel.filteredParkings.collectAsState()
@@ -131,7 +128,7 @@ fun ParkingListScreen(
         Log.d(ContentValues.TAG, "Selected tags changed: $selectedTags")
     }
 
-    val parkingList = parkingListState.value
+
 
     Scaffold(
         bottomBar = { BottomNavigationBar(navController) },
@@ -177,7 +174,7 @@ fun ParkingListScreen(
                 var sliderValue by remember { mutableStateOf(selectedDistance ?: 0f) }
                 AlertDialog(
                     onDismissRequest = { showSliderDialog = false },
-                    title = { Text("Seleccione la distancia máxima") },
+                    title = { Text("Seleccione la distancia máxima", color = Color.White)},
                     text = {
                         Column {
                             Text("Distancia: ${"%.3f".format(sliderValue)} km")
@@ -194,8 +191,14 @@ fun ParkingListScreen(
                             parkingViewModel.setSelectedDistance(sliderValue)
                             parkingViewModel.filterParkingsByDistance()
                             showSliderDialog = false
-                        }) {
-                            Text("Aplicar")
+                        },
+                            colors = ButtonColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = Color.Unspecified,
+                                disabledContainerColor = Color.Unspecified,
+                                disabledContentColor = Color.Unspecified
+                            )) {
+                            Text("Aplicar", color = Color.White)
                         }
                     }
                 )
@@ -351,8 +354,7 @@ fun ParkingSearchBar(onQueryChanged: (String) -> Unit) {
 fun ParkingItem(
     parking: Parking,
     modifier: Modifier = Modifier,
-    navController: NavHostController,
-    tagViewModel: TagViewModel = viewModel()
+    navController: NavHostController
 ) {
     var expanded by remember { mutableStateOf(false) }
     val tagDAO = TagDAO()
@@ -382,7 +384,7 @@ fun ParkingItem(
             ) {
                 //Column 1
                 Column(
-                    modifier = Modifier,
+                    modifier = Modifier.padding(top = 4.dp, start = 4.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     ParkingImage(parking.image)
@@ -512,7 +514,7 @@ fun ParkingRating(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = parkingRating.toString(),
+            text = String.format("%.2f", parkingRating),
             style = MaterialTheme.typography.bodyLarge
         )
         Icon(
@@ -586,8 +588,9 @@ fun TagItemExpanded(
             onDismissRequest = { showDialog = false },
             text = { Text(text = tag.content) },
             confirmButton = {
-                Button(onClick = { showDialog = false }) {
-                    Text("OK")
+                Button(onClick = { showDialog = false },
+                    colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary)) {
+                    Text("OK", color = Color.White)
                 }
             }
         )
@@ -596,7 +599,12 @@ fun TagItemExpanded(
     Card(
         modifier = Modifier
             .clip(RoundedCornerShape(1000.dp))
-            .clickable { showDialog = true }
+            .clickable { showDialog = true },
+        colors = CardColors(
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = Color.White,
+            disabledContainerColor = Color.Unspecified,
+            disabledContentColor = Color.Unspecified)
 
     ) {
         Row(
@@ -630,57 +638,53 @@ fun TagFilterButton(parkingViewModel: ParkingViewModel, tagViewModel: TagViewMod
     }
 
     if (showDialog) {
-        Dialog(onDismissRequest = { showDialog = false }) {
-            // Agrega un Box alrededor de tu Column y aplica un color de fondo
-            Box(modifier = Modifier.background(OrangeLight).border(2.dp, Color.Black)) {
-                Column {
-                    Text(
-                        "Seleccione los tags",
-                        modifier = Modifier.padding(8.dp),
-                        color = Color.Black, textAlign = TextAlign.Center
-                    )
-                    LazyColumn {
-                        items(tagsState.value.chunked(3)) { rowTags -> // Ajusta el valor en chunked() para cambiar el número de columnas
-                            Row(Modifier.padding(8.dp)) {
-                                rowTags.forEach { tag ->
-                                    Row(
-                                        Modifier
-                                            .clickable {
-                                                val tagId = tag.title!!
-                                                selectedTags =
-                                                    if (selectedTags.contains(tagId)) {
-                                                        selectedTags - tagId
-                                                    } else {
-                                                        selectedTags + tagId
-                                                    }
-                                            }
-                                            .padding(8.dp),
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Checkbox(
-                                            checked = selectedTags.contains(tag.title),
-                                            onCheckedChange = null // Ignoramos este evento ya que manejamos el clic en el Row
-                                        )
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                        Text(tag.title, color = Color.Black)
-                                    }
-
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text("Seleccione los tags", color = Color.White) },
+            text = {
+                LazyColumn {
+                    items(tagsState.value) { tag ->
+                        Row(
+                            Modifier
+                                .clickable {
+                                    val tagId = tag.title!!
+                                    selectedTags =
+                                        if (selectedTags.contains(tagId)) {
+                                            selectedTags - tagId
+                                        } else {
+                                            selectedTags + tagId
+                                        }
                                 }
-                            }
+                                .padding(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Checkbox(
+                                checked = selectedTags.contains(tag.title),
+                                onCheckedChange = null
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(tag.title, color = Color.White)
                         }
                     }
-                    Button(
-                        onClick = {
-                            showDialog = false
-                            parkingViewModel.updateSelectedTags(selectedTags)
-                        },
-                        modifier = Modifier.align(Alignment.End).padding(8.dp)
-                    ) {
-                        Text("Apply")
-                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showDialog = false
+                        parkingViewModel.updateSelectedTags(selectedTags)
+                    },
+                    colors = ButtonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = Color.Unspecified,
+                        disabledContainerColor = Color.Unspecified,
+                        disabledContentColor = Color.Unspecified
+                    )
+                ) {
+                    Text("Apply", color = Color.White)
                 }
             }
-        }
+        )
     }
 }
 

@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -29,6 +30,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -74,7 +76,6 @@ fun ParkingDetailsScreen(
     val parking by parkingDetailsViewModel.parking.collectAsState(null)
     val tagDAO = TagDAO()
     BackHandler {
-        // Minimiza la aplicación
         navController.navigate("parkingList")
     }
 
@@ -87,7 +88,7 @@ fun ParkingDetailsScreen(
             .fillMaxSize()
             .padding(8.dp),
         colors = CardColors(
-            containerColor = OrangeLight,
+            containerColor = MaterialTheme.colorScheme.onSecondary,
             contentColor = Color.White,
             disabledContainerColor = Color.Unspecified,
             disabledContentColor = Color.Unspecified
@@ -95,7 +96,16 @@ fun ParkingDetailsScreen(
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         if (parking != null) {
-            Column(
+            val parkingTags = parking!!.tags
+            var tags by remember { mutableStateOf<List<Tag>>(emptyList()) }
+
+            LaunchedEffect(parkingTags) {
+                tags = parkingTags.map { tagTitle ->
+                    tagDAO.getTagByTitle(tagTitle)!!
+                }
+            }
+
+            LazyColumn(
                 modifier = Modifier
                     .animateContentSize(
                         animationSpec = spring(
@@ -105,176 +115,184 @@ fun ParkingDetailsScreen(
                     )
                     .padding(8.dp)
             ) {
-                Text(
-                    text = parking!!.name,
-                    style = ButtonTextStyle,
-                    fontSize = 40.sp,
-                    color = Color.Black,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp, bottom = 10.dp),
-                    textAlign = TextAlign.Center
-                )
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+                item {
                     Text(
-                        text = "Rating: ${parking!!.parkingRating}",
-                        color = OrangeDark,
+                        text = parking!!.name,
                         style = ButtonTextStyle,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.align(Alignment.CenterVertically)
-                    )
-                    Icon(
-                        imageVector = Icons.Filled.Star,
-                        contentDescription = "Star Icon",
+                        fontSize = 40.sp,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold,
                         modifier = Modifier
-                            .size(12.dp)
-                            .align(Alignment.CenterVertically)
+                            .fillMaxWidth()
+                            .padding(top = 8.dp, bottom = 10.dp),
+                        textAlign = TextAlign.Center
                     )
                 }
-                Image(
-                    painter = rememberAsyncImagePainter(parking!!.image),
-                    contentDescription = R.string.parking_image.toString(),
-                    modifier = Modifier
-                        .height(200.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .clickable {
-                            navController.navigate("mapa/${parking!!.location.latitude}/${parking!!.location.longitude}")
+                item {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Rating: %.2f".format(parking!!.parkingRating),
+                            color = OrangeDark,
+                            style = ButtonTextStyle,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.align(Alignment.CenterVertically). padding(end = 2.dp)
+                        )
+                        Icon(
+                            imageVector = Icons.Filled.Star,
+                            contentDescription = "Star Icon",
+                            modifier = Modifier
+                                .size(12.dp)
+                                .align(Alignment.CenterVertically),
+                            tint = OrangeDark
+                        )
+                    }
+                }
+                item {
+                    Image(
+                        painter = rememberAsyncImagePainter(parking!!.image),
+                        contentDescription = R.string.parking_image.toString(),
+                        modifier = Modifier
+                            .height(200.dp)
+                            .clip(RoundedCornerShape(8.dp)).fillMaxWidth()
+                            .clickable {
+                                navController.navigate("mapa/${parking!!.location.latitude}/${parking!!.location.longitude}")
+                            }
+                            .align(Alignment.CenterHorizontally)
+                    )
+                }
+
+                item {
+                    LazyRow(
+                        Modifier
+                            .padding(2.dp)
+                            .padding(top = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        items(tags) { tag ->
+                            TagItemExpanded(
+                                tag = tag
+                            )
                         }
-                        .align(Alignment.CenterHorizontally)
-                )
-
-                val parkingTags = parking!!.tags
-                var tags by remember { mutableStateOf<List<Tag>>(emptyList()) }
-
-                LaunchedEffect(parkingTags) {
-                    tags = parkingTags.map { tagTitle ->
-                        tagDAO.getTagByTitle(tagTitle)!!
                     }
                 }
 
-                LazyRow(
-                    Modifier
-                        .padding(2.dp)
-                        .padding(top = 8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    items(tags) { tag ->
-                        TagItemExpanded(
-                            tag = tag
+                item {
+                    Card(
+                        colors = CardColors(
+                            containerColor = MaterialTheme.colorScheme.onSecondary,
+                            contentColor = Color.White,
+                            disabledContainerColor = Color.Unspecified,
+                            disabledContentColor = Color.Unspecified
+                        ),
+                        modifier = Modifier.padding(6.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.author) + " " + (parking!!.createdBy),
+                            color = OrangeDark,
+                            style = ButtonTextStyle,
+                            modifier = Modifier.padding(bottom = 6.dp)
+                        )
+                        Text(
+                            text =stringResource(R.string.price_minute) + " %.4f".format(parking!!.priceMinute) + " €",
+                            color = OrangeDark,
+                            style = ButtonTextStyle
                         )
                     }
                 }
 
-                Card(
-                    colors = CardColors(
-                        containerColor = OrangeLight,
-                        contentColor = OrangeDark,
-                        disabledContainerColor = Color.Unspecified,
-                        disabledContentColor = Color.Unspecified
-                    ),
-                    modifier = Modifier.padding(6.dp)
-                ) {
+                item {
                     Text(
-                        text = stringResource(R.string.author) + " " + (parking!!.createdBy),
-                        color = OrangeDark,
+                        text = parking!!.description,
                         style = ButtonTextStyle,
-                        modifier = Modifier.padding(bottom = 6.dp)
-                    )
-                    Text(
-                        text =stringResource(R.string.price_minute) + " %.4f".format(parking!!.priceMinute) + " €",
-                        color = OrangeDark,
-                        style = ButtonTextStyle
+                        modifier = Modifier
+                            .padding(start = 8.dp, end = 8.dp),
+                        color = Color.Black
                     )
                 }
-
-                Text(
-                    text = parking!!.description,
-                    style = ButtonTextStyle,
-                    modifier = Modifier
-                        .padding(start = 8.dp, end = 8.dp),
-                    color = Color.Black
-                )
-                Row {
-                    Button(
-                        onClick = { navController.navigate("listReviews/${parking!!.id}") },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(4.dp)
-                            .weight(0.5f),
-                        colors = ButtonColors(
-                            containerColor = OrangeDark,
-                            contentColor = Color.Unspecified,
-                            disabledContainerColor = Color.Unspecified,
-                            disabledContentColor = Color.Unspecified
-                        )
-                    ) {
-                        Text(
-                            stringResource(R.string.reviews_capital_letters),
-                            color = Color.White,
-                            style = ButtonTextStyle
-                        )
-                    }
-                    Button(
-                        onClick = { navController.navigate("createReview/${parking!!.id}") },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(4.dp)
-                            .weight(0.5f),
-                        colors = ButtonColors(
-                            containerColor = OrangeDark,
-                            contentColor = Color.Unspecified,
-                            disabledContainerColor = Color.Unspecified,
-                            disabledContentColor = Color.Unspecified
-                        )
-                    ) {
-                        Text(
-                            stringResource(R.string.new_review_capital_letters),
-                            color = Color.White,
-                            style = ButtonTextStyle
-                        )
+                item {
+                    Row {
+                        Button(
+                            onClick = { navController.navigate("listReviews/${parking!!.id}") },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(4.dp)
+                                .weight(0.5f),
+                            colors = ButtonColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = Color.Unspecified,
+                                disabledContainerColor = Color.Unspecified,
+                                disabledContentColor = Color.Unspecified
+                            )
+                        ) {
+                            Text(
+                                stringResource(R.string.reviews_capital_letters),
+                                color = Color.White,
+                                style = ButtonTextStyle
+                            )
+                        }
+                        Button(
+                            onClick = { navController.navigate("createReview/${parking!!.id}") },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(4.dp)
+                                .weight(0.5f),
+                            colors = ButtonColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = Color.Unspecified,
+                                disabledContainerColor = Color.Unspecified,
+                                disabledContentColor = Color.Unspecified
+                            )
+                        ) {
+                            Text(
+                                stringResource(R.string.new_review_capital_letters),
+                                color = Color.White,
+                                style = ButtonTextStyle
+                            )
+                        }
                     }
                 }
-                if(username == parking!!.createdBy || userIsAdmin) {
-                    Button(
-                        onClick = { navController.navigate("editparking/${parking!!.id}") },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(4.dp),
-                        colors = ButtonColors(
-                            containerColor = OrangeDark,
-                            contentColor = Color.Unspecified,
-                            disabledContainerColor = Color.Unspecified,
-                            disabledContentColor = Color.Unspecified
-                        )
-                    ) {
-                        Text(
-                            stringResource(R.string.edit_parking_capital_letters),
-                            color = Color.White,
-                            style = ButtonTextStyle
-                        )
-                    }
-                    Button(
-                        onClick = {  },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(4.dp),
-                        colors = ButtonColors(
-                            containerColor = OrangeDark,
-                            contentColor = Color.Unspecified,
-                            disabledContainerColor = Color.Unspecified,
-                            disabledContentColor = Color.Unspecified
-                        )
-                    ) {
-                        Text(
-                            stringResource(R.string.delete_parking),
-                            color = Color.White,
-                            style = ButtonTextStyle
-                        )
+                item {
+                    if(username == parking!!.createdBy || userIsAdmin) {
+                        Button(
+                            onClick = { navController.navigate("editparking/${parking!!.id}") },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(4.dp),
+                            colors = ButtonColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = Color.Unspecified,
+                                disabledContainerColor = Color.Unspecified,
+                                disabledContentColor = Color.Unspecified
+                            )
+                        ) {
+                            Text(
+                                stringResource(R.string.edit_parking_capital_letters),
+                                color = Color.White,
+                                style = ButtonTextStyle
+                            )
+                        }
+                        Button(
+                            onClick = {  },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(4.dp),
+                            colors = ButtonColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = Color.Unspecified,
+                                disabledContainerColor = Color.Unspecified,
+                                disabledContentColor = Color.Unspecified
+                            )
+                        ) {
+                            Text(
+                                stringResource(R.string.delete_parking),
+                                color = Color.White,
+                                style = ButtonTextStyle
+                            )
+                        }
                     }
                 }
             }
