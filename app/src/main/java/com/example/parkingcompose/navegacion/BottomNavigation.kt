@@ -15,9 +15,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.parkingcompose.R
-import com.example.parkingcompose.ui.theme.BlueGreyDark
-import com.example.parkingcompose.ui.theme.Orange
-import com.example.parkingcompose.ui.theme.OrangeDark
+
 
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {

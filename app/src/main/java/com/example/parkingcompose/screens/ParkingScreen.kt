@@ -3,85 +3,86 @@ package com.example.parkingcompose.screens
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.util.Log
-import com.example.parkingcompose.viewmodels.ParkingViewModel
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.example.parkingcompose.R
-import com.example.parkingcompose.model.Parking
-import com.example.parkingcompose.navegacion.BottomNavigationBar
-import com.example.parkingcompose.ui.theme.ButtonTextStyle
-import com.example.parkingcompose.ui.theme.OrangeDark
-import com.example.parkingcompose.ui.theme.OrangeLight
-import com.example.parkingcompose.viewmodels.CreateParkingViewModel
-import com.example.parkingcompose.viewmodels.ModerateViewModel
-import com.example.parkingcompose.viewmodels.TagViewModel
-import com.google.android.gms.maps.model.LatLng
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.ui.unit.DpOffset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Button
-import androidx.compose.material.Icon
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.runtime.*
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.positionInWindow
-import androidx.compose.ui.modifier.modifierLocalConsumer
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.window.Dialog
-import coil.compose.rememberImagePainter
 import com.example.parkingcompose.dao.TagDAO
 import com.example.parkingcompose.model.LocationRepository
+import com.example.parkingcompose.model.Parking
 import com.example.parkingcompose.model.Tag
-import com.example.parkingcompose.ui.theme.Blue600
-import com.example.parkingcompose.ui.theme.BlueGreyLight
+import com.example.parkingcompose.navegacion.BottomNavigationBar
+import com.example.parkingcompose.viewmodels.CreateParkingViewModel
+import com.example.parkingcompose.viewmodels.ModerateViewModel
+import com.example.parkingcompose.viewmodels.ParkingViewModel
+import com.example.parkingcompose.viewmodels.TagViewModel
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -252,7 +253,7 @@ fun YourComposableFunction(parkingViewModel: ParkingViewModel = viewModel()) {
                     parkingViewModel.orderParkingsByDistance(true)  // Ascending order
                 }
             ) {
-                Text(stringResource(id = R.string.sort_by_distance_ascending))
+                Text(stringResource(id = R.string.sort_by_distance_ascending), color = MaterialTheme.colorScheme.primary)
             }
             DropdownMenuItem(
                 onClick = {
@@ -260,7 +261,7 @@ fun YourComposableFunction(parkingViewModel: ParkingViewModel = viewModel()) {
                     parkingViewModel.orderParkingsByDistance(false) // Descending order
                 }
             ) {
-                Text(stringResource(id = R.string.sort_by_distance_descending))
+                Text(stringResource(id = R.string.sort_by_distance_descending), color = MaterialTheme.colorScheme.primary)
             }
             DropdownMenuItem(
                 onClick = {
@@ -268,7 +269,7 @@ fun YourComposableFunction(parkingViewModel: ParkingViewModel = viewModel()) {
                     parkingViewModel.orderParkingsByBestRating()  // Best rating
                 }
             ) {
-                Text("Ordenar por mejor calificación")
+                Text("Ordenar por mejor calificación", color = MaterialTheme.colorScheme.primary)
             }
             DropdownMenuItem(
                 onClick = {
@@ -276,7 +277,7 @@ fun YourComposableFunction(parkingViewModel: ParkingViewModel = viewModel()) {
                     parkingViewModel.orderParkingsByWorstRating() // Worst rating
                 }
             ) {
-                Text("Ordenar por peor calificación")
+                Text("Ordenar por peor calificación", color = MaterialTheme.colorScheme.primary)
             }
             DropdownMenuItem(
                 onClick = {
@@ -284,7 +285,7 @@ fun YourComposableFunction(parkingViewModel: ParkingViewModel = viewModel()) {
                     parkingViewModel.orderByCreationDate()
                 }
             ) {
-                Text("Ordenar por fecha de creacion")
+                Text("Ordenar por fecha de creacion", color = MaterialTheme.colorScheme.primary)
             }
         }
     }
@@ -319,9 +320,8 @@ fun RatingFilter(parkingViewModel: ParkingViewModel) {
                     Icon(
                         imageVector = Icons.Filled.Star,
                         contentDescription = "$rating stars",
-                        tint = if (rating <= (selectedRating ?: 0)) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
-                    )
-                    Text(" $rating")
+                        tint = if (rating <= (selectedRating ?: 0)) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSecondary                    )
+                    Text(" $rating", color = if (rating <= (selectedRating ?: 0)) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSecondary)
                 }
             }
         }
@@ -586,7 +586,7 @@ fun TagItemExpanded(
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            text = { Text(text = tag.content) },
+            text = { Text(text = tag.content, color = Color.White) },
             confirmButton = {
                 Button(onClick = { showDialog = false },
                     colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary)) {

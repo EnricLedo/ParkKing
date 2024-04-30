@@ -42,6 +42,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -50,6 +51,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -90,8 +92,11 @@ fun TagsScreen(tagViewModel: TagViewModel) {
             FloatingActionButton(
                 onClick = { showAddTagDialog = true },
                 content = {
-                    Icon(imageVector = Icons.Default.Add, contentDescription = stringResource(id = R.string.add_tag))
-                }
+                    Icon(imageVector = Icons.Default.Add, contentDescription = stringResource(id = R.string.add_tag,),
+                        tint = Color.White)
+
+                },
+                containerColor = MaterialTheme.colorScheme.primary
             )
         }
     ) {
@@ -209,7 +214,12 @@ fun TagItem(tag: Tag, tagViewModel: TagViewModel, onEdit: (Tag) -> Unit) {
     }
 
     Card(
-        modifier = Modifier.padding(6.dp).clickable(onClick = { handleDoubleClick() })
+        modifier = Modifier.padding(6.dp).clickable(onClick = { handleDoubleClick() }),
+        colors = CardColors(
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = Color.White,
+            disabledContainerColor = Color.Unspecified,
+            disabledContentColor = Color.Unspecified)
     ) {
         Column(
             modifier = Modifier.padding(12.dp).fillMaxWidth()

@@ -15,9 +15,11 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -27,9 +29,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -43,6 +47,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateParkingScreen(
     createParkingViewModel: CreateParkingViewModel,
@@ -92,7 +97,11 @@ fun CreateParkingScreen(
             Text(
                 text = strCreateParking,
                 fontSize = 28.sp,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center,
+                color = Color.White
+
+
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -101,7 +110,16 @@ fun CreateParkingScreen(
                 value = createParkingViewModel.name.value,
                 onValueChange = { createParkingViewModel.onNameChange(it) },
                 label = { Text(strParkingName) },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    focusedBorderColor = Color.White,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.primary,
+                    cursorColor = Color.White,
+                    focusedLabelColor = Color.White,
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White,
+                    unfocusedLabelColor = Color.White
+                )
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -110,7 +128,16 @@ fun CreateParkingScreen(
                 value = createParkingViewModel.description.value,
                 onValueChange = { createParkingViewModel.onDescriptionChange(it) },
                 label = { Text(strParkingDescription) },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    focusedBorderColor = Color.White,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.primary,
+                    cursorColor = Color.White,
+                    focusedLabelColor = Color.White,
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White,
+                    unfocusedLabelColor = Color.White
+                )
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -120,7 +147,16 @@ fun CreateParkingScreen(
                 onValueChange = { createParkingViewModel.onPriceMinuteChange(it) },
                 label = { Text(strPriceMinute) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    focusedBorderColor = Color.White,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.primary,
+                    cursorColor = Color.White,
+                    focusedLabelColor = Color.White,
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White,
+                    unfocusedLabelColor = Color.White
+                )
             )
 
             Spacer(modifier = Modifier.height(16.dp))

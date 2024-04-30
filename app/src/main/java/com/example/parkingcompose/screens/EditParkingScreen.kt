@@ -14,9 +14,11 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -27,9 +29,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
@@ -50,6 +54,7 @@ import com.example.parkingcompose.util.StorageUtil
 import com.example.parkingcompose.viewmodels.CreateParkingViewModel
 import com.example.parkingcompose.viewmodels.TagViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditParkingScreen(
     navController: NavHostController,
@@ -106,7 +111,8 @@ fun EditParkingScreen(
                 Text(
                     text = strEditParking,
                     fontSize = 28.sp,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -115,7 +121,16 @@ fun EditParkingScreen(
                     value = name,
                     onValueChange = { name = it },
                     label = { Text(strParkingName) },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = Color.White,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.primary,
+                        cursorColor = Color.White,
+                        focusedLabelColor = Color.White,
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White,
+                        unfocusedLabelColor = Color.White
+                    )
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -124,7 +139,16 @@ fun EditParkingScreen(
                     value = description,
                     onValueChange = { description = it },
                     label = { Text(strParkingDescription) },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = Color.White,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.primary,
+                        cursorColor = Color.White,
+                        focusedLabelColor = Color.White,
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White,
+                        unfocusedLabelColor = Color.White
+                    )
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -139,7 +163,16 @@ fun EditParkingScreen(
                     },
                     label = { Text(strPriceMinute) },
                     modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = Color.White,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.primary,
+                        cursorColor = Color.White,
+                        focusedLabelColor = Color.White,
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White,
+                        unfocusedLabelColor = Color.White
+                    )
                 )
 
                 AsyncImage(

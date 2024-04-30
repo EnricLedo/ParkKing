@@ -3,8 +3,11 @@ package com.example.parkingcompose.screens
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,6 +28,7 @@ import com.example.parkingcompose.viewmodels.UpdateUsernameViewModel
 import kotlinx.coroutines.launch
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UpdateUsernameScreen(viewModel: UpdateUsernameViewModel, parkingDAO: ParkingDAO, navController: NavHostController) {
     val context = LocalContext.current
@@ -65,10 +69,19 @@ fun UpdateUsernameScreen(viewModel: UpdateUsernameViewModel, parkingDAO: Parking
         OutlinedTextField(
             value = viewModel.username.value,
             onValueChange = { viewModel.username.value = it },
-            label = { Text(R.string.username.toString(), color = OrangeDark) }, // Cambia la etiqueta a "Nombre de usuario"
+            label = { Text(stringResource(id = (R.string.usernames))) }, // Cambia la etiqueta a "Nombre de usuario"
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(0.dp, 6.dp, 0.dp, 36.dp)
+                .padding(0.dp, 6.dp, 0.dp, 36.dp),
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                focusedBorderColor = Color.White,
+                unfocusedBorderColor = MaterialTheme.colorScheme.primary,
+                cursorColor = Color.White,
+                focusedLabelColor = Color.White,
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White,
+                unfocusedLabelColor = Color.White
+            )
 
         )
 
@@ -91,7 +104,7 @@ fun UpdateUsernameScreen(viewModel: UpdateUsernameViewModel, parkingDAO: Parking
     },
     modifier = Modifier.fillMaxWidth()
 ) {
-    Text(R.string.save.toString(), style = ButtonTextStyle)
+    Text(stringResource(R.string.save), style = ButtonTextStyle)
 }
     }
 }

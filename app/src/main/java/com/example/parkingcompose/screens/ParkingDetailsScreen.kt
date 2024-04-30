@@ -53,6 +53,7 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import com.example.parkingcompose.R
+import com.example.parkingcompose.dao.ParkingDAO
 import com.example.parkingcompose.dao.TagDAO
 import com.example.parkingcompose.dao.UserDao
 import com.example.parkingcompose.model.Tag
@@ -71,10 +72,9 @@ fun ParkingDetailsScreen(
     username: String,
     userIsAdmin: Boolean
 ) {
-
-    Modifier.background(OrangeLight)
     val parking by parkingDetailsViewModel.parking.collectAsState(null)
     val tagDAO = TagDAO()
+    val parkingDao = ParkingDAO()
     BackHandler {
         navController.navigate("parkingList")
     }
@@ -276,7 +276,10 @@ fun ParkingDetailsScreen(
                             )
                         }
                         Button(
-                            onClick = {  },
+                            onClick = {
+                                parkingDao.denyParking(parking!!.id)
+                                navController.navigate("parkingList")
+                            },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(4.dp),

@@ -72,7 +72,7 @@
     <string name="edit_con">Edita Icon</string>
     <string name="delet_con">Esborrar Icon</string>
     <string name="enter_new_username">Introdueix el teu nou nom d\'usuari:</string>
-    <string name="username">Nom d\'usuari</string>
+    <string name="usernames">Nom d\'usuari</string>
     <string name="save">DESA</string>
     <string name="edit_parking">Editar aparcament</string>
     <string name="edit_parking_capital_letters">EDITAR APARCAMENT</string>

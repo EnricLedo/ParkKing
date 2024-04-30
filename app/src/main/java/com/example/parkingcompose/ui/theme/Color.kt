@@ -13,25 +13,19 @@ val Blue200 = Color(0xFF90CAF9)
 val Blue100 = Color(0xFFBBDEFB)
 val Blue50 = Color(0xFFE3F2FD)
 
-val Orange900 = Color(0xFFE65100)
-val Orange800 = Color(0xFFEF6C00)
-val Orange700 = Color(0xFFF57C00)
-val Orange600 = Color(0xFFFB8C00)
-val Orange500 = Color(0xFFFF9800)
-val Orange400 = Color(0xFFFFA726)
-val Orange300 = Color(0xFFFFB74D)
-val Orange200 = Color(0xFFFFCC80)
-val Orange100 = Color(0xFFFFE0B2)
-val Orange50 = Color(0xFFFFF3E0)
+val DarkPrimary = Color(0xFF212121)
+val DarkSecondary = Color(0xFF424242)
+val DarkBackground = Color(0xFF616161)
+val DarkSurface = Color(0xFF757575)
+val DarkOnPrimary = Color(0xFFBDBDBD)
+val DarkOnSecondary = Color(0xFFE0E0E0)
+val DarkOnBackground = Color(0xFFEEEEEE)
+val DarkOnSurface = Color(0xFFFFFFFF)
 
 val Orange = Color(0xFFFF9800)
 val OrangeLight = Color(0xFFFFC947)
 val OrangeDark = Color(0xFFC66900)
 val OrangeSuperLight = Color(0xFFFFFBE8)
 
-
-val BlueGrey = Color(0xFF78909C)
-val BlueGreyLight = Color(0xFFA7C0CD)
-val BlueGreyDark = Color(0xFF4B636E)
 
 

@@ -71,7 +71,7 @@
     <string name="edit_con">Editar Icon</string>
     <string name="delet_con">Borrar Icon</string>
     <string name="enter_new_username">Ingresa tu nuevo nombre de usuario:</string>
-    <string name="username">Nombre de usuario</string>
+    <string name="usernames">Nombre de usuario</string>
     <string name="save">GUARDAR</string>
     <string name="edit_parking">Editar parking</string>
     <string name="edit_parking_capital_letters">EDITAR PARKING</string>
