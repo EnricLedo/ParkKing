@@ -1,6 +1,7 @@
 package com.example.parkingcompose.screens
 
 import android.net.Uri
+import android.provider.Settings.Global.getString
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -50,8 +51,6 @@ fun CreateParkingScreen(
     userDao: UserDao
 ) {
 
-
-
     var image by remember { mutableStateOf<Uri?>(null) }
     val context = LocalContext.current
     val selectedLocation by selectLocationViewModel.selectedLocation.collectAsState()
@@ -64,6 +63,8 @@ fun CreateParkingScreen(
     val strSelectLocation = stringResource(id = R.string.select_location)
     val strSelectImage = stringResource(id = R.string.select_image)
     val strCreate = stringResource(id = R.string.create)
+    val strLatitude = stringResource(id = R.string.latitude)
+    val strLongitude = stringResource(id = R.string.longitude)
 
     LaunchedEffect(key1 = true) {
         createParkingViewModel.parkingAddedEvent.collect {
@@ -79,11 +80,8 @@ fun CreateParkingScreen(
         onResult = { uri -> createParkingViewModel.selectedImage.value = uri }
     )
 
-    Column {
 
-    }
     LazyColumn(
-
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
@@ -131,7 +129,20 @@ fun CreateParkingScreen(
                 Text(strSelectLocation)
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
+
+            if(createParkingViewModel.latitude.value != 0.0 && createParkingViewModel.longitude.value != 0.0){
+                Row(
+                    modifier = Modifier.padding(start = 12.dp, end = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(text = strLatitude + " ${"%.4f".format(createParkingViewModel.latitude.value)}")
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(text = strLongitude + " ${"%.4f".format(createParkingViewModel.longitude.value)}")
+                }
+                Spacer(modifier = Modifier.height(6.dp))
+            }
+
 
             Button(onClick = { photoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) }) {
                 Text(strSelectImage)
@@ -141,12 +152,13 @@ fun CreateParkingScreen(
                 AsyncImage(
                     model = it,
                     contentDescription = null,
-                    modifier = Modifier.padding(10.dp).height(300.dp)
+                    modifier = Modifier
+                        .padding(10.dp)
+                        .height(300.dp)
                 )
             }
             AddTagSection(createParkingViewModel)
 
-            Spacer(modifier = Modifier.height(16.dp))
 
             Button(
                 onClick = {
