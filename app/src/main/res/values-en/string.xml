@@ -83,5 +83,10 @@
     <string name="enter_your_new_username">"Enter your new username: "</string>
     <string name="el_nombre_de_usuario_ya_est_en_uso">This username is already being used</string>
     <string name="delete_parking">DELETE PARKIING</string>
-
+    <string name="longitude">Longitude: </string>
+    <string name="latitude">Latitude: </string>
+    <string name="introduce_la_puntuaci_n_a_buscar">Enter the score to search for</string>
+    <string name="buscar_por_puntuaci_n">Search by score</string>
+    <string name="ordenar_de_mayor_a_menor">Sort from highest to lowest</string>
+    <string name="ordenar_de_menor_a_mayor">Sort from lowest to highest</string>
 </resources>
