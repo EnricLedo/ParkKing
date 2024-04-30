@@ -4,8 +4,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,9 +24,7 @@ fun BottomNavigationBar(navController: NavHostController) {
     NavigationBar(
         modifier = Modifier
             .fillMaxWidth()
-            .height(70.dp),  // Ajusta este valor a la altura que prefieras
-        containerColor = OrangeDark,
-        contentColor = BlueGreyDark
+            .height(70.dp),
     ) {
         val destinations = listOf(
             Pair("parkingList", painterResource(id = R.drawable.ic_pk_list)),
@@ -41,7 +41,11 @@ fun BottomNavigationBar(navController: NavHostController) {
                         painter = destination.second,
                         contentDescription = "Go to ${destination.first.capitalize()}"
                     )
-                }
+                },
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = Color.White,
+                    unselectedIconColor = MaterialTheme.colorScheme.onSurface
+                )
             )
         }
     }

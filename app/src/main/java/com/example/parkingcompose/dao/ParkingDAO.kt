@@ -32,6 +32,7 @@ class ParkingDAO() {
     }
 
     fun updateParking(updatedParking: Parking): Task<Void> {
+        updatedParking.checked = false
         val parkingDocument = parkingsCollection.document(updatedParking.id)
         return parkingDocument.set(updatedParking)
     }

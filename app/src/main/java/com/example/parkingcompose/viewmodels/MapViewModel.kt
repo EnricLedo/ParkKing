@@ -38,10 +38,20 @@ class MapViewModel(private val locationRepository: LocationRepository) : ViewMod
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
 
+    private val _parkingEnabledEvent = MutableStateFlow(false)
+    val parkingEnabledEvent: StateFlow<Boolean> = _parkingEnabledEvent
+
+    fun enableParking(parkingId: String, context: Context) {
+        // ...
+        _parkingEnabledEvent.value = !_parkingEnabledEvent.value
+    }
+
     init {
         getParkingList()
         getCurrentLocation()
     }
+
+
 
     fun getCurrentLocation() {
         viewModelScope.launch {
@@ -56,6 +66,9 @@ class MapViewModel(private val locationRepository: LocationRepository) : ViewMod
     fun getParkingList() {
         viewModelScope.launch {
             try {
+                // Vacía la lista de parkings
+                _parkingList.tryEmit(emptyList())
+
                 val querySnapshot = db.collection("parkings")
                     .whereEqualTo("checked", true)
                     .get()
@@ -64,7 +77,7 @@ class MapViewModel(private val locationRepository: LocationRepository) : ViewMod
                 val list = querySnapshot.documents.mapNotNull { document: DocumentSnapshot? ->
                     document?.toObject(Parking::class.java)
                 }
-                _parkingList.value = list
+                _parkingList.tryEmit(list.toList()) // Llena la lista con los nuevos datos
             } catch (e: Exception) {
                 _error.value = "Error al cargar la lista de parkings: ${e.message}"
             }

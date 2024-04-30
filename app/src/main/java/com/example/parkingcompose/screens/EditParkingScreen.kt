@@ -23,6 +23,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,6 +45,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.parkingcompose.dao.ParkingDAO
 import com.example.parkingcompose.model.EditParkingViewModelFactory
+import com.example.parkingcompose.model.Location
 import com.example.parkingcompose.util.StorageUtil
 import com.example.parkingcompose.viewmodels.CreateParkingViewModel
 import com.example.parkingcompose.viewmodels.TagViewModel
@@ -73,17 +75,26 @@ fun EditParkingScreen(
     val strSelectImage = stringResource(id = R.string.select_image)
 
     if (parking != null) {
-        // Mover la inicialización de los estados mutables aquí
-        var name by remember { mutableStateOf(parking.name ?: "") }
-        var description by remember { mutableStateOf(parking.description ?: "") }
-        var priceMinute by remember { mutableStateOf(parking.priceMinute.toString() ?: "") }
-        var image by remember { mutableStateOf(parking.image ?: "") }
+        // Recuerda los valores modificados usando rememberSaveable
+        var name by rememberSaveable { mutableStateOf(parking.name ?: "") }
+        var description by rememberSaveable { mutableStateOf(parking.description ?: "") }
+        var priceMinute by rememberSaveable { mutableStateOf(parking.priceMinute.toString() ?: "") }
+        var image by rememberSaveable { mutableStateOf(parking.image?.toUri()) }
 
         var imageMayHaveChanged = false
         val photoPickerLauncher = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.PickVisualMedia(),
-            onResult = { uri -> image = uri?.toString() ?: "" }
+            onResult = { uri -> image = uri }
         )
+        LaunchedEffect(parking) {
+            if (parking != null) {
+                editParkingViewModel.name.value = parking.name ?: ""
+                editParkingViewModel.description.value = parking.description ?: ""
+                editParkingViewModel.priceMinute.value = parking.priceMinute.toString() ?: ""
+                editParkingViewModel.image.value = parking.image?.toUri()
+
+            }
+        }
 
         LazyColumn(
             modifier = Modifier
@@ -145,6 +156,10 @@ fun EditParkingScreen(
                     Text(strSelectImage)
                 }
                 Spacer(modifier = Modifier.height(16.dp))
+                Button(onClick = { navController.navigate("selectLocation") }) {
+                    Text(strSelectLocation)
+                }
+                Spacer(modifier = Modifier.height(16.dp))
                 AddTagSection(parking.tags, editParkingViewModel)
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -157,13 +172,17 @@ fun EditParkingScreen(
                             parking.description = description
                             parking.priceMinute = priceMinute.toFloat()
                             parking.tags = editParkingViewModel.selectedTagIds.value
+                            if (selectedLocation != null) {
+                                val location = Location(selectedLocation!!.latitude, selectedLocation!!.longitude)
+                                parking.location = location
+                            }
 
                             if (imageMayHaveChanged) {
-                                val imageUrl = StorageUtil.uploadImageToFirebaseStorage(image.toUri())
+                                val imageUrl = StorageUtil.uploadImageToFirebaseStorage(image)
                                 parking.image = imageUrl ?: parking.image
                             }
 
-                            editParkingViewModel.updateParking(parking)
+                            editParkingViewModel.updateParking(parking, context)
                             }
 
                         navController.navigate("parkingList")

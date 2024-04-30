@@ -10,32 +10,32 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
-private val DarkColorScheme = darkColorScheme(
-    primary = OrangeDark,
-    secondary = BlueGreyDark
-
-
-
+private val LightColorScheme = darkColorScheme(
+    primary = Blue900,
+    secondary = Blue700,
+    background = Color.White,
+    surface = Blue800,
+    onPrimary = Blue50,
+    onSecondary = Blue100,
+    onBackground = Blue200,
+    onSurface = Blue300
 )
 
-private val LightColorScheme = lightColorScheme(
-    primary =  OrangeLight,
+private val DarkColorScheme = lightColorScheme(
+    primary = Orange500,
     secondary = BlueGreyLight,
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    background = BlueGreyDark,
+    surface = Orange100,
+    onPrimary = Orange700,
+    onSecondary = Orange800,
+    onBackground = Orange200,
+    onSurface = Orange300
 )
 
 @Composable
@@ -60,4 +60,3 @@ fun DaleComposeTheme(
         content = content
     )
 }
-

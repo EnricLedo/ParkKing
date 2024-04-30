@@ -79,6 +79,7 @@ import androidx.compose.ui.window.Dialog
 import coil.compose.rememberImagePainter
 import com.example.parkingcompose.dao.TagDAO
 import com.example.parkingcompose.model.Tag
+import com.example.parkingcompose.ui.theme.Blue600
 import com.example.parkingcompose.ui.theme.BlueGreyLight
 
 
@@ -136,8 +137,8 @@ fun ParkingListScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { navController.navigate("crearparking") },
-                containerColor = BlueGreyLight,
-                contentColor = Color.Unspecified,
+                containerColor = Color.White,
+
                 modifier = Modifier
                     .border(2.dp, Color.Black, CircleShape)
                     .clip(CircleShape)  // Añade esta línea
@@ -188,11 +189,13 @@ fun YourComposableFunction(parkingViewModel: ParkingViewModel = viewModel()) {
 
     Box {
         Button(
-            onClick = { expanded = true }
+            onClick = { expanded = true },
+            colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary)
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_order),
-                contentDescription = null
+                contentDescription = null,
+                tint = Color.White
             )
         }
 
@@ -252,11 +255,11 @@ fun RatingFilter(parkingViewModel: ParkingViewModel) {
     val selectedRating by parkingViewModel.selectedRating.collectAsState()
 
     Box() {
-        Button(onClick = { expanded = true }) {
+        Button(onClick = { expanded = true }, colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary)) {
             Icon(
                 imageVector = Icons.Filled.Star,
                 contentDescription = "Rating filter",
-                tint = MaterialTheme.colorScheme.primary
+                tint = Color.White
             )
         }
 
@@ -283,21 +286,27 @@ fun RatingFilter(parkingViewModel: ParkingViewModel) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ParkingSearchBar(onQueryChanged: (String) -> Unit) {
     var text by remember { mutableStateOf("") }
 
     OutlinedTextField(
-        value = text,
-        onValueChange = {
-            text = it
-            onQueryChanged(it)
-        },
-        label = { Text(stringResource(id = R.string.search_parkings)) },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
+    value = text,
+    onValueChange = {
+        text = it
+        onQueryChanged(it)
+    },
+    label = { Text(stringResource(id = R.string.search_parkings)) },
+    modifier = Modifier
+        .fillMaxWidth()
+        .padding(16.dp),
+    colors = TextFieldDefaults.outlinedTextFieldColors(
+        focusedBorderColor = MaterialTheme.colorScheme.primary,
+        unfocusedBorderColor = MaterialTheme.colorScheme.primary,
+        cursorColor = MaterialTheme.colorScheme.primary
     )
+)
 }
 @Composable
 fun ParkingItem(
@@ -310,12 +319,14 @@ fun ParkingItem(
     val tagDAO = TagDAO()
     Card(
         modifier = modifier.clickable { navController.navigate("parkingDetailsScreen/${parking.id}") },
+        elevation = CardDefaults.cardElevation(4.dp),
         colors = CardColors(
-            containerColor = OrangeLight,
+            containerColor = MaterialTheme.colorScheme.primary,
             contentColor = Color.White,
             disabledContainerColor = Color.Unspecified,
-            disabledContentColor = Color.Unspecified),
-        elevation = CardDefaults.cardElevation(4.dp)
+            disabledContentColor = Color.Unspecified)
+
+
     ) {
         Column(
             modifier = Modifier
@@ -512,12 +523,14 @@ fun TagItem(
 fun ResetSearchButton(parkingViewModel: ParkingViewModel, navController: NavHostController) {
     Button(
         onClick = { parkingViewModel.resetSearch()
-            navController.navigate("parkingList") }
+            navController.navigate("parkingList") },
+        colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary)
 
     ) {
         Icon(
             painter = painterResource(id = R.drawable.ic_resetsearch),
-            contentDescription = null
+            contentDescription = null,
+            tint = Color.White
         )
     }
 }
@@ -544,13 +557,8 @@ fun TagItemExpanded(
     Card(
         modifier = Modifier
             .clip(RoundedCornerShape(1000.dp))
-            .clickable { showDialog = true },
-        colors = CardColors(
-            containerColor = OrangeDark,
-            contentColor = Color.White,
-            disabledContainerColor = Color.Unspecified,
-            disabledContentColor = Color.Unspecified
-        )
+            .clickable { showDialog = true }
+
     ) {
         Row(
             Modifier.padding(8.dp),  // Aumenta el padding
@@ -578,8 +586,8 @@ fun TagFilterButton(parkingViewModel: ParkingViewModel, tagViewModel: TagViewMod
     var selectedTags by remember { mutableStateOf(setOf<String>()) }
     var showDialog by remember { mutableStateOf(false) }
 
-    Button(onClick = { showDialog = true }) {
-        Text("TAGS")
+    Button(onClick = { showDialog = true }, colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary )) {
+        Text("TAGS", color = Color.White)
     }
 
     if (showDialog) {
