@@ -2,6 +2,7 @@ package com.example.parkingcompose.dao
 
 
 import com.example.parkingcompose.model.Review
+import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.FirebaseFirestore
 
 class ReviewDaoImpl() : ReviewDao {
@@ -74,4 +75,19 @@ class ReviewDaoImpl() : ReviewDao {
                 callback(emptyList())
             }
     }
+
+    override suspend fun getReviewById(reviewId: String): Review? {
+    var review: Review? = null
+    val task = reviewsCollection.document(reviewId).get()
+    try {
+        val snapshot = Tasks.await(task)
+        if (snapshot.exists()) {
+            review = snapshot.toObject(Review::class.java)
+        }
+    } catch (e: Exception) {
+        // Handle error if needed
+    }
+    return review
+}
+
 }

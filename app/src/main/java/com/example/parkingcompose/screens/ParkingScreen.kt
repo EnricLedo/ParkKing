@@ -150,12 +150,17 @@ fun ParkingListScreen(
         floatingActionButtonPosition = FabPosition.Center
     )  {
         Column {
-            Row(){
-                Button(onClick = { showSliderDialog = true }) {
-                    Text("Filtrar por distancia")
-                }
-                ParkingSearchBar(onQueryChanged = parkingViewModel::updateSearchQuery)
-            }
+            Row(modifier = Modifier.padding(start = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+    Button(onClick = { showSliderDialog = true },
+        colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary)) {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_distancefilter),
+            contentDescription = "Filtrar por distancia",
+            tint = Color.White
+        )
+    }
+    ParkingSearchBar(onQueryChanged = parkingViewModel::updateSearchQuery)
+}
 
             Row(
                 modifier = Modifier.fillMaxWidth().padding(8.dp),

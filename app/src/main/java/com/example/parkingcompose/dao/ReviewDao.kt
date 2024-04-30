@@ -8,4 +8,5 @@ interface ReviewDao {
          fun deleteReview(reviewId: String)
         fun searchReviewsByRating(rating: Float, callback: (List<Review>) -> Unit)
 
+        suspend fun getReviewById(reviewId: String): Review?
     }

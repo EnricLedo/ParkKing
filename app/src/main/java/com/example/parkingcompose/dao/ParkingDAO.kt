@@ -50,27 +50,29 @@ class ParkingDAO() {
         }
     }
 
-    fun updateParkingRating(parkingId: String) {
-        // Obtener todas las reseñas del estacionamiento
-        reviewDao.loadReviews { reviews ->
-            val parkingReviews = reviews.filter { it.parking_id == parkingId }
-            if (parkingReviews.isNotEmpty()) {
-                // Calcular la calificación media
-                val totalRating = parkingReviews.sumOf { it.review_rating?.toDouble() ?: 0.0 }
-                val averageRating = totalRating / parkingReviews.size
-
-                // Obtener el estacionamiento y actualizar su parkingRating
-                parkingsCollection.document(parkingId).get()
-                    .addOnSuccessListener { documentSnapshot ->
-                        val parking = documentSnapshot.toObject(Parking::class.java)
-                        if (parking != null) {
-                            val updatedParking = parking.copy(parkingRating = averageRating)
-                            parkingsCollection.document(parkingId).set(updatedParking)
-                        }
-                    }
-            }
+    fun updateParkingRating(parkingId: Any) {
+    // Obtener todas las reseñas del estacionamiento
+    reviewDao.loadReviews { reviews ->
+        val parkingReviews = reviews.filter { it.parking_id == parkingId }
+        // Calcular la calificación media
+        val averageRating = if (parkingReviews.isEmpty()) {
+            0.0
+        } else {
+            val totalRating = parkingReviews.sumOf { it.review_rating?.toDouble() ?: 0.0 }
+            totalRating / parkingReviews.size
         }
+
+        // Obtener el estacionamiento y actualizar su parkingRating
+        parkingsCollection.document(parkingId.toString()).get()
+            .addOnSuccessListener { documentSnapshot ->
+                val parking = documentSnapshot.toObject(Parking::class.java)
+                if (parking != null) {
+                    val updatedParking = parking.copy(parkingRating = averageRating)
+                    parkingsCollection.document(parkingId.toString()).set(updatedParking)
+                }
+            }
     }
+}
 
     suspend fun updateCreatedBy(oldUsername: String, newUsername: String) {
         val parkings = parkingsCollection.whereEqualTo("createdBy", oldUsername).get().await()

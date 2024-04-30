@@ -82,10 +82,10 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val reviewDao = ReviewDaoImpl()
-        val reviewViewModel = ReviewViewModel(reviewDao)
+
         val userDao = UserDao()
         val parkingDao = ParkingDAO()
-
+        val reviewViewModel = ReviewViewModel(reviewDao, parkingDao)
         parkingDao.reviewDao = reviewDao
         reviewDao.parkingDao = parkingDao
         val signInViewModel: SignInGoogleViewModel by viewModels()
