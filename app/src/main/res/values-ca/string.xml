@@ -83,4 +83,10 @@
     <string name="nombre_de_usuario_cambiado">Nom d\'usuari canviat</string>
     <string name="el_nombre_de_usuario_ya_est_en_uso">El nom d\'usuari ja està en ús</string>
     <string name="delete_parking">ELIMINAR APARCAMENT</string>
+    <string name="longitude">Longitud: </string>
+    <string name="latitude">Latitud: </string>
+    <string name="introduce_la_puntuaci_n_a_buscar">Introdueix la puntuació a cercar</string>
+    <string name="buscar_por_puntuaci_n">Cerca per puntuació</string>
+    <string name="ordenar_de_mayor_a_menor">Ordena de major a menor</string>
+    <string name="ordenar_de_menor_a_mayor">Ordena de menor a major</string>
 </resources>

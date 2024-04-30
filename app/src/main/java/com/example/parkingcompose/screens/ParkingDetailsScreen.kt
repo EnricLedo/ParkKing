@@ -180,13 +180,13 @@ fun ParkingDetailsScreen(
                     modifier = Modifier.padding(6.dp)
                 ) {
                     Text(
-                        text = "·Autor: ${parking!!.createdBy}",
+                        text = stringResource(R.string.author) + "%.4f".format(parking!!.createdBy),
                         color = OrangeDark,
                         style = ButtonTextStyle,
                         modifier = Modifier.padding(bottom = 6.dp)
                     )
                     Text(
-                        text = "·Price/Minute: ${parking!!.priceMinute}",
+                        text =stringResource(R.string.price_minute) + "%.4f".format(parking!!.priceMinute) + "€",
                         color = OrangeDark,
                         style = ButtonTextStyle
                     )
@@ -263,8 +263,6 @@ fun ParkingDetailsScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(4.dp),
-                        /*horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically,*/
                         colors = ButtonColors(
                             containerColor = OrangeDark,
                             contentColor = Color.Unspecified,

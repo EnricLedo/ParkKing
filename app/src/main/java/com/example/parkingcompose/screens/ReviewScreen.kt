@@ -137,39 +137,33 @@ fun ListReviewScreen(
             OutlinedTextField(
                 value = ratingInput,
                 onValueChange = { ratingInput = it },
-                label = { Text("Introduce la puntuación a buscar") },
+                label = { Text(stringResource(R.string.introduce_la_puntuaci_n_a_buscar)) },
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
             )
             Button(
                 onClick = { ratingInput.toFloatOrNull()?.let { viewModel.searchReviewsByRating(it) } },
                 modifier = Modifier.padding(vertical = 8.dp)
             ) {
-                Text("Buscar por puntuación")
+                Text(stringResource(R.string.buscar_por_puntuaci_n))
             }
             Button(
                 onClick = { sortReviews() },
                 modifier = Modifier.padding(bottom = 16.dp)
             ) {
-                Text(if (sortOrder) "Ordenar de mayor a menor" else "Ordenar de menor a mayor")
+                Text(if (sortOrder) stringResource(R.string.ordenar_de_mayor_a_menor) else stringResource(
+                    R.string.ordenar_de_menor_a_mayor
+                )
+                )
             }
 
             reviews?.let { reviewsList ->
-                // Filtrar las reseñas que coinciden con el parkingId
                 val filteredReviews = reviewsList.filter { it.parking_id == parkingId }
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth(),
                     contentPadding = PaddingValues(vertical = 16.dp)
                 ) {
                     filteredReviews.groupBy { it.user_email }.forEach { (user, userReviews) ->
-                        // Mostrar el nombre del usuario como encabezado
-                        item {
-                            Text(
-                                text = "Reseñas:",
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 18.sp,
-                                modifier = Modifier.padding(bottom = 8.dp)
-                            )
-                        }
+
                         items(userReviews) { review ->
                             Box(
                                 modifier = Modifier

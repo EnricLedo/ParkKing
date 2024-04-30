@@ -82,4 +82,10 @@
     <string name="nombre_de_usuario_cambiado">Nombre de usuario cambiado</string>
     <string name="el_nombre_de_usuario_ya_est_en_uso">El nombre de usuario ya está en uso</string>
     <string name="delete_parking">ELIMINAR PARKING</string>
+    <string name="longitude">Longitud: </string>
+    <string name="latitude">Latitud: </string>
+    <string name="introduce_la_puntuaci_n_a_buscar">Introduce la puntuación a buscar</string>
+    <string name="buscar_por_puntuaci_n">Buscar por puntuación</string>
+    <string name="ordenar_de_mayor_a_menor">Ordenar de mayor a menor</string>
+    <string name="ordenar_de_menor_a_mayor">Ordenar de menor a mayor</string>
 </resources>
