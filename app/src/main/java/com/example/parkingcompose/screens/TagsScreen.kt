@@ -170,7 +170,7 @@ fun TagsScreen(tagViewModel: TagViewModel) {
             ) {
                 Icon(imageVector = Icons.Default.List, contentDescription = null, modifier = Modifier.size(100.dp))
                 Spacer(modifier = Modifier.height(16.dp))
-                Text(text = "No se encontraron \nTags", fontSize = 18.sp, fontWeight = FontWeight.Thin, textAlign = TextAlign.Center)
+                Text(text = stringResource(id = R.string.no_encontrar_tag), fontSize = 18.sp, fontWeight = FontWeight.Thin, textAlign = TextAlign.Center)
             }
         }
     }

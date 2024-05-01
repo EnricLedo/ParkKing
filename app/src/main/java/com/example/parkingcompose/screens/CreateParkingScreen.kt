@@ -205,7 +205,7 @@ fun CreateParkingScreen(
                     } else {
                         Toast.makeText(
                             context,
-                            "Please select an image or Location",
+                            context.getString(R.string.error_select_image_or_location),
                             Toast.LENGTH_SHORT
                         ).show()
                     }
@@ -213,7 +213,7 @@ fun CreateParkingScreen(
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(strCreate)
+                Text(stringResource(id = R.string.create))
             }
         }
     }

@@ -75,6 +75,7 @@ fun ParkingDetailsScreen(
     val parking by parkingDetailsViewModel.parking.collectAsState(null)
     val tagDAO = TagDAO()
     val parkingDao = ParkingDAO()
+
     BackHandler {
         navController.navigate("parkingList")
     }
@@ -135,7 +136,7 @@ fun ParkingDetailsScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Rating: %.2f".format(parking!!.parkingRating),
+                            text = stringResource(R.string.rating)+ " %.2f".format(parking!!.parkingRating),
                             color = OrangeDark,
                             style = ButtonTextStyle,
                             textAlign = TextAlign.Center,

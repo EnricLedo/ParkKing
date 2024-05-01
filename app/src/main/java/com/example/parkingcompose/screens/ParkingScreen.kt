@@ -124,9 +124,11 @@ fun ParkingListScreen(
             parkingViewModel.getParkingList()
         }
     }
+    val context = LocalContext.current
 
     LaunchedEffect(selectedTags) {
-        Log.d(ContentValues.TAG, "Selected tags changed: $selectedTags")
+        val logMessage = context.getString(R.string.select_tags_change)
+        Log.d(ContentValues.TAG, logMessage)
     }
 
 
@@ -153,7 +155,7 @@ fun ParkingListScreen(
         colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary)) {
         Icon(
             painter = painterResource(id = R.drawable.ic_distancefilter),
-            contentDescription = "Filtrar por distancia",
+            contentDescription = stringResource(id = R.string.filter_by_distance),
             tint = Color.White
         )
     }
@@ -175,10 +177,10 @@ fun ParkingListScreen(
                 var sliderValue by remember { mutableStateOf(selectedDistance ?: 0f) }
                 AlertDialog(
                     onDismissRequest = { showSliderDialog = false },
-                    title = { Text("Seleccione la distancia máxima", color = Color.White)},
+                    title = { Text(stringResource(id = R.string.select_max_distance), color = Color.White)},
                     text = {
                         Column {
-                            Text("Distancia: ${"%.3f".format(sliderValue)} km")
+                            Text("${stringResource(id = R.string.distance_km)} ${"%.3f".format(sliderValue)} km")
                             Slider(
                                 value = sliderValue,
                                 onValueChange = { sliderValue = it },
@@ -199,14 +201,14 @@ fun ParkingListScreen(
                                 disabledContainerColor = Color.Unspecified,
                                 disabledContentColor = Color.Unspecified
                             )) {
-                            Text("Aplicar", color = Color.White)
+                            Text(stringResource(id = R.string.apply), color = Color.White)
                         }
                     }
                 )
             }
 
             if (errorState.value != null) {
-                Text("Error: ${errorState.value}")
+                Text("${stringResource(id = R.string.error)} ${errorState.value}")
             }
 
             LazyColumn(
@@ -269,7 +271,7 @@ fun YourComposableFunction(parkingViewModel: ParkingViewModel = viewModel()) {
                     parkingViewModel.orderParkingsByBestRating()  // Best rating
                 }
             ) {
-                Text("Ordenar por mejor calificación", color = MaterialTheme.colorScheme.primary)
+                Text(stringResource(id = R.string.sort_by_best_rating), color = MaterialTheme.colorScheme.primary)
             }
             DropdownMenuItem(
                 onClick = {
@@ -277,7 +279,7 @@ fun YourComposableFunction(parkingViewModel: ParkingViewModel = viewModel()) {
                     parkingViewModel.orderParkingsByWorstRating() // Worst rating
                 }
             ) {
-                Text("Ordenar por peor calificación", color = MaterialTheme.colorScheme.primary)
+                Text(stringResource(id = R.string.sort_by_worst_rating), color = MaterialTheme.colorScheme.primary)
             }
             DropdownMenuItem(
                 onClick = {
@@ -285,7 +287,7 @@ fun YourComposableFunction(parkingViewModel: ParkingViewModel = viewModel()) {
                     parkingViewModel.orderByCreationDate()
                 }
             ) {
-                Text("Ordenar por fecha de creacion", color = MaterialTheme.colorScheme.primary)
+                Text(stringResource(id = R.string.sort_by_creation_date), color = MaterialTheme.colorScheme.primary)
             }
         }
     }
@@ -301,7 +303,7 @@ fun RatingFilter(parkingViewModel: ParkingViewModel) {
         Button(onClick = { expanded = true }, colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary)) {
             Icon(
                 imageVector = Icons.Filled.Star,
-                contentDescription = "Rating filter",
+                contentDescription = stringResource(id = R.string.filter_rating),
                 tint = Color.White
             )
         }
@@ -319,7 +321,7 @@ fun RatingFilter(parkingViewModel: ParkingViewModel) {
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Star,
-                        contentDescription = "$rating stars",
+                        contentDescription = "$rating ${stringResource(id = R.string.start)}",
                         tint = if (rating <= (selectedRating ?: 0)) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSecondary                    )
                     Text(" $rating", color = if (rating <= (selectedRating ?: 0)) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSecondary)
                 }
@@ -461,7 +463,7 @@ fun ParkingItemButton(
     ) {
         Icon(
             imageVector = if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
-            contentDescription = "See more or less information about a parking",
+            contentDescription = stringResource(id = R.string.information),
             tint = MaterialTheme.colorScheme.secondary
         )
     }
@@ -636,13 +638,13 @@ fun TagFilterButton(parkingViewModel: ParkingViewModel, tagViewModel: TagViewMod
     var showDialog by remember { mutableStateOf(false) }
 
     Button(onClick = { showDialog = true }, colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary )) {
-        Text("TAGS", color = Color.White)
+        Text(stringResource(id = R.string.tags), color = Color.White)
     }
 
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            title = { Text("Seleccione los tags", color = Color.White) },
+            title = { Text(stringResource(id = R.string.select_tags), color = Color.White) },
             text = {
                 LazyColumn {
                     items(tagsState.value) { tag ->
@@ -683,7 +685,7 @@ fun TagFilterButton(parkingViewModel: ParkingViewModel, tagViewModel: TagViewMod
                         disabledContentColor = Color.Unspecified
                     )
                 ) {
-                    Text("Apply", color = Color.White)
+                    Text(stringResource(id = R.string.apply), color = Color.White)
                 }
             }
         )

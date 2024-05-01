@@ -202,13 +202,13 @@ fun ReviewItem(
         modifier = Modifier.padding(16.dp)
     ) {
 
-            Text(text = "Title: ", fontWeight = FontWeight.Bold, color = Color.Black)
+            Text(text = stringResource(id = R.string.title), fontWeight = FontWeight.Bold, color = Color.Black)
             Text(text = review.title ?: "", color = Color.Black)
             Spacer(modifier = Modifier.width(8.dp))
-            Text(text = "Rating : ", fontWeight = FontWeight.Bold, color = Color.Black)
+            Text(text = stringResource(id = R.string.rating), fontWeight = FontWeight.Bold, color = Color.Black)
             Text(text = "${review.review_rating}", color = Color.Black)
             Spacer(modifier = Modifier.width(8.dp))
-            Text(text = "Comment: ", fontWeight = FontWeight.Bold, color = Color.Black)
+            Text(text = stringResource(id = R.string.comment), fontWeight = FontWeight.Bold, color = Color.Black)
             Text(text = review.comment ?: "", color = Color.Black)
 
 
@@ -356,7 +356,7 @@ fun UpdateReviewDialog(
                     .fillMaxWidth()
             ) {
                 Text(
-                    text = "Actualizar revisión",
+                    text = stringResource(id = R.string.actualizar_revision),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(bottom = 8.dp)
@@ -364,13 +364,13 @@ fun UpdateReviewDialog(
                 OutlinedTextField(
                     value = updatedTitle,
                     onValueChange = { updatedTitle = it },
-                    label = { Text("Título") }
+                    label = { Text(stringResource(id = R.string.title)) }
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 OutlinedTextField(
                     value = updatedComment,
                     onValueChange = { updatedComment = it },
-                    label = { Text("Comentario") }
+                    label = { Text(stringResource(id = R.string.comment)) }
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Row(
@@ -378,7 +378,7 @@ fun UpdateReviewDialog(
                     horizontalArrangement = Arrangement.End
                 ) {
                     TextButton(onClick = onDismiss) {
-                        Text("Cancelar")
+                        Text(stringResource(id = R.string.cancel))
                     }
                     Spacer(modifier = Modifier.width(16.dp))
                     Button(
@@ -391,7 +391,7 @@ fun UpdateReviewDialog(
                             onDismiss()
                         }
                     ) {
-                        Text("Actualizar")
+                        Text(stringResource(id = R.string.actualizar))
                     }
                 }
             }

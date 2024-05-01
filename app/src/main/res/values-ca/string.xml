@@ -89,4 +89,37 @@
     <string name="buscar_por_puntuaci_n">Cerca per puntuació</string>
     <string name="ordenar_de_mayor_a_menor">Ordena de major a menor</string>
     <string name="ordenar_de_menor_a_mayor">Ordena de menor a major</string>
+    <string name="enter_price">Si us plau, introdueix un preu -> Mètode OnAddParking</string>
+    <string name="parking_created">Aparcament creat. Serà publicat un cop moderat</string>
+    <string name="cselect_location">Si us plau, selecciona una ubicació -> Mètode OnAddParking</string>
+    <string name="upload_failed">Error en pujar la imatge -> Mètode OnAddParking</string>
+    <string name="error_adding_parking">Error en afegir l\'aparcament -> Mètode addParking</string>
+    <string name="parking_added_with_id">Aparcament afegit amb ID: </string>
+    <string name="error_adding">Error en afegir l\'aparcament</string>
+    <string name="parking_id_added_to_tag">ID d\'aparcament afegit a l\'etiqueta correctament:</string>
+    <string name="error_finding_tag_with_title">Error en trobar l\'etiqueta amb el títol:</string>
+    <string name="filter_by_distance">Filtrar per distància</string>
+    <string name="select_max_distance">Seleccioneu la distància màxima</string>
+    <string name="distance_km">Distància:</string>
+    <string name="apply">Aplicar</string>
+    <string name="sort_by_best_rating">Ordenar per millor qualificació</string>
+    <string name="sort_by_worst_rating">Ordenar per pitjor qualificació</string>
+    <string name="sort_by_creation_date">Ordenar per data de creació</string>
+    <string name="select_tags">Seleccioneu els tags</string>
+    <string name="filter_rating">Filtre de valoració</string>
+    <string name="update">Update</string>
+    <string name="delete">ELiminar</string>
+    <string name="icon_de_ubicacion">Icona d\'ubicació</string>
+    <string name="star_icon">Icona d\'estrella</string>
+    <string name="select_tags_change">Les etiquetes seleccionades han canviat:</string>
+    <string name="start">Estrellas</string>
+    <string name="information">Veure més o menys informació sobre un aparcament</string>
+    <string name="tags">Tags</string>
+    <string name="actualizar_revision">Actualitzar revisió</string>
+    <string name="no_encontrar_tag">No s\'han trobat Tags</string>
+    <string name="error_select_image_or_location">Seleccioneu una imatge o una ubicació.</string>
+    <string name="price">Preu: </string>
+    <string name="enable">Activa :</string>
+    <string name="loading">Carregant....</string>
+
 </resources>

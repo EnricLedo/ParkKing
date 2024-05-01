@@ -222,12 +222,12 @@ fun EditParkingScreen(
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Update")
+                    Text(stringResource(id = R.string.update))
                 }
             }
         }
     } else {
-        Text("Loading...")
+        Text(stringResource(id = R.string.loading))
     }
 }
 @Composable
