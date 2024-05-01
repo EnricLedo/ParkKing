@@ -71,6 +71,8 @@ import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
 import com.example.parkingcompose.R
 import com.example.parkingcompose.model.Tag
+import com.example.parkingcompose.viewmodels.ModerateViewModel
+import com.example.parkingcompose.viewmodels.ParkingViewModel
 import com.example.parkingcompose.viewmodels.TagViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -89,7 +91,9 @@ class MyApplication : Application() {
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun TagsScreen(tagViewModel: TagViewModel) {
+fun TagsScreen(tagViewModel: TagViewModel,
+               parkingViewModel: ParkingViewModel,
+               moderateViewModel: ModerateViewModel) {
     var showAddTagDialog by remember { mutableStateOf(false) }
     val tags by tagViewModel.getTagsFlow().collectAsState(initial = emptyList())
     val scope = rememberCoroutineScope()
@@ -145,7 +149,7 @@ fun TagsScreen(tagViewModel: TagViewModel) {
                 contentPadding = PaddingValues(4.dp)
             ) {
                 items(tags) { tag ->
-                    TagItem(tag = tag, tagViewModel = tagViewModel, onEdit = { editedTag ->
+                    TagItem(tag = tag, tagViewModel = tagViewModel, moderateViewModel = moderateViewModel, parkingViewModel = parkingViewModel, onEdit = { editedTag ->
                         scope.launch {
                             tagViewModel.updateTag(
                                 editedTag,
@@ -178,7 +182,7 @@ fun TagsScreen(tagViewModel: TagViewModel) {
 
 
 @Composable
-fun TagItem(tag: Tag, tagViewModel: TagViewModel, onEdit: (Tag) -> Unit) {
+fun TagItem(tag: Tag, tagViewModel: TagViewModel, onEdit: (Tag) -> Unit, parkingViewModel: ParkingViewModel, moderateViewModel: ModerateViewModel){
     var showDeleteTagDialog by remember { mutableStateOf(false) }
     var showEditTagDialog by remember { mutableStateOf(false) }
     var showContentDialog by remember { mutableStateOf(false) }
@@ -198,6 +202,8 @@ fun TagItem(tag: Tag, tagViewModel: TagViewModel, onEdit: (Tag) -> Unit) {
             onConfirmDelete = {
                 CoroutineScope(Dispatchers.IO).launch {
                     tagViewModel.deleteTag(tag.title ?: "")
+                    parkingViewModel.updateParkingList()
+                    moderateViewModel.getParkingList()
                     showDeleteTagDialog = false
                 }
             },
@@ -212,12 +218,11 @@ fun TagItem(tag: Tag, tagViewModel: TagViewModel, onEdit: (Tag) -> Unit) {
             tagViewModel.updateTag(
                 updatedTag,
                 onSuccess = {
-                    // Código para manejar el éxito
+                    parkingViewModel.updateParkingList()
+                    moderateViewModel.getParkingList()
                     showEditTagDialog = false
                 },
                 onTagExists = {
-                    // Código para manejar el error si el tag ya existe
-                    // Podrías mostrar un diálogo de error o un Snackbar
                 }
             )
         }, onDialogDismissed = { showEditTagDialog = false }, tagViewModel = tagViewModel)

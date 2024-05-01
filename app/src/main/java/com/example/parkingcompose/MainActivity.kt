@@ -294,7 +294,7 @@ class MainActivity : ComponentActivity() {
                             ListReviewScreen(parkingId = parkingId, viewModel = reviewViewModel, navController = navController)
                         }
                         composable("tagsscreen"){
-                            TagsScreen(tagViewModel)
+                            TagsScreen(tagViewModel, parkingViewModel, moderateViewModel)
                         }
 
                     }
