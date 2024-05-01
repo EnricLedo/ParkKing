@@ -11,13 +11,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -34,6 +38,7 @@ import com.example.parkingcompose.viewmodels.RegisterViewModel
 import com.example.parkingcompose.R
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
     navHostController: NavHostController,
@@ -60,7 +65,8 @@ fun LoginScreen(
             text = stringResource(id = R.string.login_title),
             fontSize = 28.sp,
             textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            color = Color.White
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -69,7 +75,16 @@ fun LoginScreen(
             value = loginState.email,
             onValueChange = { loginViewModel.onEmailChange(it) },
             label = { Text(stringResource(id = R.string.email)) },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                focusedBorderColor = Color.White,
+                unfocusedBorderColor = MaterialTheme.colorScheme.primary,
+                cursorColor = Color.White,
+                focusedLabelColor = Color.White,
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White,
+                unfocusedLabelColor = Color.White
+            )
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -80,7 +95,16 @@ fun LoginScreen(
             label = { Text(stringResource(id = R.string.password)) },
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                focusedBorderColor = Color.White,
+                unfocusedBorderColor = MaterialTheme.colorScheme.primary,
+                cursorColor = Color.White,
+                focusedLabelColor = Color.White,
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White,
+                unfocusedLabelColor = Color.White
+            )
         )
 
         Spacer(modifier = Modifier.height(16.dp))

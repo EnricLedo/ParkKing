@@ -344,9 +344,9 @@ fun ParkingSearchBar(onQueryChanged: (String) -> Unit) {
             .fillMaxWidth()
             .padding(16.dp),
         colors = TextFieldDefaults.outlinedTextFieldColors(
-            focusedBorderColor = MaterialTheme.colorScheme.primary,
+
             unfocusedBorderColor = MaterialTheme.colorScheme.primary,
-            cursorColor = MaterialTheme.colorScheme.primary
+            unfocusedLabelColor = MaterialTheme.colorScheme.primary
         )
     )
 }
@@ -515,12 +515,14 @@ fun ParkingRating(
     ) {
         Text(
             text = String.format("%.2f", parkingRating),
-            style = MaterialTheme.typography.bodyLarge
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.padding(end = 2.dp)
         )
         Icon(
             imageVector = Icons.Filled.Star,
             contentDescription = "Star Icon",
-            modifier = Modifier.size(12.dp)
+            modifier = Modifier.size(12.dp),
+            tint = Color.White
         )
     }
 }
