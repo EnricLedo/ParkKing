@@ -45,8 +45,12 @@ import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TextFieldDefaults.outlinedTextFieldColors
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -287,6 +291,7 @@ fun ShowContentDialog(tag: Tag, onDismiss: () -> Unit) {
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditTagDialog(tag: Tag, onTagUpdated: (Tag) -> Unit, onDialogDismissed: () -> Unit, tagViewModel: TagViewModel) {
     var titleText by remember { mutableStateOf(tag.title) }
@@ -315,7 +320,9 @@ fun EditTagDialog(tag: Tag, onTagUpdated: (Tag) -> Unit, onDialogDismissed: () -
 
     AlertDialog(
         onDismissRequest = onDialogDismissed,
-        title = { Text(text = stringResource(id = R.string.edit_tag)) },
+        title = { Text(text = stringResource(id = R.string.edit_tag),
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center) },
         confirmButton = {
             Button(onClick = {
                 if (titleText.isNotBlank() && contentText.isNotBlank()) {
@@ -363,17 +370,35 @@ fun EditTagDialog(tag: Tag, onTagUpdated: (Tag) -> Unit, onDialogDismissed: () -
             }
         },
         text = {
-            Column {
-                TextField(
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                OutlinedTextField(
                     value = titleText,
                     onValueChange = { titleText = it },
-                    label = { Text(text = stringResource(id = R.string.name)) }
+                    label = { Text(text = stringResource(id = R.string.name)) },
+                    colors = outlinedTextFieldColors(
+                        focusedBorderColor = Color.White,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.primary,
+                        cursorColor = Color.White,
+                        focusedLabelColor = Color.White,
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White,
+                        unfocusedLabelColor = Color.White
+                    )
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                TextField(
+                OutlinedTextField(
                     value = contentText,
                     onValueChange = { contentText = it },
-                    label = { Text(text = stringResource(id = R.string.description)) }
+                    label = { Text(text = stringResource(id = R.string.description)) },
+                    colors = outlinedTextFieldColors(
+                        focusedBorderColor = Color.White,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.primary,
+                        cursorColor = Color.White,
+                        focusedLabelColor = Color.White,
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White,
+                        unfocusedLabelColor = Color.White
+                    )
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 if (imageUri != null) {

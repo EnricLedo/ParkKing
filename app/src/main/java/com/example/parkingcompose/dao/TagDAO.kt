@@ -69,9 +69,19 @@ class TagDAO {
 
 
 
-    suspend fun deleteTag(tagId: String) {
-        val tagRef = firestore.collection("tags").document(tagId)
-        tagRef.delete().await()
+    suspend fun deleteTag(tagTitle: String, parkingDAO: ParkingDAO) {
+        // Primero, eliminar el tag de la lista de tags de todos los parkings
+        parkingDAO.removeTagFromParkings(tagTitle)
+
+        // Luego, eliminar el tag de la colección
+        val querySnapshot = firestore.collection("tags")
+            .whereEqualTo("title", tagTitle)
+            .get()
+            .await()
+
+        for (document in querySnapshot.documents) {
+            document.reference.delete().await()
+        }
     }
 
     fun getTagsFlow(): Flow<List<Tag>> = callbackFlow {

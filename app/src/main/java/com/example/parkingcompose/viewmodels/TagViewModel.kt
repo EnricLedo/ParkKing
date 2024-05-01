@@ -4,6 +4,7 @@ package com.example.parkingcompose.viewmodels
 import android.content.ContentValues.TAG
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import com.example.parkingcompose.dao.ParkingDAO
 import com.example.parkingcompose.dao.TagDAO
 import com.example.parkingcompose.model.Tag
 import com.google.firebase.firestore.FieldValue
@@ -23,6 +24,7 @@ import java.util.UUID
 
 class TagViewModel : ViewModel() {
     private val tagDAO = TagDAO()
+    private val parkingDAO = ParkingDAO()
     private val _selectedTags = MutableStateFlow<Set<String>>(emptySet())
     val selectedTags: StateFlow<Set<String>> = _selectedTags
 
@@ -35,7 +37,7 @@ class TagViewModel : ViewModel() {
     }
 
     suspend fun deleteTag(tagId: String) {
-        tagDAO.deleteTag(tagId)
+        tagDAO.deleteTag(tagId, parkingDAO)
     }
 
     fun getTagsFlow(): Flow<List<Tag>> {

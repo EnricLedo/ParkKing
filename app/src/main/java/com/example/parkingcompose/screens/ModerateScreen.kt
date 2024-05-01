@@ -102,7 +102,7 @@ fun ParkingModerateItem(
     val tagDAO = TagDAO()
     Card(
         colors = CardColors(
-            containerColor = OrangeLight,
+            containerColor = MaterialTheme.colorScheme.primary,
             contentColor = Color.White,
             disabledContainerColor = Color.Unspecified,
             disabledContentColor = Color.Unspecified),
@@ -125,7 +125,7 @@ fun ParkingModerateItem(
             ) {
                 //Column 1
                 Column(
-                    modifier = Modifier,
+                    modifier = Modifier.padding(top = 4.dp, start = 4.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     ModerateParkingImage(parking.image)
@@ -155,8 +155,8 @@ fun ParkingModerateItem(
                     var tags by remember { mutableStateOf<List<Tag>>(emptyList()) }
 
                     LaunchedEffect(parkingTags) {
-                        tags = parkingTags.map { tagId ->
-                            tagDAO.getTagsById(tagId)
+                        tags = parkingTags.map { tagTitle ->
+                            tagDAO.getTagByTitle(tagTitle)!!
                         }
                     }
 

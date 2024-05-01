@@ -218,7 +218,7 @@ fun EditParkingScreen(
                             editParkingViewModel.updateParking(parking, context)
                             }
 
-                        navController.navigate("parkingList")
+                        navController.navigate("mapa")
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {

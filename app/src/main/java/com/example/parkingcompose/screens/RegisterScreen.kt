@@ -8,8 +8,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,6 +29,7 @@ import com.example.parkingcompose.R
 import com.example.parkingcompose.util.GoogleAuthUiClient
 import com.example.parkingcompose.viewmodels.RegisterViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(viewModel: RegisterViewModel, navController: NavHostController, googleAuthUiClient: GoogleAuthUiClient) {
     val localContext = LocalContext.current // Capturamos el contexto local
@@ -50,7 +54,16 @@ fun RegisterScreen(viewModel: RegisterViewModel, navController: NavHostControlle
             value = viewModel.email.value,
             onValueChange = { viewModel.onEmailChange(it) },
             label = { Text(stringResource(id = R.string.email)) },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                focusedBorderColor = Color.White,
+                unfocusedBorderColor = MaterialTheme.colorScheme.primary,
+                cursorColor = Color.White,
+                focusedLabelColor = Color.White,
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White,
+                unfocusedLabelColor = Color.White
+            )
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -61,7 +74,16 @@ fun RegisterScreen(viewModel: RegisterViewModel, navController: NavHostControlle
             label = { Text(stringResource(id = R.string.password)) },
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                focusedBorderColor = Color.White,
+                unfocusedBorderColor = MaterialTheme.colorScheme.primary,
+                cursorColor = Color.White,
+                focusedLabelColor = Color.White,
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White,
+                unfocusedLabelColor = Color.White
+            )
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -72,7 +94,16 @@ fun RegisterScreen(viewModel: RegisterViewModel, navController: NavHostControlle
             label = { Text(stringResource(id = R.string.repeat_password)) },
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                focusedBorderColor = Color.White,
+                unfocusedBorderColor = MaterialTheme.colorScheme.primary,
+                cursorColor = Color.White,
+                focusedLabelColor = Color.White,
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White,
+                unfocusedLabelColor = Color.White
+            )
         )
 
         Spacer(modifier = Modifier.height(16.dp))

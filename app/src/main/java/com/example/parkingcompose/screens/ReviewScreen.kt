@@ -27,6 +27,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -165,12 +167,16 @@ fun ListReviewScreen(
                     filteredReviews.groupBy { it.user_email }.forEach { (user, userReviews) ->
 
                         items(userReviews) { review ->
-                            Box(
+                            Card(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(vertical = 4.dp)
-                                    .border(1.dp, Color.Black)
-                                    .background(OrangeLight)
+                                    .padding(vertical = 4.dp),
+
+                                colors = CardColors(
+                                    containerColor = MaterialTheme.colorScheme.primary,
+                                    contentColor = Color.White,
+                                    disabledContainerColor = Color.Unspecified,
+                                    disabledContentColor = Color.Unspecified)
                             ) {
                                 ReviewItem(review, viewModel = viewModel)
                             }
@@ -195,11 +201,7 @@ fun ReviewItem(
     Column(
         modifier = Modifier.padding(16.dp)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically // Alinea los textos verticalmente al centro
-        ) {
+
             Text(text = "Title: ", fontWeight = FontWeight.Bold, color = Color.Black)
             Text(text = review.title ?: "", color = Color.Black)
             Spacer(modifier = Modifier.width(8.dp))
@@ -208,7 +210,7 @@ fun ReviewItem(
             Spacer(modifier = Modifier.width(8.dp))
             Text(text = "Comment: ", fontWeight = FontWeight.Bold, color = Color.Black)
             Text(text = review.comment ?: "", color = Color.Black)
-        }
+
 
         Spacer(modifier = Modifier.height(4.dp))
 

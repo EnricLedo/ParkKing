@@ -80,4 +80,20 @@ class ParkingDAO() {
             document.reference.update("createdBy", newUsername).await()
         }
     }
+
+    suspend fun removeTagFromParkings(tagTitle: String) {
+        val parkingsSnapshot = db.collection("parkings")
+            .whereArrayContains("tags", tagTitle)
+            .get()
+            .await()
+
+        for (parkingDocument in parkingsSnapshot.documents) {
+            val parking = parkingDocument.toObject(Parking::class.java)
+            if (parking != null) {
+                // Eliminar el tag de la lista de tags del parking
+                val updatedTags = parking.tags.filter { it != tagTitle }
+                parkingDocument.reference.update("tags", updatedTags).await()
+            }
+        }
+    }
 }
