@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -37,6 +38,7 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
+import com.example.parkingcompose.R
 import com.example.parkingcompose.dao.TagDAO
 import com.example.parkingcompose.model.Parking
 import com.example.parkingcompose.model.Tag
@@ -72,7 +74,7 @@ fun ModerateScreen(moderateViewModel: ModerateViewModel = viewModel(), createPar
     ) {
         Column(modifier = Modifier.padding(6.dp, 12.dp,6.dp, 68.dp )) {
             if (errorState.value != null) {
-                Text("Error: ${errorState.value}")
+                Text("${stringResource(id = R.string.error)} ${errorState.value}")
             }
 
             LazyColumn(
@@ -194,7 +196,7 @@ fun ParkingModerateItem(
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
                     border = BorderStroke(1.dp, Color.Black)
                 ) {
-                    Icon(Icons.Default.Delete, contentDescription = "Delete", tint = Color.Black)
+                    Icon(Icons.Default.Delete, contentDescription = stringResource(id = R.string.delete), tint = Color.Black)
 
                 }
 
@@ -206,7 +208,7 @@ fun ParkingModerateItem(
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Green),
                     border = BorderStroke(1.dp, Color.Black)
                 ) {
-                    Icon(Icons.Default.Check, contentDescription = "Enable", tint = Color.Black)
+                    Icon(Icons.Default.Check, contentDescription = stringResource(id = R.string.enable), tint = Color.Black)
                 }
             }
         }

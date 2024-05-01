@@ -37,6 +37,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.example.parkingcompose.navegacion.BottomNavigationBar
 import com.example.parkingcompose.viewmodels.CreateParkingViewModel
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.parkingcompose.viewmodels.ModerateViewModel
 
@@ -131,7 +132,7 @@ fun MapScreen(
                         Marker(
                             state = markerState,
                             title = parking.name,
-                            snippet = "Price: ${parking.priceMinute} €/min",
+                            snippet = "${stringResource(id = R.string.price)} ${parking.priceMinute} €/min",
                             onInfoWindowClick = {
                                 navController.navigate("parkingDetailsScreen/${parking.id}")
                             }
@@ -155,7 +156,7 @@ fun MapScreen(
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_my_location),
-                        contentDescription = "Icono de ubicación",
+                        contentDescription = stringResource(id = R.string.icon_de_ubicacion),
                     )
                 }
             }

@@ -89,4 +89,37 @@
     <string name="buscar_por_puntuaci_n">Search by score</string>
     <string name="ordenar_de_mayor_a_menor">Sort from highest to lowest</string>
     <string name="ordenar_de_menor_a_mayor">Sort from lowest to highest</string>
+    <string name="enter_price">Please enter a price -> OnAddParking Method</string>
+    <string name="parking_created">Parking created. It will be published once moderated</string>
+    <string name="cselect_location">Please select a location -> OnAddParking Method</string>
+    <string name="upload_failed">Failed to upload image -> OnAddParking Method</string>
+    <string name="error_adding_parking">Error adding parking -> addParking Method</string>
+    <string name="parking_added_with_id">Parking added with ID: </string>
+    <string name="error_adding">Error adding parking</string>
+    <string name="parking_id_added_to_tag">Parking ID successfully added to tag: </string>
+    <string name="error_finding_tag_with_title">Error finding tag with title: </string>
+    <string name="filter_by_distance">Filter by distance</string>
+    <string name="select_max_distance">Select the maximum distance</string>
+    <string name="distance_km">Distance:</string>
+    <string name="apply">Apply</string>
+    <string name="sort_by_best_rating">Sort by best rating</string>
+    <string name="sort_by_worst_rating">Sort by worst rating</string>
+    <string name="sort_by_creation_date">Sort by creation date</string>
+    <string name="select_tags">Select tags</string>
+    <string name="filter_rating">Rating filter</string>
+    <string name="update">Update</string>
+    <string name="delete">Delete</string>
+    <string name="icon_de_ubicacion">Location icon</string>
+    <string name="star_icon">Star icono</string>
+    <string name="select_tags_change">Selected tags changed:</string>
+    <string name="start">Stars</string>
+    <string name="information">See more or less information about a parking</string>
+    <string name="tags">Tags</string>
+    <string name="actualizar_revision">Update review</string>
+    <string name="no_encontrar_tag">No Tags Found</string>
+    <string name="error_select_image_or_location">Please select an image or location.</string>
+    <string name="price">Price: </string>
+    <string name="enable">Enable :</string>
+    <string name="loading">Loading....</string>
+
 </resources>

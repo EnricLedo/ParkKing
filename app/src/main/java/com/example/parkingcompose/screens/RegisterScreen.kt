@@ -1,5 +1,6 @@
 package com.example.parkingcompose.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,6 +15,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,6 +36,15 @@ import com.example.parkingcompose.viewmodels.RegisterViewModel
 fun RegisterScreen(viewModel: RegisterViewModel, navController: NavHostController, googleAuthUiClient: GoogleAuthUiClient) {
     val localContext = LocalContext.current // Capturamos el contexto local
 
+    LaunchedEffect(viewModel.errorMessage.value) {
+        if (viewModel.errorMessage.value == "User successfully registered.") {
+            navController.navigate("mapa")
+        } else if (viewModel.errorMessage.value.isNotEmpty()) {
+            // Mostrar un Toast con el mensaje de error, si se desea
+            Toast.makeText(localContext, viewModel.errorMessage.value, Toast.LENGTH_LONG).show()
+        }
+    }
+    
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -108,13 +119,22 @@ fun RegisterScreen(viewModel: RegisterViewModel, navController: NavHostControlle
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        if (viewModel.errorMessage.value.isNotEmpty()) {
+            Text(text = viewModel.errorMessage.value, color = Color.Red)
+        }
+
         Button(
-            onClick = { viewModel.registerUser()
-                navController.navigate("mapa")},
+            onClick = {
+                viewModel.registerUser()
+                if (viewModel.errorMessage.value.isEmpty()) {
+                    navController.navigate("mapa")
+                }
+            },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(stringResource(id = R.string.register))
         }
+
 
         Spacer(modifier = Modifier.height(16.dp))
 
