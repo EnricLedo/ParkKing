@@ -1,6 +1,6 @@
 :copyleft:
 
-:author: Enric Ledo, Adrián Ramírez, Raúl Fernández y Yassine Allahuagbar
+:author: Enric Ledo
 :revdate: 11/04/2024
 :revnumber: 1.0
 :doctype: book
@@ -14,27 +14,11 @@
 :sectnums:
 = Parking Compose
 
-== Introduction
+== About
 
-The application enables users to access information regarding parking spots, including the reservation of spaces, their features, and other pertinent details such as user reviews.
+This app was born from the idea that you can only search for parking on Google Maps, but not every area to park is actually a designated parking space, so finding these areas is impossible on the internet. Using the app is simple: you can either upload a parking zone or browse for parking near you. You can upload both parking zones and legitimate parking businesses. You can add different tags to the parking spaces, such as whether it is covered, free, or if it can charge electric vehicles. Additionally, users can comment on and rate various aspects of the parking.
 
-== Release Notes
+This app comes in handy when you travel frequently and you’re in search of reliable, free parking spots.
 
-=== First Sprint
-=== Second Sprint
-=== Third Sprint
-=== Forth Sprint
 
-· Modify the parking list to show information more clearly.
 
-· Clean architecture: Divide files into MVVM.
-
-· Modify items visually using the palette colors.
-
-· Sign in with google and creating a user from it.
-
-· App theme: setting a global app theme.
-
-· Add tags to data database. With this parking will have certain attributes.
-
-· Show items rating, showing the overall stars rating from that parking.
